@@ -2,6 +2,8 @@
 #define MYTHREAD_H
 #include <QThread>
 
+
+// used to create a delay
 class mythread:public QThread
 {
     public:
