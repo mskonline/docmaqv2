@@ -5,12 +5,13 @@
 
 
 class QSettings;
-class QDialog;
+class QDialog ;
 
 class AuthenDialog:public QDialog,public Ui::AuthenDialog
 
 {
     Q_OBJECT
+
 
 public:
 
