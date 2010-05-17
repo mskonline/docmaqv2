@@ -35,8 +35,8 @@ void AppManager::load_init_modules()
 {
     // Load Settings, Auth, DB
     cdb = new CDatabase();
-    //ad=new AuthenDialog();
-    //ad->show();
+    ad=new AuthenDialog();
+    ad->show();
 
     log= new logs(new QTextEdit);
     settings=new GetSettings();
@@ -45,9 +45,9 @@ void AppManager::load_init_modules()
     else
         qDebug() << "Connected to Database" ;
 
-    load_final_modules();
-    //connect(ad,SIGNAL(isAdmin(QString)),cdb,SLOT(get_user_password(QString)));
-    //connect(ad,SIGNAL(userAuthenticated()),this,SLOT(load_final_modules()));
+    //load_final_modules();
+    connect(ad,SIGNAL(isAdmin(QString)),cdb,SLOT(get_user_password(QString)));
+    connect(ad,SIGNAL(userAuthenticated()),this,SLOT(load_final_modules()));
     connect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
 }
 
@@ -87,9 +87,6 @@ void AppManager::load_final_modules()
     // Native
     connect(bg,SIGNAL(buttonClicked(int)),this,SLOT(updatetype(int)));
     //connect(interface->print,SIGNAL(pressed()),this,SLOT(print()));
-    //
-
-    interface->showMaximized();
 }
 
 void AppManager::onRollEntry()

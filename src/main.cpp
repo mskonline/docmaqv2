@@ -7,10 +7,9 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     AppManager *app = new AppManager();
-//    myThread::delay(2);
+   //myThread::delay(2);
 
-    // Load DB , Settings Module Authentication Manager
-    app->load_final_modules();
+
 
 
 

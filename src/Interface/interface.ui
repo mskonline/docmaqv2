@@ -679,7 +679,7 @@ The tear indicator and the scroll buttons can be further customized as follows:
   <customwidget>
    <class>BulkTable</class>
    <extends>QTableWidget</extends>
-   <header>../btable/bulktable.h</header>
+   <header location="global">../Interface/btable/bulktable.h</header>
   </customwidget>
   <customwidget>
    <class>RollLineEdit</class>
