@@ -211,7 +211,7 @@ void AppManager::itemchanged(int id, const QString &data)
     }
 }
 
-// cell clicked
+// bulktable cell clicked
 void AppManager::btableclicked(int row,int col)
 {
     //interface->vpic = 0;
