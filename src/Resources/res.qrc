@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/images">
+    <qresource>
         <file>images/authpic.png</file>
         <file>images/cc.png</file>
         <file>images/checkbox_checked.png</file>
