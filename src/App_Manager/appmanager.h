@@ -35,7 +35,6 @@ void init_print(int);
 void manualProcess();
 void previewLastRoll();
 void update_counts(int,int);
-void test(QString);
 ~AppManager();
 
 private :

@@ -102,7 +102,6 @@ bool CDatabase::fetch_ex(Student *student)
 
     if(fetch(student))
     {
-        qDebug() << "std_ex allocated";
         student->std_ex = new Student_ex;
         QString c,q;
 

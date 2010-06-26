@@ -241,7 +241,6 @@ void AppManager::itemchanged(int id, const QString &data)
         interface->rarrow->setAcceptHoverEvents(false);
         et += id;
         p_lock -= 1;
-        qDebug() << "et : " << et;
         return;
     }
 
@@ -285,8 +284,6 @@ void AppManager::itemchanged(int id, const QString &data)
     }
 
     et += id;
-
-    qDebug() << "et after : " << et;
     p_lock += 1;
 
     if(et == 0)
@@ -369,8 +366,6 @@ void AppManager::updatetype(int i)
 
 
         interface->set_ct(student);
-
-        test("type changed");
     }
     else
     {
@@ -432,11 +427,9 @@ void AppManager::removeSt(int i)
     {
         if(st_plist->at(i)->c_type[j])
         {
-            qDebug() << "yes";
             for(k = i + 1; k < st_plist->count() ; ++k)
             {
                 st_plist->at(k)->c_sno[j] -= 1;
-                qDebug() << "d";
             }
         }
     }
@@ -444,9 +437,6 @@ void AppManager::removeSt(int i)
     // Release the memory & clean up the entry
     delete this->st_plist->at(i);
     this->st_plist->removeAt(i);
-
-    test("cell delete :");
-    qDebug() << st_plist->count();
 }
 
 /* rollfocus()
@@ -472,12 +462,6 @@ void AppManager::rollfocus()
     }
 
    interface->resetView(i);
-}
-
-void AppManager::test(QString msg)
-{
-    qDebug() << msg;
-    qDebug() << "c_c" <<c_count.at(0) << c_count.at(1);
 }
 
 /* Right & Left Navigation works only when
