@@ -3,25 +3,33 @@
 
 #include <QtGui>
 
-class CertificateScene;
+class CredentialScene;
 
 class DateItem : public QGraphicsTextItem
 {
     Q_OBJECT
+
+public:
+    DateItem(CredentialScene *,QGraphicsItem *parent,int);
+    void constructWidgets();
+    void itemName(QString);
+    void setText(QString);
+
 private:
+    CredentialScene *scene;
     QWidget *Form;
-    CertificateScene *scene;
+    QString iname;
     QGraphicsProxyWidget *proxy;
     QDateEdit *de;
-    int id;
     QPushButton *okButton;
-public:
-    DateItem(CertificateScene *,int);
-    void constructWidgets();
+    int id;
+
+signals :
+    void itemchanged(int,const QString &);
+
 public slots:
     void done();
-signals :
-    void changed(int,QString);
+
 protected:
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
     {

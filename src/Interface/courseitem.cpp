@@ -1,15 +1,16 @@
 #include "courseitem.h"
-#include "certificatescene.h"
+#include "credentialscene.h"
 
-CourseItem::CourseItem(CertificateScene *scene, int id)
+CourseItem::CourseItem(CredentialScene *scene, int id)
 {
     this->scene = scene;
-    this->setPlainText("STUDENT COURSE DETAILS");
     this->id = id;
 }
 
 void CourseItem::constructWidgets()
 {
+    // Report an item being changed
+    emit itemchanged(-id,"");
 
     Form = new QWidget;
     Form->resize(450, 42);
@@ -76,6 +77,14 @@ void CourseItem::constructWidgets()
        proxy->setPos(this->pos());
 }
 
+void CourseItem::setText(QString t)
+{
+    if(t.isEmpty())
+        this->setPlainText("STUDENT COURSE DETAILS");
+    else
+        this->setPlainText(t);
+}
+
 void CourseItem::done()
 {
     QString t = cbcourse->currentText() + " - " + cbbranch->currentText() + " , " + cbyear->currentText() +
@@ -83,5 +92,5 @@ void CourseItem::done()
 
     this->setPlainText(t);
     scene->removeItem(proxy);
-    emit changed(id,t);
+    emit itemchanged(id,t);
 }

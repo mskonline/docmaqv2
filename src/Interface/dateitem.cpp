@@ -1,15 +1,29 @@
 #include "dateitem.h"
+#include "credentialscene.h"
 
-#include "certificatescene.h"
-
-DateItem::DateItem(CertificateScene *scene,int id)
+DateItem::DateItem(CredentialScene *scene,QGraphicsItem *parent,int id):QGraphicsTextItem(parent)
 {
     this->scene = scene;
     this->id  = id;
 }
+void DateItem::itemName(QString name)
+{
+    this->iname = name;
+}
+
+void DateItem::setText(QString t)
+{
+    if(t.isEmpty())
+        this->setPlainText(iname);
+    else
+        this->setPlainText(t);
+}
 
 void DateItem::constructWidgets()
 {
+    // Report an item being changed
+    emit itemchanged(-id,"");
+
     Form = new QWidget;
     Form->resize(170,40);
     Form->setWindowOpacity(0.75);
@@ -38,5 +52,5 @@ void DateItem::done()
 	this->setPlainText(t);
 
         scene->removeItem(proxy);
-        emit changed(id,t);
+        emit itemchanged(id,t);
 }

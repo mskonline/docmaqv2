@@ -3,24 +3,30 @@
 
 #include <QtGui>
 
-class CertificateScene;
+class CredentialScene;
 class Student;
+
 class CourseItem : public QGraphicsTextItem
 {
 Q_OBJECT
 public:
-    CertificateScene *scene;
+    CredentialScene *scene;
     QWidget *Form;
     QGraphicsProxyWidget *proxy;
-    CourseItem(CertificateScene *, int);
-    int id;
     QComboBox *cbsem,*cbyear,*cbbranch,*cbcourse;
     QPushButton *okButton;
+    int id;
+
+    CourseItem(CredentialScene *, int);
     void constructWidgets();
+    void setText(QString);
+
 public slots:
     void done();
+
 signals:
-    void changed(int,QString);
+    void itemchanged(int,QString);
+
 protected:
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
     {

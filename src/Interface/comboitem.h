@@ -3,31 +3,36 @@
 
 #include <QtGui>
 
-class CertificateScene;
+class CredentialScene;
 
 class ComboItem : public QGraphicsTextItem
 {
     Q_OBJECT
+
+public:
+    int id;
+
+    ComboItem(CredentialScene *,QGraphicsItem *parent,int ,int,QStringList);
+    void setText(QString);
+    void constructWidgets();
+    void itemName(QString);
+
 private:
+       CredentialScene *scene;
        QWidget *Form;
-       CertificateScene *scene;
        QGraphicsProxyWidget *proxy;
        QComboBox *cb;
-       int widgetWidth,comboWidth;
        QString iname;
        QPushButton *okButton;
        QStringList list;
-public:
-    int id;
-    ComboItem(CertificateScene *,int ,int,QStringList);
-    void toManual();
-    void toDB();
-    void constructWidgets();
-    void itemName(QString);
-//signals:
-  //  changed(int id,QVariant data);
+       int widgetWidth,comboWidth;
+
+signals:
+    void itemchanged(int , const QString &);
+
 public slots:
     void done();
+
 protected:
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
     {

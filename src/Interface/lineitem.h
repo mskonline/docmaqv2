@@ -3,29 +3,35 @@
 
 #include <QtGui>
 
-class CertificateScene;
+class CredentialScene;
 
 class LineItem :public QGraphicsTextItem
 {
     Q_OBJECT
-private:
-    QWidget *Form;
-    CertificateScene *scene;
-    QGraphicsProxyWidget *proxy;
-    QString iname;
-    int widgetWidth, lineWidth;
-    QLineEdit *le;
+
 public:
     int id;
-    LineItem(CertificateScene *,int ,int);
-    void toManual();
-    void toDB();
+
+    LineItem(CredentialScene *, int ,int , QGraphicsItem *parent = 0);
+    void setText(QString);
+    void reset();
     void itemName(QString);
     void constructWidgets();
+
+private:
+    CredentialScene *scene;
+    QWidget *Form;
+    QGraphicsProxyWidget *proxy;
+    QString iname;
+    QLineEdit *le;
+    int widgetWidth, lineWidth;
+
 signals:
     void itemchanged(int ,const QString &);
+
 public slots:
     void done();
+
 protected:
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
     {

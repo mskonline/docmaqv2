@@ -12,24 +12,37 @@ public:
     }
 };
 
-
-class blinkpix :public QObject, public QGraphicsPixmapItem
+class ButtonItem :public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
-
-    QPropertyAnimation *anim;
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
-
 public :
+ButtonItem(const QPixmap &pic) : QGraphicsPixmapItem(pic)
+{}
 
-    blinkpix(const QPixmap &pix) : QGraphicsPixmapItem(pix)
-    {
-        anim = new QPropertyAnimation(this,"opacity");
-        anim->setEasingCurve(QEasingCurve::Linear);
-        anim->setStartValue(0.25);
-        anim->setEndValue(1.0);
-        anim->setDuration(1000);
-    }
+signals:
+void pressed();
+
+protected:
+void hoverMoveEvent ( QGraphicsSceneHoverEvent *event )
+{
+    setCursor(Qt::PointingHandCursor);
+}
+void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    setCursor(Qt::ArrowCursor);
+}
+void mousePressEvent ( QGraphicsSceneMouseEvent *event )
+{
+    emit pressed();
+}
+};
+
+class ArrowItem :public QObject, public QGraphicsPixmapItem
+{
+    Q_OBJECT
+public :
+    ArrowItem(const QPixmap &pic) : QGraphicsPixmapItem(pic)
+    {}
 
 signals:
     void pressed();
@@ -37,13 +50,12 @@ signals:
 protected:
     void hoverMoveEvent ( QGraphicsSceneHoverEvent *event )
     {
-        anim->setLoopCount(-1);
-        anim->start();
+        setCursor(Qt::PointingHandCursor);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     {
-        anim->setLoopCount(1);
+        setCursor(Qt::ArrowCursor);
     }
 
     void mousePressEvent ( QGraphicsSceneMouseEvent *event )

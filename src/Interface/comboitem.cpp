@@ -1,7 +1,7 @@
 #include "comboitem.h"
-#include "certificatescene.h"
+#include "credentialscene.h"
 
-ComboItem::ComboItem(CertificateScene *scene,int widgetWidth,int comboWidth,QStringList list)
+ComboItem::ComboItem(CredentialScene *scene,QGraphicsItem *parent,int widgetWidth,int comboWidth,QStringList list):QGraphicsTextItem(parent)
 {
     this->scene = scene;
     this->widgetWidth = widgetWidth;
@@ -11,21 +11,22 @@ ComboItem::ComboItem(CertificateScene *scene,int widgetWidth,int comboWidth,QStr
 
 void ComboItem::itemName(QString name)
 {
-    this->iname = name.toUpper();
+    this->iname = name;
 }
 
-void ComboItem::toManual()
+void ComboItem::setText(QString t)
 {
-    this->setPlainText(iname);
-}
-
-void ComboItem::toDB()
-{
-
+    if(t.isEmpty())
+        this->setPlainText(iname);
+    else
+        this->setPlainText(t);
 }
 
 void ComboItem::constructWidgets()
 {
+    // Report an item being changed
+    emit itemchanged(-id,"");
+
     Form = new QWidget;
     Form->resize(widgetWidth,40);
     Form->setWindowOpacity(0.75);
@@ -47,14 +48,7 @@ void ComboItem::constructWidgets()
 
 void ComboItem::done()
 {
-    if(!cb->currentIndex())
-    {
-        this->setPlainText(iname);
-//        emit changed(id,"");
-    }
-    else
-    {
-        this->setPlainText(cb->currentText());
-//        emit changed(id,cb->currentText());
-    }
+    this->setPlainText(cb->currentText());
+    scene->removeItem(proxy);
+    emit itemchanged(id,cb->currentText());
 }
