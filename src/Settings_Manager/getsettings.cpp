@@ -1,49 +1,50 @@
 #include "getsettings.h"
-#include "settings.h"
+#include "Settings.h"
 #include <QList>
 #include <QStringList>
 #include <QSettings>
-#include <QtAlgorithms>
+#include <QMessageBox>
+#include <QProcess>
 #include <QDebug>
 
 
 GetSettings::GetSettings()
 {
     settings=new QSettings(QSettings::SystemScope,"Qogency","DocmaQ");
-
+    createSettingsInterface(0);
 }
 
 
-QString GetSettings::decideType(short type)
+void GetSettings::setType(const short& type)
 {
-    QString str1;
+
     switch (type)
     {
     case BONAFIDE:
-        str1="bonafide";
+        cert="Bonafide";
         break;
     case CONDUCT :
-        str1="conduct";
+        cert="Conduct";
         break;
     case TC      :
-        str1="tc";
+        cert="TC";
         break;
     }
-    return str1;
+
 }
 
-QStringList GetSettings::getChildGroups(short type)
+void GetSettings::getFieldGroups(QStringList &fieldkeys)
 {
-    QString cert1=decideType(type);
-    settings->beginGroup("certificate/"+cert1+"/fields");
 
-    QStringList fieldkeys=settings->childGroups();
-    qDebug()<<fieldkeys;
+    settings->beginGroup("certificate/"+cert+"/fields");
+
+    fieldkeys=settings->childGroups();
+
     settings->endGroup();
-    return fieldkeys;
+
 }
 
-QStringList GetSettings::getDatabaseDetails()
+void GetSettings::getDatabaseDetails(QStringList &databaseDetails)
 {
     settings->beginGroup("Database");
     databaseDetails<<settings->value("databasename").toString();
@@ -52,148 +53,117 @@ QStringList GetSettings::getDatabaseDetails()
     databaseDetails<<settings->value("username").toString();
     databaseDetails<<settings->value("password").toString();
     settings->endGroup();
-    return databaseDetails;
 }
-
-QList <int> GetSettings::getCount(short type)
-{
-    QString str1=decideType(type);
-    QList <int> count;
-
-    settings->beginGroup("certificate/"+str1+"/count");
-    QStringList list=settings->childKeys();
-
-    short size=list.size();
-    for(short i=0;i<size;i++)
-    {
-        count<<settings->value(list.at(i),0000).toInt();
-
-    }
-    settings->endGroup();
-    return count;
-
-}
-
-QStringList GetSettings::getLastSnoRollNo(short type)
-{
-    QString str1=decideType(type);
-    QStringList snorollno;
-
-    settings->beginGroup("certificate/"+str1+"/");
-    QStringList list;
-    list<<"serialno"<<"lastrollno";
-
-    short size=list.size();
-
-    for(short i=0;i<size;i++)
-    {
-        snorollno<<settings->value(list.at(i),0000).toString();
-
-    }
-    settings->endGroup();
-
-    return snorollno;
-}
-
 
 //for every print this is called
-void GetSettings::setLastSnoRollNo(short serialno ,QString rollno,short type)
+void GetSettings::setCountSno()
 {
-    QString str1=decideType(type);
-    QStringList snorollno;
-    snorollno<<QString().setNum(serialno)<<rollno;
+    QString str;
+    settings->beginGroup("certificate");
 
-    settings->beginGroup("certificate/"+str1+"/");
-    QStringList list;
-    list<<"serialno"<<"lastrollno";
+    settings->value("sessiontotal",str.setNum(settings->value("sessiontotal").toInt()+1));
+    settings->value("total",str.setNum(settings->value("total").toInt()+1));
+    settings->value(cert+"count/total",str.setNum(settings->value(cert+"count/total").toInt()+1));
+    settings->value(cert+"/serialno",str.setNum(settings->value(cert+"/serialno").toInt()+1));
+    settings->value(cert+"count/sessiontotal",str.setNum(settings->value(cert+"count/sessiontotal").toInt()+1));
+    settings->endGroup();
 
-    short size=snorollno.size();
+}
 
-    for(short i=0;i<size;i++)
+void GetSettings::getSessionInfo(QStringList &info)
+{
+    //current session info
+    info<<settings->value("log/currentsession/username").toString();
+    info<<settings->value("log/currentsession/logintime").toString();
+
+    info<<settings->value("certificate/sessiontotal").toString();
+    QStringList cert1;
+    cert1<<"bonafide"<<"conduct"<<"tc";
+    for(int i=0;i<3;i++)
     {
-        settings->setValue(list.at(i),snorollno.at(i));
-
+        settings->beginGroup("certificate/"+cert1[i]);
+        info<<settings->value("count/sessiontotal",0000).toString();
+        info<<settings->value("previousrollno",0000).toString();
+        settings->endGroup();
     }
-
-    settings-> endGroup();
-    settings->sync();
+    info<<settings->value("log/previoussession/username").toString();
+    info<<settings->value("log/previoussession/logintime").toString();
+    info<<settings->value("log/previoussession/logouttime").toString();
 }
 
-QList<int> GetSettings::getAcademicYear()
+
+//this will called for each cert type.type is set in log class(writeCertificateLog) and will be available here as cert
+void GetSettings::getSno(QString& sno)
 {
-    QList<int> academicyear;
-    academicyear<<settings->value("general/from").toInt();
-    academicyear<<settings->value("general/to").toInt();
-    return academicyear;
+    sno=settings->value("certificate/"+cert+"/serialno").toString();
 }
 
-QList<int> GetSettings::getPrintPositions(short type)
-{
-    QList<int> pos,pos1,pos2;
 
-    QStringList fieldkeys=getChildGroups(type);
+void GetSettings::getDateAcademicYear(QList<int>& academicyear)
+{
+
+    academicyear<<settings->value("certificate/from").toInt();
+    academicyear<<settings->value("certificate/to").toInt();
+}
+
+
+void GetSettings::getPrintPositions(QList<int>& pos,short type)
+{
+
+    QStringList fieldkeys;
+
+    setType(type);
+
+    getFieldGroups(fieldkeys);
 
     short size=fieldkeys.size();
 
+    settings->beginGroup("certificate/"+cert+"/fields");
+
     for(short i=0;i<size;i++)
     {
-        pos1<<settings->value(fieldkeys.at(i)+"/id").toInt();
-        pos2<<settings->value(fieldkeys.at(i)+"/x").toInt();
-        pos2<<settings->value(fieldkeys.at(i)+"/y").toInt();
+        pos<<settings->value(fieldkeys.at(i)+"/x").toInt();
+        pos<<settings->value(fieldkeys.at(i)+"/y").toInt();
     }
-    for(int i=0;i<size;i++)
-    {
-        int index=pos1.indexOf(i);
-        pos<<pos2.at(2*index);
-        pos<<pos2.at(2*index+1);
-    }
+
     settings->endGroup();
-    return pos;
-}
 
-QList<int> GetSettings::getOrder()
-{
-    QList<int> order;
-    settings->beginGroup("certificate");
-    order<<settings->value("bonafide/order").toInt();
-    order<<settings->value("conduct/order").toInt();
-    order<<settings->value("tc/order").toInt();
-    settings->endGroup();
-    return order;
 }
 
 
-
-QStringList GetSettings::getPrinters()
-{
-    QStringList list;
-    //to be done
-
-    return list;
-}
-
-QString GetSettings::getDefaultPrinter()
+QString  GetSettings::getDefaultPrinter()
 {
     return settings->value("general/defaultprinter").toString();
 }
 
-bool GetSettings::isFullScreen()
+void  GetSettings::createSettingsInterface(int id)
 {
-    if(settings->value("general/fullscreen").toString()=="true")
-        return true;
-    return false;
+    // Settings *st = new Settings(settings,,id);
 
 }
 
-short GetSettings::getTheme()
+void GetSettings::error1()
 {
-    return settings->value("general/theme").toInt();
+    if (settings->status()!= QSettings::NoError)
+        QMessageBox::critical(0,tr("Settings Manager"),tr("Error occured during fetching the settings.\n\nPlease try again."));
+    else  if(QMessageBox::RestoreDefaults==QMessageBox::critical(0,tr("Settings Manager"),tr("\
+                                                                                             Error occured during fetching the settings.\n\n\
+                                                                                             You can do one of the following\n\n\
+                                                                                             1.Press Cancel and Retry  (or)\n\
+                                                                                             2.Restore to Initial settings.\n\n\
+                                                                                             CAUTION:\n\n\
+                                                                                                 Before Restoring to Defaults it is MANDATORY to\n\
+                                                                                                 Export the settings to save critical settings\n\
+                                                                                                 and Import them after restore."),QMessageBox::RestoreDefaults|QMessageBox::Default,
+                                                                 QMessageBox::Cancel,QMessageBox::NoButton))
+    {
+
+        QProcess *myProcess = new QProcess(this);
+        myProcess->start("./DocmaQ Initializer.exe",NULL);
+
+    }
 }
 
-
-void  GetSettings::createSettingsInterface()
+GetSettings::~GetSettings()
 {
-
-    Settings *st = new Settings(settings,this);
-
 }

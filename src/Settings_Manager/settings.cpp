@@ -2,170 +2,190 @@
 #include "getsettings.h"
 
 #include <QDebug>
+#include <QProgressDialog>
 #include <QCryptographicHash>
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QMessageBox>
 #include <QProcess>
+#include <QPrinterInfo>
 #include <QCloseEvent>
-#include <QItemSelectionModel>
 
-Settings::Settings(QSettings *settings,GetSettings* getSettings,QWidget *parent)
-    : QWidget(parent)
+Settings::Settings(QSettings *settings,GetSettings* getSettings,int id,QWidget *parent)
+    : QWidget(parent,Qt::WindowCloseButtonHint)
 {
 
     //gets limited settings for interface fill up
     this->getSettings=getSettings;
+    
     this->settings = settings;
-
+    
     setupUi(this);
     show();
-
     connect(adminPasswordLE,SIGNAL(returnPressed()),this,SLOT(adminAuthentication()));
-
-    //  setWindowFlags(Qt::FramelessWindowHint);
-
 
     //connecting signals
     connect(stackedWidget,SIGNAL(currentChanged(int)),this,SLOT(selectFunction(int)));
-
+    
+    //print page
+    connect(bonafideRB1,SIGNAL(clicked()),this,SLOT(decideCert1()));
+    connect(conductRB1,SIGNAL(clicked()),this,SLOT(decideCert1()));
+    connect(tcRB1,SIGNAL(clicked()),this,SLOT(decideCert1()));
+    
+    connect(fieldCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(setXY(int)));
+    connect(xSB,SIGNAL(editingFinished()),this,SLOT(savePrintPositions()));
+    connect(ySB,SIGNAL(editingFinished()),this,SLOT(savePrintPositions()));
+    
     //database page
-
+    
     connect(databasenameLE,SIGNAL(textChanged(const QString &)),this,SLOT(databaseSettingsChanged(const QString &)));
     connect(hostnameLE,SIGNAL(textChanged(const QString &)),this,SLOT(databaseSettingsChanged(const QString &)));
     connect(portLE,SIGNAL(textChanged(const QString &)),this,SLOT(databaseSettingsChanged(const QString &)));
     connect(usernameLE,SIGNAL(textChanged(const QString &)),this,SLOT(databaseSettingsChanged(const QString &)));
     connect(passwordLE,SIGNAL(textChanged(const QString &)),this,SLOT(databaseSettingsChanged(const QString &)));
-
+    
     connect(databasenameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableUndoReconnectButtons()));
     connect(portLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableUndoReconnectButtons()));
     connect(hostnameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableUndoReconnectButtons()));
     connect(usernameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableUndoReconnectButtons()));
     connect(passwordLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableUndoReconnectButtons()));
-
+    
     connect(undoButton,SIGNAL(clicked()),this,SLOT(undoDatabaseSettings()));
     //connect(reconnectButton,SIGNAL(clicked()),appmanager,SLOT(connect(databaseDetails)));
+    
+    //Log settings
 
-
-    //Account page
-
-
-
+    
     //Certificate page
 
-    connect(bonafideRB,SIGNAL(clicked()),this,SLOT(prepareCertificateSettings()));
-    connect(conductRB,SIGNAL(clicked()),this,SLOT(prepareCertificateSettings()));
-    connect(tcRB,SIGNAL(clicked()),this,SLOT(prepareCertificateSettings()));
+    connect(bonafideRB2,SIGNAL(clicked()),this,SLOT(decideCert2()));
+    connect(conductRB2,SIGNAL(clicked()),this,SLOT(decideCert2()));
 
     connect(serialSB,SIGNAL(editingFinished()),this,SLOT(saveCertificateSettings()));
     connect(dateEdit,SIGNAL(editingFinished()),this,SLOT(saveCertificateSettings()));
-
-
-
-    //print page
-
-    connect(bonafideRB2,SIGNAL(clicked()),this,SLOT(preparePrintSettings()));
-    connect(conductRB2,SIGNAL(clicked()),this,SLOT(preparePrintSettings()));
-    connect(tcRB2,SIGNAL(clicked()),this,SLOT(preparePrintSettings()));
-    connect(fieldCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(setXY(QString)));
-    connect(xSB,SIGNAL(editingFinished()),this,SLOT(savePrintPositions()));
-    connect(ySB,SIGNAL(editingFinished()),this,SLOT(savePrintPositions()));
-
-    //Log settings
-    connect(logDurationLE,SIGNAL(editingFinished()),this,SLOT(saveLogDuration()));
-
-    //General Settings
-    //connect(fullScreenCB,toggled(bool),appManager,SLOT(fullscreen()));
-    connect(fullScreenCB,SIGNAL(toggled(bool)),this,SLOT(saveFullscreen(bool)));
-    connect(themeCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(saveTheme(int)));
-    connect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(savePrinter(const QString)));
     connect(fromSB,SIGNAL(editingFinished()),this,SLOT(saveAcademicYear()));
     connect(toSB,SIGNAL(editingFinished()),this,SLOT(saveAcademicYear()));
-    qDebug()<<"wats";
-    listWidget->setCurrentRow(3,QItemSelectionModel::ToggleCurrent);
-//settings->value("general/laststackwidget",0).toInt()
+    
+    //General Settings
+    
+    connect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(savePrinter(const QString)));
+
+    connect(databaseRB,SIGNAL(clicked()),this,SLOT(saveMode()));
+    connect(manualRB,SIGNAL(clicked()),this,SLOT(saveMode()));
+
+    int laststackwidget=settings->value("general/laststackwidget",0).toInt();
+    listWidget->setCurrentRow(laststackwidget,QItemSelectionModel::ToggleCurrent);
+
+    selectFunction(laststackwidget);
+
 }
+
 void Settings::selectFunction(int id)
 {
-    qDebug()<<"gfhfghgfhfgh";
+
+    //flags ensure each functions to be called once
     switch(id)
     {
-    case 0:if(!flag[0])preparePrintSettings();
-    case 1:if(!flag[1])prepareDatabaseSettings();
-    case 2:if(!flag[2])prepareAccountSettings();
-    case 3:if(!flag[3])prepareLogSettings();
-    case 4:if(!flag[4])prepareCertificateSettings();
-    case 5:if(!flag[5])prepareGeneralSettings();
+    case 0:if(!flag[0])preparePrintSettings();break;
+    case 1:if(!flag[1])prepareDatabaseSettings();break;
+    case 2:if(!flag[2])prepareAccountSettings();break;
+    case 3:if(!flag[3])prepareLogSettings();break;
+    case 4:if(!flag[4])prepareCertificateSettings();break;
+    case 5:if(!flag[5])prepareGeneralSettings();break;
     }
 }
 
-
-void Settings::decideCert2( short &type)
-{
-
-    if(bonafideRB2->isChecked())
-        type=BONAFIDE;
-
-    else if(conductRB2->isChecked())
-        type=CONDUCT;
-    else
-        type=TC;
-
-}
 
 void Settings::preparePrintSettings()
 {
 
-    short type;
-
+    //this fuction is only called once
     flag[0]=true;
-    fieldCombo->clear();
+    
+    QList<int> pos;
+    
+    //Initializing type1 and cert1
+    type1=BONAFIDE;
+    cert1="bonafide";
+    
+    fields[0]<<"serial no"<<"date"<<"student's name"<<"care of"<<"fathers name"<<"roll number"
+            <<"course details"<<"from year"<<"to year"<<"purpose text"<<"purpose";
+    
+    fields[1]<<"serial no"<<"date"<<"student's name"<<"care of"<<"father's name"<<"roll number"
+            <<"course details"<<"academic year";
+    
+    fields[2]<<"Certificate type(original or duplicate)"<<"roll number"<<"admission number"<<"date"
+            <<"student's name"<<"father's name"<<"date of birth"<<"date of admission"<<"course"<<"branch"
+            <<"date of leaving"<<"qualified"<<"dues"<<"disciplinary measures"
+            <<"conduct"<<"community"<<"remarks";
+    
 
-    decideCert2(type);
-
-    QList<int> pos=getSettings->getPrintPositions(type);
-
-    short size=pos.size();
-
-    QStringList fieldkeys=getSettings->getChildGroups(type);
-
-    for(short i=0;i<size;i=i+3)
-    {          qDebug()<<"hello";
-        fieldCombo->insertItem(pos.at(i),fieldkeys.at(i));
-    }
-    settings->endGroup();
-
-    //for displaying first entry
-    setXY(fieldkeys.at(0));
-
-    if(type==BONAFIDE ||type==CONDUCT)
-        paperLabel->setText("A5 Sheet(Land Scape) DIMENSIONS: 210MM X 148MM");
-    else
-        paperLabel->setText("A4 Sheet(Land Scape) DIMENSIONS: 420MM X 296MM");
-    error();
+    insertFields();
+    
 }
 
-void Settings::setXY(QString text)
+
+void Settings::decideCert1( )
 {
-    f[0]=true;
-    settings->beginGroup("certificate/"+cert1+"/fields/"+text);
-    xSB->setValue(settings->value("x").toInt());
-    ySB->setValue(settings->value("y").toInt());
+    QString previous=cert1;
+    cert1=sender()->objectName();
+    cert1.chop(3);
+    
+    if(!(previous==cert1))
+    {
+        if(cert1=="bonafide")
+        {
+            type1=BONAFIDE;
+            paperLabel->setText("A5 Sheet(Land Scape) DIMENSIONS: 210MM X 148MM");
+        }
+        else if(cert1=="conduct")
+        {    type1=CONDUCT;
+            paperLabel->setText("A5 Sheet(Land Scape) DIMENSIONS: 210MM X 148MM");
+        }
+        else
+        {
+            type1=TC;
+            paperLabel->setText("A4 Sheet(Land Scape) DIMENSIONS: 420MM X 296MM");
+        }
+        insertFields();
+    }
+
+}
+
+
+void Settings::insertFields()
+{
+    disconnect(fieldCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(setXY(int)));
+
+    fieldCombo->clear();//to avoid append of insertion during revisit
+    fieldCombo->insertItems(0,fields[type1]);
+
+    connect(fieldCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(setXY(int)));
+
+    setXY(0);//setting first fields X,Y for view
+}
+
+void Settings::setXY(int index)
+{
+    index*=2;
+    settings->beginGroup("certificate/"+cert1+"/positions");
+
+    xSB->setValue(settings->value((QString().setNum(index))).toInt());
+    ySB->setValue(settings->value((QString().setNum(index+1))).toInt());
     settings->endGroup();
-    error();
+
 }
 
 
 void Settings::savePrintPositions()
 {
-    f[0]=true;
-    QString text= fieldCombo->currentText();
-    settings->beginGroup("certificate/"+cert1+"/fields/"+text);
-    settings->setValue("x",xSB->value());
-    settings->setValue("y",ySB->value());
+    f[0]=true;//to detect to generate signal to intimate change
+    settings->beginGroup("certificate/"+cert1+"/positions");
+    settings->setValue(QString().setNum(2*fieldCombo->currentIndex()),xSB->value());
+    settings->setValue(QString().setNum(2*fieldCombo->currentIndex()+1),ySB->value());
     settings->endGroup();
-    error();
+    settings->sync();
 }
 
 
@@ -173,13 +193,12 @@ void Settings::savePrintPositions()
 void Settings::prepareDatabaseSettings()
 {
     flag[1]=true;
-    qDebug()<<"prepareDatabaseSettings";
 
     //fetch Database Settings
 
-    databaseDetails=getSettings->getDatabaseDetails();
+    adminPasswordLE->setFocus();
 
-    error();
+
 }
 
 void Settings::adminAuthentication()
@@ -196,10 +215,19 @@ void Settings::adminAuthentication()
         logGB->setEnabled(true);
         //fill interface same as undo for first time
 
-        pLabel->clear();
-        pLabel2->clear();
-        undoDatabaseSettings();
-        fillLogSettings();
+        pLabel->hide();
+        pLabel2->hide();
+        pLabel3->hide();
+        picon->hide();
+
+        if(flag[1])
+        {
+            getSettings->getDatabaseDetails(databaseDetails);
+            undoDatabaseSettings();//same as fill for first time
+        }
+
+        if(flag[3])
+            fillLogSettings();
 
     }
     else
@@ -212,7 +240,6 @@ void Settings::adminAuthentication()
 
 void Settings::undoDatabaseSettings()
 {
-
     databasenameLE->setText(databaseDetails.at(0));
     hostnameLE->setText(databaseDetails.at(1));
     portLE->setText(databaseDetails.at(2));
@@ -221,7 +248,7 @@ void Settings::undoDatabaseSettings()
 
     undoButton->setEnabled(false);
     reconnectButton->setEnabled(false);
-    error();
+
 }
 
 
@@ -234,10 +261,10 @@ void Settings::enableUndoReconnectButtons()
 void Settings::prepareAccountSettings()
 {
     flag[2]=true;
-
+    adminPasswordLE->setFocus();
 }
 
-void Settings::on_newPasswordLE_editingFinished()
+void Settings::on_newPasswordLE_textEdited()
 {
     if (!newPasswordLE->text().isEmpty())
         changeButton->setEnabled(true);
@@ -274,33 +301,25 @@ void Settings::on_changeButton_clicked()
         confirmPasswordLE->clear();
         newPasswordLE->setFocus();
     }
-    error();
+
 }
 void Settings::prepareLogSettings()
 {
+    qDebug()<<"log";
     flag[3]=true;
+    adminPasswordLE->setFocus();
 }
 
 void Settings::fillLogSettings()
 {
-    settings->beginGroup("log");
-
-    if (settings->value("logmode","local")=="local")
-        localCB->setChecked(true);
-    else
-        centralCB->setChecked(true);
-
-    logDurationLE->setText(settings->value("logduration",360).toString());
-    logPathLE->setText(settings->value("centrallogpath").toString());
-    settings->endGroup();
+    logPathLE->setText(settings->value("log/backuplogpath").toString());
 
 }
-void Settings::saveLogDuration()
+
+void Settings::saveLogPath()
 {
-    settings->setValue("log/logduration",logDurationLE->text());
+    settings->setValue("log/backuplogpath",logPathLE->text());
 }
-
-
 
 
 void Settings::on_browseButton_clicked()
@@ -308,133 +327,151 @@ void Settings::on_browseButton_clicked()
 
     QFileDialog::Options options = QFileDialog::ShowDirsOnly;
     options |= QFileDialog::DontUseNativeDialog;
-    QString directory = QFileDialog::getExistingDirectory(this,
-                                                          tr("Choose a folder to store logs"),
-                                                          logPathLE->text(),
-                                                          options);
+    directory= QFileDialog::getExistingDirectory(this,
+                                                 tr("Choose a folder to store logs"),
+                                                 logPathLE->text(),
+                                                 options);
+    if(!directory.endsWith("/"))
+        directory+="/";
+
     if (!directory.isEmpty())
         logPathLE->setText(directory);
 
-    settings->setValue("log/centrallogpath",directory);
+    settings->setValue("log/backuplogpath",directory);
 
 }
-void Settings::on_defaultButton_clicked()
-{
-    settings->beginGroup("log");
-    logDurationLE->setText(settings->value("logduration",250).toString());
-    logPathLE->setText(settings->value("centrallogpath").toString());
-    settings->endGroup();
 
-    localCB->setChecked(true);
-    error();
+void Settings::on_backupButton_clicked()
+{
+    directory=logPathLE->text();
+    QStringList logpath,logdir;
+    QString path,dir;
+    logpath<<"./logs/certificate/"<<"./logs/session/";
+    logdir<<"certificate"<<"session";
+    for(int k=0;k<2;k++)
+    {qDebug()<<"\n\n\nvalue of k="<<k;
+        path=logpath[k];
+        dir=logdir[k];
+
+        if(!QDir(directory+dir).exists())
+        {
+            QDir().mkdir(directory+dir);//create a directory if dir doesn't exist
+        }
+
+        QDir logDir(path);
+
+        QStringList files = logDir.entryList(QStringList("*.Log"),QDir::Files,QDir::Time|QDir::Reversed);
+        uint size=files.count();
+
+
+        QProgressDialog progressDialog(0);
+        progressDialog.setCancelButtonText(tr("&Cancel"));
+        progressDialog.setRange(0, size);
+        progressDialog.setWindowTitle(tr("Log Manager Performing Back Up...."));
+
+        QFile logfile;//holds each file for backup
+
+        for (uint i=0;i<size;i++)
+        {
+            progressDialog.setValue(i);
+            progressDialog.setLabelText(tr("Back up file number %1 of %2...\n\nCurrent File: %3")
+                                        .arg(i).arg(size).arg(files[i]));
+            qApp->processEvents();
+
+            if (progressDialog.wasCanceled())
+                break;
+            if(!createServerFile( files[i],path,dir))
+            {   k=1;//to stop back up of session logs incase of failure with certificate logs
+                break;
+            }
+        }
+
+    }
+
+    if(QFile().error()==QFile::CopyError)
+    {
+
+        QMessageBox::information(this,tr("Log Manager"),tr("Back Up failed due to an error.\n\nOperation Aborted !!"),QMessageBox::Ok);
+
+    }
+    //else
+
 }
 
-void Settings::decideCert1( QString &cert)
+
+bool Settings::createServerFile(const QString& filename,const QString &path,const QString &dir)
 {
+    qDebug()<<"input"<<filename<<path;
+    bool ok;
+    QString localfile=path+filename;
 
-    if(bonafideRB->isChecked())
-        cert=bonafideRB->objectName();
+    ok=QFile::copy( localfile,directory+dir+"/"+filename);//copying to central repository
 
-    else if(conductRB->isChecked())
-        cert=conductRB->objectName();
+    if (ok)
+    {
 
-    else
-        cert=tcRB->objectName();
+        qDebug()<<"copy sucesss"<<QFile::rename( localfile,localfile+"c");
+        return true;
+    }
 
+    else if(QFile().error()==(QFile::CopyError||QFile::TimeOutError||QFile::UnspecifiedError))
+    {
+        qDebug()<<"iam the error"<<filename<<path<<dir;
+        return false;
+    }
 
+    return true;
 }
 
 void Settings::prepareCertificateSettings()
 {
     flag[4]=true;
+    cert2="bonafide";
+    bonafideRB2->setChecked(true);
+    dateEdit->setDate(settings->value("certificate/date").toDate());
+    fromSB->setValue(settings->value("certificate/from").toInt());
+    toSB->setValue(settings->value("certificate/to").toInt());
+}
 
-    bonafideRB->setChecked(true);
-    setOrder();
+void Settings::decideCert2()
+{
 
-    QString cert;
-    decideCert1(cert);
+    QString previous=cert2;
+    cert2=sender()->objectName();
+    cert2.chop(3);
+    if(!(cert2==previous))
+    {
+        fillSerial();
 
-    cert.chop(2);
-    settings->beginGroup("certificate/"+cert);
+    }
+}
+
+void Settings::fillSerial()
+{
+    settings->beginGroup("certificate/"+cert2);
+
     serialSB->setValue(settings->value("serialno").toInt());
-    dateEdit->setDate(settings->value("date").toDate());
+
     settings->endGroup();
-    error();
 }
 
 
 void Settings::saveCertificateSettings()
 {
-    f[3]=true;
-    QString cert;
-    decideCert1(cert);
-    cert.chop(2);
-    settings->beginGroup("certificate/"+cert);
+    f[1]=true;
+
+    settings->beginGroup("certificate/"+cert2);
+
     settings->setValue("serialno",serialSB->value());
     settings->setValue("date",dateEdit->date().toString("dd.MMM.yyyy"));
-    settings->endGroup();
-}
 
-void Settings::setOrder()
-{
-    QList <int> order=getSettings->getOrder();
-
-    QStringList tabtext,name;
-    QString temp;
-    tabtext<<"   BONAFIDE "<<"    CONDUCT   "<<"         TC        ";
-    name<<"bonafide"<<"conduct"<<"tc";
-
-    for(short i=0;i<3;i++)
-    {
-        temp=name.at(i);
-        tabWidget->widget(order.at(i))->setObjectName(temp+"Tab");
-        tabWidget->setTabText(order.at(i),tabtext.at(i));
-
-    }
-}
-
-void Settings::saveOrder()
-{
-    f[1]=true;
-    for(short i=0;i<3;i++)
-    {
-        QString  name=  tabWidget->widget(i)->objectName();
-        name.chop(3);
-        settings->setValue("certificate/"+name+"/order",i);
-    }
-}
-
-void Settings::prepareGeneralSettings()
-{
-    flag[5]=true;
-    themeCombo->setCurrentIndex(getSettings->getTheme());
-    fullScreenCB->setChecked(getSettings->isFullScreen());
-    QList<int> fromto=getSettings->getAcademicYear();
+    QList<int> fromto;
+    getSettings->getDateAcademicYear(fromto);
     fromSB->setValue(fromto.at(0));
     toSB->setValue(fromto.at(1));
-    getPrinters();
-}
-
-void Settings::getPrinters()
-{
-    QStringList printers=getSettings->getPrinters();
-    if( !printers.isEmpty())
-        QMessageBox::information(this,"Settings Manager","No Printers Currently Connected !!");
-
-    //else if(printersCombo->findText(getSettings->getDefaultPrinter(),Qt::MatchExactly)==-1 )
-      //  QMessageBox::information(this,"Settings Manager","Default Printer Set to "+printers.at(0)+"\n\nDefault Printer Can be changed at Settings->General Settings");
-
-    savePrinter(printers.at(0));
-}
-
-void Settings::savePrinter(const QString &printer)
-{
-    f[2]=true;
-    settings->setValue("general/defaultprinter",printer);
+    settings->endGroup();
     settings->sync();
 }
-
-
 
 void Settings::saveAcademicYear()
 {
@@ -444,18 +481,71 @@ void Settings::saveAcademicYear()
     settings->sync();
 }
 
+
+void Settings::prepareGeneralSettings()
+{
+    flag[5]=true;
+
+    databaseRB->setChecked(settings->value("general/mode").toBool());
+
+    QList<QPrinterInfo> plist;
+    QPrinterInfo pinfo;
+    plist=pinfo.availablePrinters();
+
+    QStringList printers;
+    for(int i=0;i<plist.size();i++)
+        printers<<plist[i].printerName();
+
+    QString temp,dprinter=pinfo.defaultPrinter().printerName();
+    temp=dprinter;
+    temp+="(Default)";
+    printers.replace(printers.indexOf(dprinter),temp);
+
+
+    if(!printers.isEmpty())
+    {
+        printersCombo->insertItems(0,printers);
+        savePrinter(printers.at(0));
+    }
+
+    if( printers.isEmpty())
+        QMessageBox::information(this,"Settings Manager","No Printers Currently Connected !! Print in PDF format.");
+
+    else if(printersCombo->findText(getSettings->getDefaultPrinter(),Qt::MatchExactly)==-1 )
+        QMessageBox::information(this,"Settings Manager","Default Printer Set to "+printers.at(0)+".\n\nDefault Printer can be changed at Settings->General Settings.");
+
+}
+
+void Settings::saveMode()
+{
+    if(settings->value("general/mode","true").toBool()!=databaseRB->isChecked())
+    {
+        f[2]=true;
+        settings->setValue("general/mode",databaseRB->isChecked());
+    }
+}
+
+void Settings::savePrinter(const QString &printer)
+{
+    f[3]=true;
+    settings->setValue("general/defaultprinter",printer);
+    settings->sync();
+}
+
+
+
 void Settings::on_exportButton_clicked()
 {
-    stringType<<"date"<<"logpath"<<"theme"<<"fullscreen"<<"logmode";
+    stringType<<"date"<<"backuplogpath"<<"printer";
     QFileDialog::Options options;
     options |= QFileDialog::DontUseNativeDialog;
     QString selectedFilter;
-    QString fileName = QFileDialog::getSaveFileName(this,tr("Export Settings"), QDir::homePath ()+"/Desktop"+"/DocmaQ Settings.reg", tr("Registration files (*.reg)"),&selectedFilter,options);
-    if(!fileName.endsWith("reg"))
-        fileName+=".reg";
+    QString fileName = QFileDialog::getSaveFileName(this,tr("Export Settings"), QDir::homePath ()+"/Desktop"+"/DocmaQ Settings.drf", tr("DocmaQ Registration Files (*.drf)"),&selectedFilter,options);
+    if(!fileName.endsWith("drf"))
+        fileName+=".drf";
+
     if (!fileName.isEmpty())
     {
-
         file.setFileName(QDir().absoluteFilePath(fileName));
         out.setDevice(&file);
         file.open(QIODevice::WriteOnly|QIODevice::Text);
@@ -472,13 +562,13 @@ void Settings::on_exportButton_clicked()
 
         generateRegFile("log","[HKEY_LOCAL_MACHINE\\SOFTWARE\\Qogency\\DocmaQ\\log");
     }
+    file.close();
 
 }
 
 
 void Settings::generateRegFile(QString key,QString path)
 {
-
     //for childkeys
     settings->beginGroup(key);
     QStringList list=settings->childKeys();
@@ -504,7 +594,6 @@ void Settings::generateRegFile(QString key,QString path)
 
     }
 
-
     list.clear();
 
     //for child groups
@@ -520,7 +609,7 @@ void Settings::generateRegFile(QString key,QString path)
         out<<path+"]\n\n";
 
         file.flush();
-        generateRegFile(list.at(j),path);
+        generateRegFile(list.at(j),path);//recursive call
 
         short index=path.lastIndexOf("\\");
 
@@ -533,101 +622,43 @@ void Settings::generateRegFile(QString key,QString path)
 
 void Settings::on_importButton_clicked()
 {
+    fileName.clear();
     QFileDialog::Options options;
     options |= QFileDialog::DontUseNativeDialog;
     QString selectedFilter;
 
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Import Settings"), QDir::homePath ()+"/Desktop", tr("DocmaQ Settings (*.reg)"),&selectedFilter,options);
+    fileName = QFileDialog::getOpenFileName(this,tr("Import Settings"), QDir::homePath ()+"/Desktop", tr("DocmaQ Settings (*.drf)"),&selectedFilter,options);
+    QString newname=fileName;
+    newname.chop(4);newname+=".reg";
+    qDebug()<<"rename"<<QFile::rename(fileName,newname);
+
 
     if (!fileName.isEmpty())
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir().absoluteFilePath(fileName)));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir().absoluteFilePath(newname)));
+
+    qDebug()<<"end of func";
 
 }
 
-inline void Settings::messageBox(char *title,char *message)
-{
-    QMessageBox::information(this,tr(title),tr(message),
-                             QMessageBox::Ok|QMessageBox::Default,
-                             QMessageBox::NoButton,QMessageBox::NoButton);
-
-}
-inline void Settings::criticalMessageBox(char *title,char *message)
-{
-
-    QMessageBox::critical(this,tr(title),tr(message),
-                          QMessageBox::Ok|QMessageBox::Default);
-    /*
-    if(QMessageBox::RestoreDefaults== QMessageBox::critical(this,tr(title),tr(message),
-                                                            QMessageBox::RestoreDefaults|QMessageBox::Default,
-                                                            QMessageBox::Cancel,QMessageBox::NoButton))
-    {
-        QProcess *myProcess = new QProcess(this);
-        myProcess->start("./loadregmain",NULL);
-    }
-*/
-}
-
-void Settings::error()
-{
-
-    if (settings->status()!= QSettings::NoError)
-    {
-
-        criticalMessageBox("Settings Manager","\
-                           Error occured during fetching the settings.\n\n\
-                           Reset all settings to solve the problem.\n\n\
-                           CAUTION: Export the settings to save critical settings and Import them after reset.");
-
-    }
-}
-
-
-void Settings::saveTheme(int index)
-{
-    settings->setValue("general/theme",index);
-    emit changeTheme(themeCombo->currentText());
-}
-
-void Settings::saveFullscreen(bool f)
-{
-    if(f)
-    settings->setValue("general/fullscreen","true");
-    else
-    settings->setValue("general/fullscreen","false");
-}
 
 void Settings::closeEvent(QCloseEvent *e)
 {
-
-    if(f[0])
-        emit updatePrintPositions(0);
-    if(f[1])
-    {
-        saveOrder();
-        emit updateOrder(1);
-    }
-    if(f[2])
-        emit updatePrinter(2);
-    if(f[3])
-        emit updateCertificateSettings(3);
-    if(f[4])
-        emit updateAcademicYear(4);
-    if(f[5])
-        emit removeExcessLogFiles(5);
-    if(f[6])
-        emit checkLogDirectory(6);
-
-
-
     settings->setValue("general/laststackwidget",stackedWidget->currentIndex());
 
-    settings->beginGroup("log");
-    if (localCB->isChecked())
-        settings->setValue("logmode","local");
-    else
-        settings->setValue("logmode","central");
+    QString newname=fileName;
+    newname.chop(4);
+    newname+=".reg";
 
-    settings->endGroup();
+    if(QFile::exists(newname))
+    {
+        qDebug()<<"old"<<newname;
+        if(!QFile::rename(newname,fileName))
+            QFile::remove(newname);
+    }
+
+    for(int i=0;f[i]&&i<5;i++)
+        emit sendSignal(i);
+
 }
 
 Settings::~Settings()

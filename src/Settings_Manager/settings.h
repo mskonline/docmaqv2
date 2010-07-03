@@ -5,7 +5,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QTextStream>
-#include <QSharedPointer>
+
 
 class GetSettings;
 
@@ -15,73 +15,78 @@ class Settings : public QWidget,public Ui::settings
 
 public:
 
-    Settings(QSettings *settings,GetSettings *getSettings,QWidget *parent = 0);
+    Settings(QSettings *settings,GetSettings *getSettings,int id=0,QWidget *parent = 0);
     void closeEvent(QCloseEvent * e);
     ~Settings();
 
 private slots:
-    void selectFunction(int);
+    void selectFunction(int id);
 
     //Database page
     void adminAuthentication();
 
-    void saveDatabaseSettings(const QString &name,const QString &text)
-    {
-
-        settings->setValue("Database/"+name,text);
-    }
-
-
     void databaseSettingsChanged( const QString &text)
     {
+
         QString name= sender()->objectName();
         name.chop(2);
         saveDatabaseSettings(name,text);
+    }
+
+    void saveDatabaseSettings(const QString &name,const QString &text)
+    {
+        f[1]=true;
+        //settings->setValue("Database/"+name,text);
+        // settings->sync();
     }
 
     void undoDatabaseSettings();
     void enableUndoReconnectButtons();
 
     //Account page
-    void on_newPasswordLE_editingFinished();
+    void on_newPasswordLE_textEdited();
     void on_changeButton_clicked();
 
     //Certificate page
     void prepareCertificateSettings();
     void saveCertificateSettings();
-    void saveOrder();
+    void saveMode();
 
     //Print page
+    void decideCert1();
+    void decideCert2();
+
+    void insertFields();
     void preparePrintSettings();
-    void setXY(QString);
+    void setXY(int index);
     void savePrintPositions();
     void savePrinter(const QString &printer);
 
     //Log page
     void on_browseButton_clicked();
-    void on_defaultButton_clicked();
-    void saveLogDuration();
+    void on_backupButton_clicked();
+    void saveLogPath();
 
     //General Page
 
-    void saveFullscreen(bool);
-    void saveTheme(int index);
     void on_importButton_clicked();
     void on_exportButton_clicked();
     void saveAcademicYear();
 
 
-
-
 private:
-    enum certificatetype{BONAFIDE,CONDUCT,TC};
-    QSettings *settings;
-    QString cert1;
+
+
     QFile file;
     QTextStream out;
     bool flag[6],f[7];
     GetSettings *getSettings;
-    QStringList databaseDetails,stringType;
+    QStringList databaseDetails,stringType,fields[3];
+    short type1;//cert1 for print page,cert2 for certificate page
+    QString cert1,cert2,fileName;//similarly type1 these hold current type being dealt in respective pages
+    QFile serverfile;
+    QString directory;
+    QSettings *settings;
 
 
     void prepareDatabaseSettings();
@@ -89,29 +94,16 @@ private:
 
     void prepareLogSettings();
     void fillLogSettings();
+    bool createServerFile(const QString& filename,const QString &path,const QString &dir);
     void prepareGeneralSettings();
-    void getPrinters();
+
     void generateRegFile(QString key,QString path);
-    void setOrder();
 
-    void decideCert1( QString &cert);
-    void decideCert2( short &type);
-
-    inline void messageBox(char *,char *);
-    inline void criticalMessageBox(char *,char *);
-    void error();
+    void fillSerial();
 
 signals:
 
-    void changeTheme(QString theme);
-    void updatePrintPositions(int);
-    void updateOrder(int);
-    void updatePrinter(int);
-    void updateCertificateSettings(int);
-    void updateAcademicYear(int);
-    void checkLogDirectory(int);
-    void removeExcessLogFiles(int);
-
+    void sendSignal(int id);
 
 };
 

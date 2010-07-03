@@ -5,57 +5,59 @@
 #include <QStringList>
 #include <QSettings>
 #include <QDebug>
-
-class GetSettings:public QObject
-{
-
-Q_OBJECT
-public :
+#include <QWidget>
 
 
 enum certificateType{BONAFIDE,CONDUCT,TC};
 
-QStringList databaseDetails;
+class GetSettings:public QObject
+{
+
+    Q_OBJECT
+    
+public :
+
+        QString cert;
 
 GetSettings();
+~GetSettings();
 
-QString decideType(short type);
+void setType(const short& type);
 
-QStringList getChildGroups(short type);
+void getFieldGroups(QStringList& fieldkeys);
 
 //-----database
-QStringList getDatabaseDetails();
+void getDatabaseDetails(QStringList& databasedetails);
 
 //-----certificate
-QList <int> getCount(short type);
+void getSessionInfo(QStringList& info);
 
-QStringList getLastSnoRollNo(short type);
+void setCountSno();
 
-//for every print this is called
-void setLastSnoRollNo(short serialno ,QString rollno,short type);
+void getSno(QString& sno);
+
 
 //-----general
-QList<int> getAcademicYear();
+void  getDateAcademicYear(QList<int>& academicyear);
 
-QList<int> getPrintPositions(short type);
+void getPrintPositions(QList<int>& pos,short type);
 
-QList<int> getOrder();
-
-QStringList getPrinters();
+void  setPrinters(QStringList list);
 
 QString getDefaultPrinter();
 
-bool isFullScreen();
-
-short getTheme();
 
 public slots:
 
-void createSettingsInterface();
+void createSettingsInterface(int id);
 
 private:
 
 QSettings *settings;
+QStringList databaseDetails;
+
+void error1();
+
 
 };
 
