@@ -2,76 +2,55 @@
 #define LOGMANAGER_H
 
 #include <QWidget>
-#include <QList>
-#include <QTextCursor>
-#include <QMessageBox>
 #include <QDir>
-
-QT_BEGIN_NAMESPACE
-
-class QPushButton;
-class QTextEdit;
-class QComboBox;
-class QCheckBox;
-class QTabWidget;
-class QTableWidget;
-class QDateEdit;
-class QDate;
-class QLabel;
-class QSettings;
-class QLineEdit;
-
-QT_END_NAMESPACE
+#include "ui_logmanager.h"
 
 
-class Logmanager : public QWidget
+class Logmanager : public QWidget,public Ui::Logmanager
 {
     Q_OBJECT
-public:
-    Logmanager();
-    void messageBox(char *title,char *message)
-    {
-        QMessageBox::information(this,tr(title),tr(message),
-                                 QMessageBox::Ok|QMessageBox::Default,
-                                 QMessageBox::NoButton,QMessageBox::NoButton);
 
-    }
-    // multiple log search
-    void find();
-    QStringList findFiles(const QDir &directory, const QStringList &files,const QString &text);
-    void showFiles(const QDir &directory, const QStringList &files);
-    void loadTextFile(const QDate& date);
-    void keyPressEvent(QKeyEvent *e);
+public:
+    Logmanager(QWidget *parent=0);
+    ~Logmanager();
 
 
 private slots:
 
-    void on_searchButton_clicked();
-    void on_goButton_clicked();
-    void on_checkBox_toggled(bool);
-    void on_searchCombo_editTextChanged();
-    void on_tableWidget_cellDoubleClicked( int row, int column );
-    void on_tabWidget_currentChanged(int index);
+    void on_viewLogButton_clicked();
+    void prepareSearch();
+    void currentChanged(int index);
+    void searchAll();
+    void searchCurrent();
+
 
 private:
 
-    QWidget* loadUiFile( QString);
-    void checkLogDirectory();
-    QSettings *settings;
-    QPushButton *searchButton,*goButton;
-    QTextEdit *textEdit;
-    QCheckBox *checkBox;
-    QComboBox *searchCombo;
-    QTabWidget *tabWidget;
-    QTableWidget *tableWidget;
-    QDateEdit *dateEdit;
-    QLabel *logDateLabel,*resultLabel,*foundLabel,*filesFoundLabel;
-    bool isFirstTime;
-    QList<int> pos;
-    QTextCursor defaultcursor;
+    QTableWidget *table;
+    QLabel *label;
+    QAction *searchCurrentAction,*searchAllAction;
     QString path;
     QDir directory;
-    QStringList filter;
+    QList<QTableWidgetItem*> items;
+    QString cdate,sdate,//certificate and log date b/w tab changes
+    prevText;//to store previous search text
+
+    QString cfound,sfound;//certificate and log count b/w tab changes
+    int nitems;
+    int currentAction;//specifies whether search current/search all mode
+
+    void loadTextFile(const QDate& date);
+
+
+    // multiple log search
+    void enterRecord(const QString& line);
+    void find();
+    void findFiles(const QDir &directory, const QStringList &files,const QString &text);
+
+    void searchType();
+    void clearTable();
+    void highlightItems();
+    void unHighlightItems();
 
 };
 #endif

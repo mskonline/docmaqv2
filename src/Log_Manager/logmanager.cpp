@@ -1,318 +1,360 @@
-#include <QtUiTools>
-#include <QtGui>
+#include <QMenu>
+#include <QProgressDialog>
+#include <QSettings>
 #include <QDebug>
 #include "logmanager.h"
 
-
-Logmanager::Logmanager()
+Logmanager::Logmanager(QWidget *parent): QWidget(parent)
 {
 
-    settings= new QSettings( QSettings::SystemScope,"Quogency","DocmaQ");
-    QWidget *formWidget = loadUiFile("./forms/logmanager.ui");
-    searchButton = qFindChild<QPushButton*>(this, "searchButton");
-    textEdit = qFindChild<QTextEdit*>(this, "textEdit");
-    searchCombo = qFindChild<QComboBox*>(this, "searchCombo");
-    checkBox = qFindChild<QCheckBox*>(this, "checkBox");
-    tabWidget = qFindChild<QTabWidget*>(this, "tabWidget");
-    tableWidget = qFindChild<QTableWidget*>(this, "tableWidget");
-    dateEdit = qFindChild<QDateEdit*>(this, "dateEdit");
-    goButton = qFindChild<QPushButton*>(this, "goButton");
-    logDateLabel = qFindChild<QLabel*>(this, "logDateLabel");
-    resultLabel = qFindChild<QLabel*>(this, "resultLabel");
-    foundLabel = qFindChild<QLabel*>(this, "foundLabel");
-    filesFoundLabel = qFindChild<QLabel*>(this, "filesFoundLabel");
+    setupUi(this);
 
-    connect(dateEdit,SIGNAL(editingFinished ()),this,SLOT(on_goButton_clicked()));
+    searchCurrentAction=new QAction(" in current log ",this);
+    searchAllAction=new QAction(" in all logs ",this);
 
+    QMenu *searchMenu= new QMenu(this);
+    searchMenu->addAction(searchCurrentAction);
+    searchMenu->addAction(searchAllAction);
+    searchButton->setMenu(searchMenu);
 
+    connect(tabWidget,SIGNAL(currentChanged(int)),this,SLOT(currentChanged(int)));
+    connect(searchLE,SIGNAL(textEdited(QString)),this,SLOT(prepareSearch()));
+    connect(searchLE,SIGNAL(returnPressed()),this,SLOT(prepareSearch()));
+    connect(searchCurrentAction,SIGNAL(triggered()),this,SLOT(searchCurrent()));
+    connect(searchAllAction,SIGNAL(triggered()),this,SLOT(searchAll()));
     QMetaObject::connectSlotsByName(this);
 
-
-
-    //arranging tableWidget
-    tableWidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-    tableWidget->verticalHeader()->show();
-    tableWidget->setShowGrid(true);
-
-    //Setting up Default cursor
-
-    QTextDocument *document = textEdit->document();
-    defaultcursor=QTextCursor(document);
-    textEdit->setTextCursor(defaultcursor);
-    textEdit->ensureCursorVisible ();
-
-
-    textEdit->setReadOnly(true);
-    textEdit->setWordWrapMode(QTextOption::NoWrap);
-    textEdit->setUndoRedoEnabled(true);
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(formWidget);
-    setLayout(layout);
-    setWindowTitle(tr("Log Manager"));
-
-    setGeometry(175,175,645,550);
-    isFirstTime = true;
-
-    // setting Log directory path
-    /* if(settings->value("generalsettings/logmode","local")=="central")
-    {
-     path=settings->value("generalsettings/logpath","//10.4.9.57/srinivas/logs/").toString();
-
-     if(!path.endsWith("\\"))
-        path=path+"\\";
-    }
-     else
-     */
-
-    path="./logs/";
+    path="./logs/certificate/";
 
     directory=QDir(path);
 
-    loadTextFile(QDate::currentDate());
+    table=certificateTable;
 
-    if (settings->status()!= QSettings::NoError)
-    {
-        messageBox("Log Path Error","Log Path Cannot be fetched Contact \"Software Dept\"  for help,");
-    }
+    label=logFlagLabel;
+
+    QDate date=QDate::currentDate();
+
+    sdate=" Log View: "+date.toString("dd-MMM-yyyy")+" ";// to enable first time change of tabwidget
+
+    loadTextFile(date);//load cert log
+
+    sfound=" Records Found: "+QString().setNum(table->rowCount())+" ";
+
+    table=sessionTable;
+    label=logFlagLabel2;
+    loadTextFile(date);//load session log,same as sdate for first time
+
+
+    label=logFlagLabel;
+    table=certificateTable;//reverting to initial table
+
+    searchMsgLabel->hide();
+
+    currentAction=0;
 
 }
 
-QWidget* Logmanager::loadUiFile(QString str)
+
+void Logmanager::on_viewLogButton_clicked()
 {
-    QUiLoader loader;
+    table->setAlternatingRowColors(true);
 
-    QFile file(str);
-    file.open(QFile::ReadOnly);
-
-    QWidget *formWidget = loader.load(&file, this);
-    file.close();
-
-    return formWidget;
+    loadTextFile(dateEdit->date());
 }
+
 
 void Logmanager::loadTextFile(const QDate& date)
 {
+    label->hide();
+    table->show();
 
     QString filename = date.toString("dd.MMM.yyyy");
 
     dateEdit->setDate(date);
 
+    modeLabel->setText(" Log View: "+date.toString("dd-MMM-yyyy")+" ");
+
     QFile inputFile(path+filename+".Log");
 
     if(!inputFile.exists())
-        inputFile.setFileName(path+filename+".Logc");
-
-    logDateLabel->setText(filename);
-
-    if (inputFile.open(QIODevice::ReadOnly))
     {
-        textEdit->clear();
-        QDataStream in(&inputFile);
-        in.setDevice(&inputFile);
+        if(QFile::exists(path+filename+".Logc"))
+            inputFile.setFileName(path+filename+".Logc");
+    }
 
-        QString line(" "), data("");
+
+    int recordsFound=0;
+    if (inputFile.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+
+        table->setRowCount(0);
+        QTextStream in(&inputFile);
+
+        QString line;
 
         while (!in.atEnd())
         {
-            in>>line;
+
+            line=in.readLine();
 
             if (!line.isEmpty())
-                data+=line+"\n";
+            {
+                recordsFound++;
+                enterRecord(line);
+            }
+
         }
 
         inputFile.close();
-        textEdit->setPlainText(data);
+
     }
 
     else
     {
-        textEdit->clear();
-        textEdit->setPlainText("\n\n\n\t\t         Sorry, Log Unavailable !!");
+        label->show();
+        table->hide();
+        clearTable();
+    }
+
+    recordsLabel->setText(" Records Found: "+QString().setNum(recordsFound)+" ");
+
+    if(table->objectName().startsWith("s")&&date==QDate::currentDate())
+    {
+        QSettings settings(QSettings::SystemScope,"Qogency","DocmaQ");
+        table->setItem((table->rowCount()-1),5,new QTableWidgetItem(settings.value("certificate/sessiontotal").toString()));
+        table->setItem((table->rowCount()-1),4,new QTableWidgetItem("Logged in now"));
+
+    }
+
+}
+
+void Logmanager::clearTable()
+{
+    if(table)
+    {
+        int rowcount=table->rowCount();
+        for(int i=0;i<rowcount;i++)
+            table->removeRow(i);
+        table->removeRow(0);
     }
 }
 
 
-void Logmanager::on_searchCombo_editTextChanged()
+void Logmanager::currentChanged(int index)
 {
-    searchButton->setEnabled(true);
+
+    if(index==0)
+    {
+        label=logFlagLabel;
+        table=certificateTable;
+        path="./logs/certificate/";
+
+
+        sdate=modeLabel->text();
+        modeLabel->setText(cdate);
+
+        sfound=recordsLabel->text();
+        recordsLabel->setText(cfound);
+
+    }
+    else
+    {
+        label=logFlagLabel2;
+        table=sessionTable;
+        path="./logs/session/";
+
+        cdate=modeLabel->text();
+        modeLabel->setText(sdate);
+
+        cfound=recordsLabel->text();
+        recordsLabel->setText(sfound);
+
+    }
+
 }
 
-void Logmanager::keyPressEvent(QKeyEvent *e)
+
+void Logmanager::prepareSearch()
+{
+    unHighlightItems();
+
+    if(searchLE->text()!="")
+    {
+        searchType();
+    }
+    else
+    {
+        if(currentAction==0)
+            searchTip->setText("Type text to search");
+        else
+
+            searchTip->setText("Type text and press\n    Enter to search");
+
+    }
+
+}
+
+
+void Logmanager::searchType()
+{
+    if(currentAction==0)
+        searchCurrent();
+    else
+    {
+
+        searchAll();
+    }
+}
+
+
+/*void Logmanager::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key())
     {
     case Qt::Key_Enter:
-    {
-        searchButton->animateClick();
-
-    }
-    break;
-    case Qt::Key_Backspace:
-        searchCombo->clear();
+        {
+            if(searchLE->text()!="")
+                searchType();
+        }
         break;
 
+    case Qt::Key_Backspace:
+        searchLE->clear();
+        break;
     }
-}
+}*/
 
-void Logmanager::on_searchButton_clicked()
+
+void Logmanager::searchCurrent()
 {
-    if (!checkBox->isChecked())
+    searchTip->setText("Type text to search");
+    //connection fails if already connection exists --> Qt::UniqueConnection
+    connect(searchLE,SIGNAL(textEdited(QString)),this,SLOT(prepareSearch()),Qt::UniqueConnection);
+    searchButton->setText("  in current log ");
+    currentAction=0;
+    if(table->isHidden()&&!searchLE->text().isEmpty())
     {
-        int result=0;
-        textEdit->setTextCursor(defaultcursor);
+        searchMsgLabel->show();
+        searchTip->setText("");
+    }
+    else
+    {
 
-        QString searchString = searchCombo->currentText();
-        QTextDocument *document = textEdit->document();
+        modeLabel->setText(" Search Results: Search Current");
 
-
-        bool found = false;
-
-        if (isFirstTime == false)
-            document->undo();
-
-        if (searchString == "")
+        if(searchLE->text()!="")
         {
-            messageBox("Empty Search Field","The search field is empty. Please enter a word and click Find.");
+            table->setAlternatingRowColors(false);
+
+            highlightItems();
         }
         else
+            table->setAlternatingRowColors(true);
+    }
+    searchLE->setFocus();
+}
+
+
+void Logmanager::highlightItems()
+{
+    items=table->findItems(searchLE->text(),Qt::MatchContains);
+    nitems=items.size();
+
+    if(nitems==0)
+        searchMsgLabel->show();
+    else
+        searchMsgLabel->hide();
+
+    recordsLabel->setText(" Records Found: "+QString().setNum(nitems)+" ");
+
+    for(int i=0;i<nitems;i++)
+    {
+        items[i]->setBackground(Qt::darkBlue);
+        items[i]->setFont(QFont ("Verdana", 8, QFont::Bold));
+        items[i]->setForeground(Qt::white);
+    }
+
+}
+
+void Logmanager::unHighlightItems()
+{
+    nitems=items.size();
+    for(int i=0;i<nitems;i++)
+    {
+        items[i]->setBackground(Qt::white);
+        items[i]->setFont(QFont ("MS Shell Dlg 2", 8, QFont::Normal));
+        items[i]->setForeground(Qt::black);
+    }
+}
+
+void Logmanager::searchAll()
+{
+    searchTip->setText("Type text and press\n    Enter to search");
+    disconnect(searchLE,SIGNAL(textEdited(QString)),this,SLOT(prepareSearch()));
+    table->show();
+    label->hide();
+    currentAction=1;
+    modeLabel->setText(" Search Results: Search All");
+    searchButton->setText(" in all logs ");
+
+    if(prevText!=searchLE->text())
+    {
+        unHighlightItems();
+
+        prevText=searchLE->text();
+        if(prevText!="")
         {
-            QTextCursor highlightCursor(document);
-            QTextCursor cursor(document);
-
-            cursor.beginEditBlock();
-
-            QTextCharFormat plainFormat(highlightCursor.charFormat());
-            QTextCharFormat colorFormat =plainFormat;
-
-            colorFormat.setForeground(Qt::white);
-            colorFormat.setBackground(QBrush(QColor(85,170,255)));
-            colorFormat.setFont(QFont("Verdana",10,QFont::Black,true));
-
-            textEdit->setTextCursor(highlightCursor);
-
-            while (!highlightCursor.isNull() && !highlightCursor.atEnd())
-            {
-                highlightCursor = document->find(searchString, highlightCursor, QTextDocument::FindWholeWords);
-
-                if (!highlightCursor.isNull())
-                {
-                    found = true;
-                    result++;   //holds the no of results found
-
-                    /*highlightCursor.setPosition(pos.at(0));
-                    textEdit->setTextCursor(highlightCursor);
-                    textEdit->ensureCursorVisible ();  */
-
-                    highlightCursor.movePosition(QTextCursor::WordRight,
-                                                 QTextCursor::KeepAnchor);
-                    highlightCursor.mergeCharFormat(colorFormat);
-
-                }
-
-            }
-
-
-            resultLabel->setText("Results Found : "+QString().setNum(result));
-
-            cursor.endEditBlock();
-            isFirstTime = false;
-
-            if (found == false)
-            {
-                foundLabel->setText("Word not found.. !!");
-            }
-            else
-            {
-                foundLabel->clear();
-                searchButton->setEnabled(false);
-            }
+            table->setAlternatingRowColors(false);
+            find();
         }
-    }
-    else
-    {
-        find();
-    }
 
+    }
+    if(prevText!="")
+        highlightItems();
+    searchLE->setFocus();
 }
 
-void Logmanager::on_goButton_clicked()
-{
 
-    textEdit->setTextCursor(defaultcursor);
 
-    loadTextFile(dateEdit->date());
-
-    tabWidget->setCurrentIndex(0);
-
-    if (!(searchCombo->currentText()==""))
-        on_searchButton_clicked();
-
-}
-
-void Logmanager::on_checkBox_toggled(bool flag)
-{
-    if (flag)
-    {
-        searchButton->setEnabled(true);
-        tabWidget->setCurrentIndex(1);
-    }
-    else
-    {
-        tabWidget->setCurrentIndex(0);
-
-    }
-
-}
-
-/*void Logmanager::on_optionsButton_toggled(bool flag)
-{
-     QWidget *formWidget = loadUiFile("../forms/optionswidget.ui");
-     keepLabel1 = qFindChild<QLabel*>(this, "keepLabel1");
-     keepLabel2 = qFindChild<QLabel*>(this, "keepLabel2");
-     keepLe = qFindChild<QLineEdit*>(this, "keepLe");
-     QVBoxLayout *layout = new QVBoxLayout;
-     layout->addWidget(formWidget);
-     setLayout(layout);
-     formWidget->show();
-     {
-     }
-
-     keepLabel1->setVisible(flag);
-     keepLabel2->setVisible(flag);
-     keepLe->setVisible(flag);
-
-}*/
 
 void Logmanager::find()
 {
-    tabWidget->setCurrentIndex(1);
 
-    tableWidget->setRowCount(0);
+    table->setRowCount(0);
 
-
-    QString text = searchCombo->currentText();
-
+    QString text = searchLE->text();
 
     QStringList files,ext;
     ext<<"*.Log"<<"*.Logc";
 
+    directory.setPath(path);
+
     files << directory.entryList(ext,QDir::Files,QDir::Time);
 
-    if (!text.isEmpty())
-        files = findFiles(directory, files, text);
-    showFiles(directory, files);
+    int nfiles;
+    if( !searchLE->text().isEmpty()&&(nfiles=files.size())==0)
+    {
+        searchTip->setText("");
+        searchMsgLabel->show();
+    }
+    else
+        searchMsgLabel->hide();
+
+
+    if (!text.isEmpty()&&nfiles!=0)
+        findFiles(directory, files, text);
+
 }
 
-QStringList Logmanager::findFiles(const QDir &directory, const QStringList &files,
-                                  const QString &text)
+void Logmanager::findFiles(const QDir &directory, const QStringList &files,
+                           const QString &text)
 {
     QProgressDialog progressDialog(this);
     progressDialog.setCancelButtonText(tr("&Cancel"));
     progressDialog.setRange(0, files.size());
     progressDialog.setWindowTitle(tr("Finding Log Files...."));
 
-    QStringList foundFiles;
+    int recordsFound=0;
 
     for (int i = 0; i < files.size(); ++i)
     {
@@ -326,72 +368,58 @@ QStringList Logmanager::findFiles(const QDir &directory, const QStringList &file
 
         QFile logfile(directory.absoluteFilePath(files[i]));
 
-        if (logfile.open(QIODevice::ReadOnly))
+        if (logfile.open(QIODevice::ReadOnly|QIODevice::Text));
         {
             QString line;
-            QDataStream in(&logfile);
+            QTextStream in(&logfile);
+
 
             while (!in.atEnd())
             {
                 if (progressDialog.wasCanceled())
                     break;
-                in>>line;
-                if (line.contains(text)||line.contains(text.toUpper()))
+
+
+                line=in.readLine();
+
+                if (line.contains(text)||line.contains(text,Qt::CaseInsensitive))
                 {
-                    foundFiles << files[i];
-                    break;
+                    enterRecord(line);
+                    recordsFound++;
+
                 }
             }
         }
     }
-    return foundFiles;
+    recordsLabel->setText(" Records Found: "+QString().setNum(recordsFound)+" ");
 }
 
-void Logmanager::showFiles(const QDir &directory, const QStringList &files)
+
+void Logmanager::enterRecord(const QString &line)
 {
-    for (int i = 0; i < files.size(); ++i)
+    QStringList recordField;
+
+    table->setSortingEnabled(false);
+
+    recordField=line.split(" ");
+
+    int row = table->rowCount();
+
+    table->insertRow(row);
+
+    int columnCount=recordField.size();//column count varies as per words in a single record
+
+    for(int i=0;i<columnCount;i++)
     {
-        QFile file(directory.absoluteFilePath(files[i]));
-        qint64 size = QFileInfo(file).size();
-
-        QTableWidgetItem *fileNameItem = new QTableWidgetItem(files[i]);
-        fileNameItem->setFlags(Qt::ItemIsEnabled);
-        QTableWidgetItem *sizeItem = new QTableWidgetItem(tr("%1 KB")
-                .arg(int((size + 1023) / 1024)));
-        sizeItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        sizeItem->setFlags(Qt::ItemIsEnabled);
-
-        int row = tableWidget->rowCount();
-        tableWidget->insertRow(row);
-        tableWidget->setItem(row, 0, fileNameItem);
-        tableWidget->setItem(row, 1, sizeItem);
+        table->setItem(row,i,new QTableWidgetItem(recordField[i]));
     }
-    filesFoundLabel->setText(tr("%1 Log file(s) found").arg(files.size()));
+    recordField.clear();
+
+    table->setSortingEnabled(true);
+
 }
 
-void Logmanager::on_tableWidget_cellDoubleClicked( int row, int column )
+
+Logmanager::~Logmanager()
 {
-    QString str=tableWidget->item (  row,  column )->text();
-    if(str.endsWith('c'))
-        str.chop(5);
-    else
-        str.chop(4);
-    tabWidget->setCurrentIndex(0);
-    loadTextFile(QDate::fromString(str,"dd.MMM.yyyy"));
-
 }
-
-void Logmanager::on_tabWidget_currentChanged(int index)
-{
-    textEdit->setTextCursor(defaultcursor);
-    searchButton->setEnabled(true);
-
-    if (index == 1)
-        checkBox->setChecked(Qt::Checked);
-    else
-        checkBox->setChecked(Qt::Unchecked);
-
-}
-
-
-
