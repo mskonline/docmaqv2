@@ -6,20 +6,20 @@
 
 
 
-AuthenDialog::AuthenDialog(QDialog* parent) :QDialog(parent)
+AuthenDialog::AuthenDialog(QDialog* parent) :QDialog(parent,Qt::WindowMaximizeButtonHint)
 {
 
     setupUi(this);
 
     QCoreApplication::setAttribute ( Qt::AA_ImmediateWidgetCreation);
 
-    //settings= new QSettings( QSettings::SystemScope,"Qogency","DocmaQ");
+    settings= new QSettings( QSettings::SystemScope,"Qogency","DocmaQ");
 
     //---------------first page
 
     connect(passwordLE,SIGNAL(textChanged(const QString &)),this,SLOT(enableLoginButton(const QString &)));
     connect(passwordLE,SIGNAL(returnPressed()),loginButton,SLOT(animateClick()));
-    //connect(this,SIGNAL(isAdmin(QString)),this,SLOT(user(QString)));
+
 
     connect(loginButton,SIGNAL(clicked()),this,SLOT(loginPageAuthentication()));
 
@@ -113,3 +113,6 @@ inline void AuthenDialog::messageBox(char *title,char *message)
 
 }
 
+AuthenDialog()::~AuthenDialog()
+{
+}

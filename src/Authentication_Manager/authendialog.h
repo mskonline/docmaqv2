@@ -12,14 +12,14 @@ class AuthenDialog:public QDialog,public Ui::AuthenDialog
 {
     Q_OBJECT
 
-
 public:
 
     AuthenDialog(QDialog* parent=0);
+    ~AuthenDialog();
 
 public slots:
 
-    void authenticate(const QString &passwd);
+   void authenticate(const QString&passwd);
 
 private slots:
 
@@ -28,12 +28,13 @@ private slots:
     void on_optionsList_currentRowChanged(int row);
     void on_tabWidget_currentChanged(int index);
     void marquee();
-    // void user(QString userID);
+
 
 private:
     QSettings *settings;
     QTimer *timer;
     QScrollBar *sb;
+
     void messageBox(char *title,char *message);
 
 signals:

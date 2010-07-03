@@ -3,15 +3,27 @@
  <class>AuthenDialog</class>
  <widget class="QDialog" name="AuthenDialog">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>315</height>
+    <width>546</width>
+    <height>304</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>546</width>
+    <height>304</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>546</width>
+    <height>304</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -26,17 +38,20 @@
    <string>DocmaQ Login</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="symbols.qrc">
+   <iconset>
     <normaloff>:/newPrefix/Images/printmgr.png</normaloff>:/newPrefix/Images/printmgr.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">border-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));</string>
+   <string notr="true"/>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <widget class="QListWidget" name="optionsList">
    <property name="enabled">
@@ -44,9 +59,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>9</y>
-     <width>132</width>
+     <x>2</x>
+     <y>2</y>
+     <width>131</width>
      <height>300</height>
     </rect>
    </property>
@@ -55,12 +70,6 @@
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>132</width>
-     <height>300</height>
-    </size>
    </property>
    <property name="maximumSize">
     <size>
@@ -71,7 +80,7 @@
    <property name="font">
     <font>
      <family>MS Shell Dlg 2</family>
-     <pointsize>10</pointsize>
+     <pointsize>9</pointsize>
      <weight>75</weight>
      <italic>false</italic>
      <bold>true</bold>
@@ -124,6 +133,9 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
    <property name="verticalScrollBarPolicy">
     <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>
@@ -156,8 +168,8 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
    </property>
    <property name="iconSize">
     <size>
-     <width>70</width>
-     <height>70</height>
+     <width>64</width>
+     <height>64</height>
     </size>
    </property>
    <property name="textElideMode">
@@ -179,7 +191,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
     <enum>QListView::Fixed</enum>
    </property>
    <property name="layoutMode">
-    <enum>QListView::Batched</enum>
+    <enum>QListView::SinglePass</enum>
    </property>
    <property name="spacing">
     <number>32</number>
@@ -188,7 +200,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
     <enum>QListView::IconMode</enum>
    </property>
    <property name="uniformItemSizes">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="wordWrap">
     <bool>false</bool>
@@ -204,8 +216,8 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <string>Login</string>
     </property>
     <property name="icon">
-     <iconset resource="symbols.qrc">
-      <normaloff>:/newPrefix/images/cc.png</normaloff>:/newPrefix/images/cc.png</iconset>
+     <iconset resource="../Resources/res.qrc">
+      <normaloff>:/images/users.png</normaloff>:/images/users.png</iconset>
     </property>
    </item>
    <item>
@@ -213,8 +225,8 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <string>About</string>
     </property>
     <property name="icon">
-     <iconset resource="symbols.qrc">
-      <normaloff>:/newPrefix/Images/groupevent-256.png</normaloff>:/newPrefix/Images/groupevent-256.png</iconset>
+     <iconset resource="../Resources/res.qrc">
+      <normaloff>:/images/docmaq.png</normaloff>:/images/docmaq.png</iconset>
     </property>
    </item>
   </widget>
@@ -224,9 +236,9 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
    </property>
    <property name="geometry">
     <rect>
-     <x>147</x>
-     <y>9</y>
-     <width>411</width>
+     <x>136</x>
+     <y>2</y>
+     <width>408</width>
      <height>300</height>
     </rect>
    </property>
@@ -235,6 +247,12 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>408</width>
+     <height>298</height>
+    </size>
    </property>
    <property name="font">
     <font>
@@ -246,7 +264,15 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
     <string>Gets u Logged in</string>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(0, 170, 255)</string>
+    <string notr="true">
+QStackedWidget {
+
+
+     border: 1px solid #00AAFF;
+     border-radius: 0px;
+     
+ }
+</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Box</enum>
@@ -264,24 +290,23 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
     <widget class="QLabel" name="fig1">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>411</width>
-       <height>171</height>
+       <x>-13</x>
+       <y>-10</y>
+       <width>433</width>
+       <height>188</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Verdana</family>
        <pointsize>12</pointsize>
-       <weight>9</weight>
+       <weight>50</weight>
        <italic>true</italic>
        <bold>false</bold>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-image:url(:/newPrefix/images/Diamond_104.JPG);
-font: 75 italic 12pt &quot;Verdana&quot;;</string>
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
@@ -289,20 +314,21 @@ font: 75 italic 12pt &quot;Verdana&quot;;</string>
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
      </property>
-     <property name="lineWidth">
-      <number>0</number>
-     </property>
      <property name="midLineWidth">
       <number>0</number>
      </property>
      <property name="text">
-      <string/>
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Verdana'; font-size:12pt; font-weight:400; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/images/authpic.png&quot; /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
      </property>
      <property name="pixmap">
-      <pixmap resource="symbols.qrc">:/newPrefix/images/authpic.png</pixmap>
+      <pixmap>:/newPrefix/images/authpic.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -335,29 +361,35 @@ font: 75 italic 12pt &quot;Verdana&quot;;</string>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton {
-     border: 2px solid #8f8f91;
-     border-radius: 6px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
-     min-width: 80px;
- }
+      <string notr="true">QPushButton { 
+color:rgb(0,0,0);
+border: 1px solid #00AAFF;
+border-radius: 4px;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #f6f7fa, stop: 1 #dadbde);
+min-width: 80px;
+}
 
- QPushButton:pressed {
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
- }
+QPushButton:hover { border: 2px solid #000000;
+color:rgb(0,0,255);}
+QPushButton:pressed {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
 
- QPushButton:flat {
-     border: none; /* no border for a flat push button */
- }
-</string>
+QPushButton:flat {
+border: none; /* no border for a flat push button */
+}
+
+QPushButton:default {
+border-color: navy; /* make the default button prominent */
+}</string>
      </property>
      <property name="text">
       <string>&amp;Login</string>
      </property>
      <property name="icon">
-      <iconset resource="symbols.qrc">
+      <iconset>
        <normaloff>:/newPrefix/images/msn.png</normaloff>:/newPrefix/images/msn.png</iconset>
      </property>
      <property name="iconSize">
@@ -398,32 +430,35 @@ font: 75 italic 12pt &quot;Verdana&quot;;</string>
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton {
-     border: 2px solid #8f8f91;
-     border-radius: 6px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
-     min-width: 80px;
- }
+      <string notr="true">QPushButton { 
+	color: rgb(0, 0, 0);
+border: 1px solid #00AAFF;
+border-radius: 4px;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #f6f7fa, stop: 1 #dadbde);
+min-width: 80px;
+}
 
- QPushButton:pressed {
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
- }
+QPushButton:hover { border: 2px solid #000000;
+color:rgb(0,0,255);}
+QPushButton:pressed {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
 
- QPushButton:flat {
-     border: none; /* no border for a flat push button */
- }
+QPushButton:flat {
+border: none; /* no border for a flat push button */
+}
 
- QPushButton:default {
-     border-color: navy; /* make the default button prominent */
- }</string>
+QPushButton:default {
+border-color: navy; /* make the default button prominent */
+}</string>
      </property>
      <property name="text">
       <string>&amp;Quit</string>
      </property>
      <property name="icon">
-      <iconset resource="symbols.qrc">
+      <iconset>
        <normaloff>:/newPrefix/images/exit.png</normaloff>:/newPrefix/images/exit.png</iconset>
      </property>
      <property name="iconSize">
@@ -487,8 +522,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -541,8 +576,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -559,8 +594,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -624,8 +659,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -678,8 +713,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -696,8 +731,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -761,8 +796,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -815,8 +850,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -833,8 +868,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -906,6 +941,21 @@ p, li { white-space: pre-wrap; }
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QLineEdit { 
+color:rgb(0,0,0);
+border: 1px solid #8f8f91;
+border-radius: 3px;
+min-width: 80px;
+}
+
+QLineEdit:hover {
+
+border: 1px solid #00aaff;
+border-radius: 3px;
+min-width: 80px;
+}</string>
+     </property>
      <property name="echoMode">
       <enum>QLineEdit::Normal</enum>
      </property>
@@ -955,8 +1005,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1009,8 +1059,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1027,8 +1077,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1092,8 +1142,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1146,8 +1196,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1164,8 +1214,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1229,8 +1279,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1283,8 +1333,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1301,8 +1351,8 @@ p, li { white-space: pre-wrap; }
          <brush brushstyle="SolidPattern">
           <color alpha="255">
            <red>0</red>
-           <green>170</green>
-           <blue>255</blue>
+           <green>0</green>
+           <blue>0</blue>
           </color>
          </brush>
         </colorrole>
@@ -1371,6 +1421,21 @@ p, li { white-space: pre-wrap; }
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QLineEdit { 
+color:rgb(0,0,0);
+border: 1px solid #8f8f91;
+border-radius: 3px;
+min-width: 80px;
+}
+
+QLineEdit:hover {
+
+border: 1px solid #00aaff;
+border-radius: 3px;
+min-width: 80px;
+}</string>
+     </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
      </property>
@@ -1381,9 +1446,9 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>43</y>
        <width>410</width>
-       <height>271</height>
+       <height>261</height>
       </rect>
      </property>
      <property name="font">
@@ -1424,11 +1489,11 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>409</width>
-         <height>253</height>
+         <height>241</height>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
+        <string notr="true"/>
        </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1479,7 +1544,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;Imbibed with above unique combination it the most &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;Imbibed with above unique combination it is the most &lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;User-friendly,Multi-featured,Accountable,Managable and Stable application.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;&lt;/p&gt;
@@ -1493,12 +1558,12 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#aa0000;&quot;&gt;Happy Docmaq'ing !&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#bc0000;&quot;&gt;Happy Docmaq'ing !&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; color:#aa0000;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; color:#aa0000;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; color:#aa0000;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; color:#aa0000;&quot;&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Qogency Corporation - April 2010&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Qogency Corporation &lt;/span&gt;&lt;span style=&quot; font-size:9pt; font-weight:600; vertical-align:super;&quot;&gt;TM&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:super;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2010&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600;&quot;&gt;&lt;/p&gt;
@@ -1537,6 +1602,31 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;M. Sai Kumar	     saikumar_m@in.com 	&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;K. Praneeth	     praneethk@in.com	&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#00aa00;&quot;&gt;M. Kiran	     mola.kiran@gmail.com&lt;/span&gt;&lt;span style=&quot; font-size:8pt; color:#00aa00;&quot;&gt;	&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>-90</x>
+         <y>-10</y>
+         <width>251</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <stylestrategy>PreferAntialias</stylestrategy>
+        </font>
+       </property>
+       <property name="text">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/images/my version/src/Resources/images/groupevent-256.png&quot; /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </widget>
@@ -1583,7 +1673,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>0</y>
+       <y>10</y>
        <width>121</width>
        <height>20</height>
       </rect>
@@ -1608,14 +1698,14 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
      <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
+      <set>Qt::TextBrowserInteraction</set>
      </property>
     </widget>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>0</y>
+       <y>10</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -1633,7 +1723,10 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00aa00;&quot;&gt;Qogency Corporation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#00a100;&quot;&gt;Qogency Corporation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
      </property>
     </widget>
    </widget>
@@ -1645,7 +1738,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>quitButton</tabstop>
  </tabstops>
  <resources>
-  <include location="symbols.qrc"/>
+  <include location="../Resources/res.qrc"/>
  </resources>
  <connections>
   <connection>
