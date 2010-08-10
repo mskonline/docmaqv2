@@ -20,7 +20,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources/res.qrc">
-    <normaloff>:/Images/Images/printer.png</normaloff>:/Images/Images/printer.png</iconset>
+    <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -36,6 +36,9 @@
           <width>711</width>
           <height>563</height>
          </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -85,30 +88,45 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGroupBox" name="CertificateGb">
+          <widget class="QGroupBox" name="rollboxGb">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>30</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>261</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>261</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="font">
             <font>
-             <family>Verdana</family>
+             <family>Segoe UI</family>
              <pointsize>9</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
            <property name="title">
-            <string>Roll Box</string>
+            <string>Roll</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="flat">
             <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QStackedWidget" name="cstack">
+             <widget class="QFrame" name="cframe">
               <property name="minimumSize">
                <size>
                 <width>241</width>
@@ -121,102 +139,74 @@
                 <height>41</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QFrame, QLabel, QToolTip {
-     border: 1px solid #00AAFF ;
-
-     border-radius: 4px;
-     padding: 2px;
-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
-stop: 0 #E0E0E0, stop: 1 #FFFFFF);
-     
- }
-</string>
-              </property>
               <property name="frameShape">
-               <enum>QFrame::Box</enum>
+               <enum>QFrame::StyledPanel</enum>
               </property>
-              <property name="currentIndex">
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="lineWidth">
                <number>0</number>
               </property>
-              <widget class="QWidget" name="page">
-               <widget class="QCheckBox" name="bCb">
-                <property name="geometry">
-                 <rect>
-                  <x>40</x>
-                  <y>10</y>
-                  <width>81</width>
-                  <height>17</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>9</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string> Bonafide</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-                <property name="autoExclusive">
-                 <bool>false</bool>
-                </property>
-               </widget>
-               <widget class="QCheckBox" name="cCb">
-                <property name="geometry">
-                 <rect>
-                  <x>120</x>
-                  <y>10</y>
-                  <width>81</width>
-                  <height>16</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>9</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Conduct</string>
-                </property>
-                <property name="autoExclusive">
-                 <bool>false</bool>
-                </property>
-               </widget>
+              <widget class="QCheckBox" name="cCb">
+               <property name="geometry">
+                <rect>
+                 <x>140</x>
+                 <y>13</y>
+                 <width>91</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>11</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>Conduct</string>
+               </property>
+               <property name="autoExclusive">
+                <bool>false</bool>
+               </property>
               </widget>
-              <widget class="QWidget" name="page_2">
-               <widget class="QLabel" name="label_2">
-                <property name="geometry">
-                 <rect>
-                  <x>-10</x>
-                  <y>-10</y>
-                  <width>251</width>
-                  <height>51</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>13</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>TC  ISSUE</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
+              <widget class="QCheckBox" name="bCb">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>13</y>
+                 <width>101</width>
+                 <height>20</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>11</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string> Bonafide</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>false</bool>
+               </property>
               </widget>
              </widget>
             </item>
@@ -230,8 +220,8 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>17</width>
-                <height>3</height>
+                <width>15</width>
+                <height>4</height>
                </size>
               </property>
              </spacer>
@@ -246,33 +236,90 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
               </property>
               <property name="font">
                <font>
-                <family>Microsoft Sans Serif</family>
+                <family>Verdana</family>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+                <kerning>false</kerning>
                </font>
               </property>
-              <property name="styleSheet">
-               <string notr="true"> border: 0.5px solid #00AAFF ;
-</string>
+              <property name="cursor" stdset="0">
+               <cursorShape>ArrowCursor</cursorShape>
               </property>
               <property name="frameShape">
-               <enum>QFrame::Box</enum>
+               <enum>QFrame::StyledPanel</enum>
               </property>
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
               </property>
+              <property name="lineWidth">
+               <number>0</number>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>false</bool>
+              </property>
               <property name="selectionMode">
                <enum>QAbstractItemView::SingleSelection</enum>
               </property>
+              <property name="textElideMode">
+               <enum>Qt::ElideRight</enum>
+              </property>
+              <property name="showGrid">
+               <bool>true</bool>
+              </property>
+              <property name="gridStyle">
+               <enum>Qt::SolidLine</enum>
+              </property>
+              <property name="cornerButtonEnabled">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
               <attribute name="horizontalHeaderMinimumSectionSize">
                <number>50</number>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>false</bool>
               </attribute>
               <attribute name="verticalHeaderVisible">
                <bool>true</bool>
               </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderStretchLastSection">
+               <bool>false</bool>
+              </attribute>
               <attribute name="verticalHeaderVisible">
                <bool>true</bool>
               </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>false</bool>
+              </attribute>
               <attribute name="horizontalHeaderMinimumSectionSize">
                <number>50</number>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderStretchLastSection">
+               <bool>false</bool>
               </attribute>
               <column>
                <property name="text">
@@ -305,7 +352,7 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
                 </property>
                 <property name="font">
                  <font>
-                  <family>Microsoft Sans Serif</family>
+                  <family>MS Sans Serif</family>
                   <pointsize>16</pointsize>
                   <weight>50</weight>
                   <bold>false</bold>
@@ -323,17 +370,19 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
                 </property>
                 <property name="styleSheet">
                  <string notr="true"> QLineEdit{
-
-border: 2px solid #00BB00;
+border: 2px solid #00AAFF;
 border-radius:4px;
 }
 
  QLineEdit:hover{
-border: 2px solid #0000FF;
+border: 2px solid #33CC00;
 }</string>
                 </property>
                 <property name="text">
                  <string/>
+                </property>
+                <property name="maxLength">
+                 <number>15</number>
                 </property>
                 <property name="dragEnabled">
                  <bool>false</bool>
@@ -367,19 +416,136 @@ border: 2px solid #0000FF;
            </property>
            <property name="font">
             <font>
-             <family>Verdana</family>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <bold>true</bold>
+             <kerning>false</kerning>
             </font>
            </property>
            <property name="title">
             <string>Select Certificate for Printing</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <widget class="QRadioButton" name="rbc">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>62</y>
+              <width>101</width>
+              <height>17</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+              <kerning>false</kerning>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>  Conduct</string>
+            </property>
+           </widget>
+           <widget class="QLCDNumber" name="blcd">
+            <property name="geometry">
+             <rect>
+              <x>200</x>
+              <y>26</y>
+              <width>41</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="lineWidth">
+             <number>1</number>
+            </property>
+            <property name="smallDecimalPoint">
+             <bool>true</bool>
+            </property>
+            <property name="numDigits">
+             <number>3</number>
+            </property>
+            <property name="segmentStyle">
+             <enum>QLCDNumber::Filled</enum>
+            </property>
+            <property name="value" stdset="0">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="intValue" stdset="0">
+             <number>0</number>
+            </property>
+           </widget>
+           <widget class="QLCDNumber" name="clcd">
+            <property name="geometry">
+             <rect>
+              <x>200</x>
+              <y>58</y>
+              <width>41</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="lineWidth">
+             <number>1</number>
+            </property>
+            <property name="smallDecimalPoint">
+             <bool>true</bool>
+            </property>
+            <property name="numDigits">
+             <number>3</number>
+            </property>
+            <property name="segmentStyle">
+             <enum>QLCDNumber::Filled</enum>
+            </property>
+            <property name="value" stdset="0">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="intValue" stdset="0">
+             <number>0</number>
+            </property>
+           </widget>
            <widget class="QRadioButton" name="rbb">
             <property name="geometry">
              <rect>
               <x>20</x>
-              <y>30</y>
+              <y>25</y>
               <width>121</width>
               <height>21</height>
              </rect>
@@ -390,53 +556,14 @@ border: 2px solid #0000FF;
               <bold>false</bold>
              </font>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>  Bonafide</string>
-            </property>
-           </widget>
-           <widget class="QRadioButton" name="rbc">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>60</y>
-              <width>101</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>  Conduct</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="bcl">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>30</y>
-              <width>31</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-           <widget class="QLabel" name="ccl">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>60</y>
-              <width>46</width>
-              <height>13</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string/>
             </property>
            </widget>
           </widget>
@@ -478,7 +605,7 @@ border: 2px solid #0000FF;
              </property>
              <property name="font">
               <font>
-               <family>MS Sans Serif</family>
+               <family>Eras Demi ITC</family>
                <pointsize>14</pointsize>
                <weight>50</weight>
                <italic>false</italic>
@@ -486,6 +613,12 @@ border: 2px solid #0000FF;
                <stylestrategy>PreferAntialias</stylestrategy>
                <kerning>false</kerning>
               </font>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="toolTip">
+              <string>Print Certificate</string>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton { 
@@ -496,8 +629,9 @@ stop: 0 #f6f7fa, stop: 1 #dadbde);
 min-width: 80px;
 }
 
-QPushButton:hover { border: 2px solid #000000;
-color:rgb(0,0,255);}
+QPushButton:hover { border: 2px solid #33CC00;
+color: rgb(255, 0, 0);}
+
 QPushButton:pressed {
 background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #dadbde, stop: 1 #f6f7fa);
@@ -515,8 +649,8 @@ border-color: navy; /* make the default button prominent */
               <string>Print</string>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>../resources/print.ico</normaloff>../resources/print.ico</iconset>
+              <iconset resource="../resources/res.qrc">
+               <normaloff>:/Images/docmaq.png</normaloff>:/Images/docmaq.png</iconset>
              </property>
              <property name="iconSize">
               <size>

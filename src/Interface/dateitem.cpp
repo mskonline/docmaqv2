@@ -1,7 +1,6 @@
 #include "dateitem.h"
-#include "credentialscene.h"
 
-DateItem::DateItem(CredentialScene *scene,QGraphicsItem *parent,int id):QGraphicsTextItem(parent)
+DateItem::DateItem(QGraphicsScene *scene,QGraphicsItem *parent,int id):QGraphicsTextItem(parent)
 {
     this->scene = scene;
     this->id  = id;
@@ -30,12 +29,12 @@ void DateItem::constructWidgets()
 
     de = new QDateEdit(Form);
     de->setGeometry(QRect(10, 10,110, 22));
-    de->setMinimumDate(QDate(1996, 1, 1));
+   // de->setMinimumDate(QDate(1996, 1, 1));
     de->setCalendarPopup(true);
-    de->setDisplayFormat("dd.MM.yyyy");
-    de->setDate(QDate().fromString(this->toPlainText(),"dd.MM.yyyy"));
+    de->setDisplayFormat("dd.MMM.yyyy");
+    de->setDate(QDate().fromString(this->toPlainText(),"dd.MMM.yyyy"));
     okButton =  new QPushButton(Form);
-    okButton->setText("ok");
+    okButton->setIcon(QIcon(":/Images/ok.png"));
     okButton->show();
     okButton->setGeometry(QRect(130,10,31,21));
     connect(okButton,SIGNAL(pressed()),this,SLOT(done()));

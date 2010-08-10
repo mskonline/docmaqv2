@@ -12,7 +12,7 @@
 //
 // Icon resources
 //
-IDI_ICON1          ICON           "./Images/print.ico"
+IDI_ICON1          ICON           "./images/print.ico"
 
 //
 // Version Information resources
@@ -28,7 +28,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
     {
         BLOCK "04090025"
         {
-            VALUE "Comments", "QT Based Application Developed by Praneeth,Sai Kumar,Kiran. Batch:2006-10"
+            VALUE "Comments", "Qt Based Publishing Application Developed by Praneeth,Sai Kumar,Kiran. Batch:2006-10"
             VALUE "CompanyName", "Qogency Corporation"
             VALUE "FileDescription", "Credential Publishing"
             VALUE "FileVersion", "2.0"

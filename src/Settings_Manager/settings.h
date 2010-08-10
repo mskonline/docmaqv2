@@ -1,3 +1,21 @@
+/* DocmaQ v2.0, Credential Publishing System
+    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
@@ -5,17 +23,16 @@
 #include <QSettings>
 #include <QFile>
 #include <QTextStream>
-
+#include <QWidget>
 
 class GetSettings;
 
-class Settings : public QWidget,public Ui::settings
+class Settings : public QWidget, public Ui::settings
 {
     Q_OBJECT
 
 public:
-
-    Settings(QSettings *settings,GetSettings *getSettings,int id=0,QWidget *parent = 0);
+    Settings(int,QSettings *,GetSettings *,QWidget *parent = 0);
     void closeEvent(QCloseEvent * e);
     ~Settings();
 
@@ -24,88 +41,65 @@ private slots:
 
     //Database page
     void adminAuthentication();
-
-    void databaseSettingsChanged( const QString &text)
-    {
-
-        QString name= sender()->objectName();
-        name.chop(2);
-        saveDatabaseSettings(name,text);
-    }
-
-    void saveDatabaseSettings(const QString &name,const QString &text)
-    {
-        f[1]=true;
-        //settings->setValue("Database/"+name,text);
-        // settings->sync();
-    }
-
-    void undoDatabaseSettings();
-    void enableUndoReconnectButtons();
+    void databaseSettingsChanged();
+    void checkConnectivity();
+    void fillDatabaseSettings();
+    void enableReconnectButton();
 
     //Account page
     void on_newPasswordLE_textEdited();
     void on_changeButton_clicked();
 
     //Certificate page
+    void decideCert2();
     void prepareCertificateSettings();
-    void saveCertificateSettings();
-    void saveMode();
+    void setDateAcademicYearFlag();
+    void setModeFlag();
+    void on_serialSB_editingFinished();
 
     //Print page
     void decideCert1();
-    void decideCert2();
-
     void insertFields();
     void preparePrintSettings();
     void setXY(int index);
-    void savePrintPositions();
-    void savePrinter(const QString &printer);
+    void setPrintPositionsFlag();
+    void setPrinterFlag( const QString &printer);
 
     //Log page
     void on_browseButton_clicked();
     void on_backupButton_clicked();
-    void saveLogPath();
 
     //General Page
-
     void on_importButton_clicked();
     void on_exportButton_clicked();
-    void saveAcademicYear();
 
+    //on ok button pressed
+    void saveSettings();
 
 private:
-
-
     QFile file;
+    QList<int>pos[3],x[3],y[3],ser;
     QTextStream out;
-    bool flag[6],f[7];
+    bool flag[6],f[8],au;
     GetSettings *getSettings;
-    QStringList databaseDetails,stringType,fields[3];
-    short type1;//cert1 for print page,cert2 for certificate page
+    QStringList databaseDetails,fields[3];
+    int type1,type2;//cert1 for print page,cert2 for certificate page
     QString cert1,cert2,fileName;//similarly type1 these hold current type being dealt in respective pages
     QFile serverfile;
     QString directory;
     QSettings *settings;
-
+    QList <int> siglist;
+    enum certificateType{BONAFIDE,CONDUCT,TC};
 
     void prepareDatabaseSettings();
     void prepareAccountSettings();
-
     void prepareLogSettings();
     void fillLogSettings();
-    bool createServerFile(const QString& filename,const QString &path,const QString &dir);
+    bool createServerFile( QString& filename, QString &path, QString &dir);
     void prepareGeneralSettings();
-
-    void generateRegFile(QString key,QString path);
-
-    void fillSerial();
+    void savep(QString& cert,int &type);
 
 signals:
-
-    void sendSignal(int id);
-
+    void sendSignal(QList <int> &);
 };
-
-
 #endif // SETTINGS_H

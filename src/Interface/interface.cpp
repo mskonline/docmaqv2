@@ -1,3 +1,21 @@
+/* DocmaQ v2.0, Credential Publishing System
+    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "interface.h"
 #include <QDebug>
 
@@ -5,19 +23,19 @@ Interface::Interface()
 {
     setupUi(this);
 
-    menu = new ButtonItem(QPixmap(":/Images/Images/menu.png"));
-    menu->setAcceptHoverEvents(true);
-    session = new ButtonItem(QPixmap(":/Images/Images/session.png"));
-    session->setAcceptHoverEvents(true);
+    menu = new HoverItem(QPixmap(":/Images/menu.png"));
+    menu->enable(true);
+    session = new HoverItem(QPixmap(":/Images/session.png"));
+    session->enable(true);
 
-    larrow = new ArrowItem(QPixmap(":/Images/Images/larrow.png"));
-    larrow->setAcceptHoverEvents(true);
-    rarrow = new ArrowItem(QPixmap(":/Images/Images/rarrow.png"));
-    rarrow->setAcceptHoverEvents(true);
-    uarrow = new ArrowItem(QPixmap(":/Images/Images/uparrow.png"));
-    uarrow->setAcceptHoverEvents(true);
-    darrow = new ArrowItem(QPixmap(":/Images/Images/dnarrow.png"));
-    darrow->setAcceptHoverEvents(true);
+    larrow = new HoverItem(QPixmap(":/Images/larrow.png"));
+    larrow->enable(true);
+    rarrow = new HoverItem(QPixmap(":/Images/rarrow.png"));
+    rarrow->enable(true);
+    uarrow = new HoverItem(QPixmap(":/Images/uparrow.png"));
+    uarrow->enable(true);
+    darrow = new HoverItem(QPixmap(":/Images/dnarrow.png"));
+    darrow->enable(true);
 
     menu->setPos(CView->mapToScene(QPoint(0,0)));
     session->setPos(CView->mapToScene(QPoint(CView->rect().width() - 87,0)));
@@ -25,8 +43,11 @@ Interface::Interface()
     create_NItems();
     createPrintDialog();
     createShortCuts();
-    this->showMaximized();
+    setStatusBar();
     createPanels();
+
+    btable->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+    btable->verticalHeader()->setResizeMode(QHeaderView::Fixed);
 
     CView->verticalScrollBar()->setFocusPolicy(Qt::NoFocus);
 
@@ -38,71 +59,28 @@ Interface::Interface()
     connect(CView->verticalScrollBar(),SIGNAL(sliderMoved(int)),this,SLOT(viewresized()));
     connect(fscreenb,SIGNAL(pressed()),this,SLOT(fnscreen()));
     connect(aboutb,SIGNAL(pressed()),this,SLOT(about_docmaq()));
+
+    tpl = false;
 }
 
+/* create_NItems
+ * Called by Interface()
+ * Performs initialization of Graphic Items
+ */
 void Interface::create_NItems()
 {
-    cscene = new CredentialScene;
+    cscene = new QGraphicsScene;
     cscene->setSceneRect(0,0,619,438);
+    QFont ifont("Bitstream Vera Serif",10);
+    ifont.setBold(true);
 
-    pic[2] = new gpix(QPixmap("./tc.png"));
-    pic[1] = new gpix(QPixmap("./conduct.png"));
+    pic[2] = new QGraphicsPixmapItem(QPixmap("./images/tc.png"));
+    pic[1] = new QGraphicsPixmapItem(QPixmap("./images/conduct.png"));
     pic[1]->setZValue(pic[2]->zValue() + 1);
-    pic[0] = new gpix(QPixmap("./bpicrz.png"));
+    pic[0] = new QGraphicsPixmapItem(QPixmap("./images/bonafide.png"));
     pic[0]->setZValue(pic[1]->zValue() + 1);
 
     z = pic[0]->zValue() + 1;
-
-    QString t = QDate::currentDate().toString("dd.MM.yyyy");
-    cdate = new QGraphicsTextItem;
-    cdate->setPlainText(t);
-    cdate->setPos(QPointF(512,132));
-    cdate->setZValue(z);
-
-    stname = new LineItem(cscene,328,261);
-    stname->id = 1;
-    stname->itemName("STUDENT NAME");
-    stname->setPos(QPointF(230,191));
-    stname->setZValue(z);
-
-    co = new ComboItem(cscene,pic[0],140,69,QStringList() << "S/o" << "D/o");
-    co->id = 2;
-    co->setZValue(z);
-
-    fname = new LineItem(cscene,328,261);
-    fname->id = 3;
-    fname->itemName("FATHER NAME");
-    fname->setPos(QPointF(115,216));
-    fname->setZValue(z);
-
-    roll = new QGraphicsTextItem;
-    roll->setPos(QPointF(206,244));
-    roll->setZValue(z);
-
-    cdetails = new LineItem(cscene,388,331);
-    cdetails->id = 4;
-    cdetails->itemName("COURSE DETAILS");
-    cdetails->setPos(273,271);
-    cdetails->setZValue(z);
-
-    fyear = new QGraphicsTextItem(pic[0]);
-    fyear->setPos(QPointF(192,300));
-    fyear->setZValue(z);
-
-    tyear = new QGraphicsTextItem(pic[0]);
-    tyear->setPos(QPointF(294,300));
-    tyear->setZValue(z);
-
-    purposetext = new QGraphicsTextItem(pic[0]);
-    purposetext->setPlainText("This Certificate is issued for the purpose of:");
-    purposetext->setPos(QPointF(30,339));
-    purposetext->setZValue(z);
-
-    purpose = new LineItem(cscene,150,92,pic[0]);
-    purpose->id = 5;
-    purpose->itemName("PURPOSE");
-    purpose->setPos(QPointF(365,339));
-    purpose->setZValue(z);
 
     QFont snofont("Bitstream Vera Serif",11);
     snofont.setBold(true);
@@ -112,10 +90,69 @@ void Interface::create_NItems()
     sno->setDefaultTextColor(QColor("red"));
     sno->setFont(snofont);
 
-    acyear =  new QGraphicsTextItem(pic[1]);
-    acyear->setPos(222,264);
-    acyear->setZValue(z);
+    cdate = new QGraphicsTextItem;
+    cdate->setFont(ifont);
+    cdate->setPos(512,129);
+    cdate->setZValue(z);
 
+    stname = new LineItem(cscene,241);
+    stname->setFont(ifont);
+    stname->id = 1;
+    stname->itemName("STUDENT NAME");
+    stname->setPos(230,191);
+    stname->setZValue(z);
+
+    co = new ComboItem(cscene,69,QStringList() << "S/o" << "D/o");
+    co->setFont(ifont);
+    co->id = 2;
+    co->setZValue(z);
+
+    fname = new LineItem(cscene,241);
+    fname->setFont(ifont);
+    fname->id = 3;
+    fname->itemName("FATHER NAME");
+    fname->setPos(QPointF(115,216));
+    fname->setZValue(z);
+
+    roll = new QGraphicsTextItem;
+    roll->setFont(ifont);
+    roll->setPos(206,244);
+    roll->setZValue(z);
+
+    cdetails = new LineItem(cscene,240);
+    cdetails->setFont(ifont);
+    cdetails->id = 4;
+    cdetails->itemName("COURSE DETAILS");
+    cdetails->setPos(273,271);
+    cdetails->setZValue(z);
+
+    fyear = new QGraphicsTextItem(pic[0]);
+    fyear->setFont(ifont);
+    fyear->setPos(192,300);
+    fyear->setZValue(z);
+
+    tyear = new QGraphicsTextItem(pic[0]);
+    tyear->setFont(ifont);
+    tyear->setPos(QPointF(294,300));
+    tyear->setZValue(z);
+
+    purposetext = new QGraphicsTextItem(pic[0]);
+    purposetext->setFont(ifont);
+    purposetext->setPlainText("This Certificate is issued for the purpose of :");
+    purposetext->setPos(30,339);
+    purposetext->setZValue(z);
+
+    purpose = new LineItem(cscene,92,pic[0]);
+    purpose->setFont(ifont);
+    purpose->id = 5;
+    purpose->itemName("PURPOSE");
+    purpose->setPos(345,339);
+    purpose->setZValue(z);
+
+    acyear =  new QGraphicsTextItem(pic[1]);
+    acyear->setFont(ifont);
+    acyear->setPos(222,262);
+    acyear->setZValue(z);
 
     uarrow->setZValue(z);
     darrow->setZValue(z);
@@ -130,7 +167,6 @@ void Interface::create_NItems()
     cscene->addItem(pic[1]);
     cscene->addItem(pic[2]);
 
-
     cscene->addItem(stname);
     cscene->addItem(fname);
     cscene->addItem(roll);
@@ -138,12 +174,7 @@ void Interface::create_NItems()
     cscene->addItem(sno);
 
     cscene->addItem(cdate);
-    /*scscene->addItem(fyear);
-    cscene->addItem(tyear);
-    cscene->addItem(purposetext);
-    cscene->addItem(purpose);
-
-    cscene->addItem(acyear);*/
+    cscene->addItem(co);
 
     CView->setScene(cscene);
     CView->setBackgroundBrush(QBrush(QColor("grey")));
@@ -152,154 +183,249 @@ void Interface::create_NItems()
     pic[2]->setVisible(false);
 }
 
+/* set_TC_Items(int)
+ * Called by AppManager::TC_mode()
+ * Performs initialization/Removal of Graphic Items of TC
+ */
 void Interface::set_TC_Items(int s)
 {
     switch(s)
     {
-    case 0: // Remove TC Items
-        cscene->removeItem(admno);
-        cscene->removeItem(doa);
-        cscene->removeItem(dob);
-        cscene->removeItem(dol);
-        cscene->removeItem(qlf);
-        cscene->removeItem(conduct);
-        cscene->removeItem(community);
-        cscene->removeItem(dues);
-        cscene->removeItem(dis);
-        cscene->removeItem(course);
-        cscene->removeItem(branch);
+    case 0:
+        typecb->disconnect();
+        sersb->disconnect();
 
+        stname->setAcceptHoverEvents(true);
+        fname->setAcceptHoverEvents(true);
 
+        // Remove TC Items
+        for(int i = 0 ; i < 11 ; ++i)
+        {
+            cscene->removeItem(tcitems->at(i));
+            delete tcitems->at(i);
+        }
+
+        tcitems->clear();
+        delete tcitems;
+        delete tc_type;
+        delete tc_sno;
+        delete admno;
 
         showTc(false);
-        delete doa;
-        delete dob;
-        delete dol;
-        delete qlf;
-        delete conduct;
-        delete community;
-        delete dues;
-        delete dis;
-        delete course;
-        delete branch;
-
+        cscene->removeItem(tpanel);
         cscene->setSceneRect(0,0,619,438);
 
+        tpl = false;
         break;
-    case 1: // Set TC Items
+    case 1:
+        stname->setAcceptHoverEvents(false);
+        fname->setAcceptHoverEvents(false);
+
+        // Set TC Items
+        tcitems = new QList <QGraphicsTextItem *>;
+
         QFont tfont("Bitstream Vera Serif",11);
         tfont.setBold(true);
+
+        tc_sno = new QGraphicsTextItem(pic[2]);
+        tc_sno->setPos(45,62);
+        tc_sno->setZValue(z);
+        tc_sno->setFont(tfont);
+        tc_sno->setDefaultTextColor(QColor("red"));
+
         tc_type = new QGraphicsTextItem(pic[2]);
-        tc_type->setPos(518,70);
+        tc_type->setPos(518,62);
         tc_type->setZValue(z);
         tc_type->setFont(tfont);
         tc_type->setDefaultTextColor(QColor("red"));
 
+        QFont ifont("Bitstream Vera Serif",10);
+        ifont.setBold(true);
+
         admno = new QGraphicsTextItem(pic[2]);
         admno->setPos(384,149);
         admno->setZValue(z);
+        admno->setFont(ifont);
 
-        doa = new DateItem(cscene,pic[2],7);
-        doa->itemName("DATE OF ADMISSION");
-        doa->setPos(319,314);
-        doa->setZValue(z);
+        // DATE OF BIRTH
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(0)->setPos(294,269);
+        tcitems->at(0)->setZValue(z);
+        tcitems->at(0)->setFont(ifont);
 
-        dob = new DateItem(cscene,pic[2],6);
-        dob->itemName("DATE OF BIRTH");
-        dob->setPos(190,269);
-        dob->setZValue(z);
+        // DATE OF ADMISSION
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(1)->setPos(362,312);
+        tcitems->at(1)->setZValue(z);
+        tcitems->at(1)->setFont(ifont);
 
-        dol = new DateItem(cscene,pic[2],10);
-        dol->itemName("DATE OF LEAVING");
-        dol->setPos(285,440);
-        dol->setZValue(z);
+        // COURSE
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(2)->setPos(332,352);
+        tcitems->at(2)->setZValue(z);
+        tcitems->at(2)->setFont(ifont);
 
-        course = new ComboItem(cscene,pic[2],164,102, QStringList()
-        << "B.Tech"
-        << "M.Tech"
-        << "MBA"
-        << "MCA"
-        );
-        course->id = 8;
-        course->itemName("COURSE");
-        course->setPos(239,352);
-        course->setZValue(z);
+        // BRANCH
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(3)->setPos(254,398);
+        tcitems->at(3)->setZValue(z);
+        tcitems->at(3)->setFont(ifont);
 
-        branch = new ComboItem(cscene,pic[2],164,102, QStringList()
-        << "AM"
-        << "Bio-Tech"
-        << "CSE"
-        << "ECE"
-        << "ECM"
-        << "EEE"
-        << "EET"
-        << "IT"
-        << "Mech"
-        << "BSCE"
-        << "CAD-CAM"
-        << "ECE"
-        << "SE"
-        << "S & H"
-        << "VLSI" );
-        branch->id = 9;
-        branch->itemName("BRANCH");
-        branch->setPos(254,398);
-        branch->setZValue(z);
+        // DATE OF LEAVING
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(4)->setPos(345,440);
+        tcitems->at(4)->setZValue(z);
+        tcitems->at(4)->setFont(ifont);
 
-        qlf = new LineItem(cscene,328,261,pic[2]);
-        qlf->id = 11;
-        qlf->itemName("YES / NO");
-        qlf->setPos(QPointF(230,191));
-        qlf->setPos(402,480);
-        qlf->setZValue(z);
+        // YES / NO
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(5)->setPos(414,480);
+        tcitems->at(5)->setZValue(z);
+        tcitems->at(5)->setFont(ifont);
 
-        dues = new LineItem(cscene,328,261,pic[2]);
-        dues->id = 12;
-        dues->itemName("DUES");
-        dues->setPos(QPointF(230,191));
-        dues->setPos(136,524);
-        dues->setZValue(z);
+        // DUES
+        tcitems->append(new QGraphicsTextItem(pic[2]));    
+        tcitems->at(6)->setPos(304,524);
+        tcitems->at(6)->setZValue(z);
+        tcitems->at(6)->setFont(ifont);
 
-        dis = new LineItem(cscene,328,261,pic[2]);
-        dis->id = 13;
-        dis->itemName("DISCIPILINE");
-        dis->setPos(QPointF(230,191));
-        dis->setPos(321,567);
-        dis->setZValue(z);
+        // DISCIPILINE
+        tcitems->append(new QGraphicsTextItem(pic[2]));   
+        tcitems->at(7)->setPos(321,567);
+        tcitems->at(7)->setZValue(z);
+        tcitems->at(7)->setFont(ifont);
 
-        conduct = new LineItem(cscene,328,261,pic[2]);
-        conduct->id = 14;
-        conduct->itemName("CONDUCT");
-        conduct->setPos(QPointF(230,191));
-        conduct->setPos(172,610);
-        conduct->setZValue(z);
+        ifont.setItalic(true);
 
-        community = new LineItem(cscene,328,261,pic[2]);
-        community->id = 15;
-        community->itemName("COMMUNITY");
-        community->setPos(QPointF(230,191));
-        community->setPos(389,654);
-        community->setZValue(z);
+        // CONDUCT
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(8)->setPos(266,610);
+        tcitems->at(8)->setZValue(z);
+        tcitems->at(8)->setFont(ifont);
+
+        ifont.setItalic(false);
+
+        // COMMUNITY
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(9)->setPos(389,654);
+        tcitems->at(9)->setZValue(z);
+        tcitems->at(9)->setFont(ifont);
+
+        // REMARKS
+        tcitems->append(new QGraphicsTextItem(pic[2]));
+        tcitems->at(10)->setPos(220,698);
+        tcitems->at(10)->setZValue(z);
+        tcitems->at(10)->setFont(ifont);
+
+        stname->setPlainText("");
+        fname->setPlainText("");
+        roll->setPlainText("");
 
         showTc(true);
+        stname->setPos(214,183);
+        fname->setPos(202,225);
+        roll->setPos(82,149);
+        cdate->setPos(538,149);
+
+        create_TC_Panel();
         cscene->setSceneRect(0,0,619,877);
+
+        int w = CView->viewport()->width() / 2;
+        int h = CView->viewport()->height();
+
+        tpanel->setPos(CView->mapToScene(w - 215, h - 50));
+
+        tpl = true;
     }
 }
 
-void Interface::set_items(QStringList *dlist)
+/* set_items(QStringList &)
+ * Called by Interface()
+ * Performs data initialization of Items
+ */
+void Interface::set_items(QStringList &dlist)
 {
-    /*tyear->setPlainText(dlist->at());
-    fyear->setPlainText(dlist->at());
-    cdate->setPlainText(dlist->at());
-    acyear->setPlainText(dlist->at() + " - " + dlist->at());
-    */
+    cdate->setPlainText(dlist.at(0));
+    fyear->setPlainText(dlist.at(1));
+    tyear->setPlainText(dlist.at(2));
+    acyear->setPlainText(dlist.at(1) + " - " + dlist.at(2));
 }
 
+void Interface::create_TC_Panel()
+{
+    QLabel *label;
+    QLabel *label_2;
+    QLabel *label_3;
+    QWidget *widget = new QWidget;
+
+    QPixmap pixmap(":/Images/tpanel.png");
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(QImage(":/Images/tpanel.png")));
+
+    widget->setGeometry(0,0,430, 50);
+    label = new QLabel(widget);
+    label->setGeometry(QRect(36, 1, 81, 16));
+    label->setText("ROLL NUMBER");
+
+    troll = new QLineEdit(widget);
+    troll->setGeometry(QRect(10, 20, 131, 25));
+    QFont font;
+    font.setPointSize(10);
+    font.setBold(true);
+    troll->setFont(font);
+
+    sersb = new QSpinBox(widget);
+    sersb->setGeometry(QRect(150, 20, 71, 25));
+    sersb->setMinimum(1);
+    sersb->setMaximum(99999);
+    sersb->setValue(1);
+    sersb->setEnabled(false);
+
+    typecb = new QCheckBox(widget);
+    typecb->setText("ORIGINAL");
+    typecb->setEnabled(false);
+    typecb->setGeometry(QRect(236, 20, 81, 21));
+
+    tprint = new QPushButton(widget);
+    tprint->setGeometry(QRect(330, 9, 91, 34));
+
+    QFont font1;
+    font1.setFamily(QString::fromUtf8("Segoe UI"));
+    font1.setPointSize(12);
+    font1.setBold(true);
+    font1.setWeight(75);
+
+    QIcon icon;
+    icon.addFile(":/Images/docmaq.png",QSize(),QIcon::Normal, QIcon::Off);
+    tprint->setFont(font1);
+    tprint->setText("Print");
+    tprint->setCursor(QCursor(Qt::PointingHandCursor));
+    tprint->setIcon(icon);
+
+    label_2 = new QLabel(widget);
+    label_2->setGeometry(QRect(157, 1, 61, 16));
+    label_2->setText("SERIAL NO.");
+
+    label_3 = new QLabel(widget);
+    label_3->setGeometry(QRect(258, 1, 41, 16));
+    label_3->setText("TYPE");
+
+    widget->setMask(pixmap.mask());
+    widget->setPalette(palette);
+
+    tpanel = cscene->addWidget(widget);
+    tpanel->setZValue(z);
+}
+
+/* createPanels()
+ * Called by Interface()
+ * Performs initialisation of Interface Panels
+ */
 void Interface::createPanels()
 {
-    QPixmap pixmap(":/Images/Images/panel.png");
+    QPixmap pixmap(":/Images/panel.png");
     QPalette palette;
-    palette.setBrush(this->backgroundRole(), QBrush(QImage(":/Images/Images/panel.png")));
+    palette.setBrush(this->backgroundRole(), QBrush(QImage(":/Images/panel.png")));
 
     //lpanel
     lframe = new QWidget;
@@ -313,7 +439,7 @@ void Interface::createPanels()
     settingsb->setFont(font);
     settingsb->setText("Settings");
     QIcon icon;
-    icon.addFile(QString::fromUtf8(":/Images/Images/settings.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon.addFile(":/Images/settings.png", QSize(), QIcon::Normal, QIcon::Off);
     settingsb->setIcon(icon);
     settingsb->setIconSize(QSize(48, 48));
     settingsb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -325,7 +451,7 @@ void Interface::createPanels()
     fscreenb->setFont(font);
     fscreenb->setText("Full Screen");
     QIcon icon2;
-    icon2.addFile(QString::fromUtf8(":/Images/Images/fullscreen.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon2.addFile(":/Images/fullscreen.png", QSize(), QIcon::Normal, QIcon::Off);
     fscreenb->setIcon(icon2);
     fscreenb->setIconSize(QSize(48, 48));
     fscreenb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -336,7 +462,7 @@ void Interface::createPanels()
     tcb->setFont(font);
     tcb->setText("Issue TC");
     QIcon icon1;
-    icon1.addFile(QString::fromUtf8(":/Images/Images/tc.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon1.addFile(":/Images/tc.png", QSize(), QIcon::Normal, QIcon::Off);
     tcb->setIcon(icon1);
     tcb->setIconSize(QSize(48, 48));
     tcb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -354,30 +480,30 @@ void Interface::createPanels()
     logb->setFont(font);
     logb->setText("Logs");
     QIcon icon4;
-    icon4.addFile(QString::fromUtf8(":/Images/Images/log.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon4.addFile(":/Images/log48.png", QSize(), QIcon::Normal, QIcon::Off);
     logb->setIcon(icon4);
     logb->setIconSize(QSize(48, 48));
     logb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     logb->setAutoRaise(true);
     logb->setArrowType(Qt::NoArrow);
 
-    helpb = new QToolButton(rframe);
-    helpb->setGeometry(QRect(10, 170, 71, 71));
-    helpb->setFont(font);
-    helpb->setText("Help");
+    pdfb = new QToolButton(rframe);
+    pdfb->setGeometry(QRect(10, 90, 71, 71));
+    pdfb->setFont(font);
+    pdfb->setText("Print PDF");
     QIcon icon5;
-    icon5.addFile(QString::fromUtf8(":/Images/Images/help.png"), QSize(), QIcon::Normal, QIcon::Off);
-    helpb->setIcon(icon5);
-    helpb->setIconSize(QSize(48, 48));
-    helpb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    helpb->setAutoRaise(true);
+    icon5.addFile(":/Images/pdf.png", QSize(), QIcon::Normal, QIcon::Off);
+    pdfb->setIcon(icon5);
+    pdfb->setIconSize(QSize(48, 48));
+    pdfb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    pdfb->setAutoRaise(true);
 
     aboutb = new QToolButton(rframe);
-    aboutb->setGeometry(QRect(10, 90, 71, 71));
+    aboutb->setGeometry(QRect(10, 170, 71, 71));
     aboutb->setFont(font);
     aboutb->setText("About");
     QIcon icon6;
-    icon6.addFile(QString::fromUtf8(":/Images/Images/printer.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon6.addFile(":/Images/printer.png", QSize(), QIcon::Normal, QIcon::Off);
     aboutb->setIcon(icon6);
     aboutb->setIconSize(QSize(48, 48));
     aboutb->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -388,6 +514,9 @@ void Interface::createPanels()
 
     lproxy = cscene->addWidget(lframe);
     rproxy = cscene->addWidget(rframe);
+
+    lproxy->setZValue(z + 10);
+    rproxy->setZValue(z + 10);
 
     // Parallel Animations for Both Panels
     QParallelAnimationGroup *group = new QParallelAnimationGroup;
@@ -420,91 +549,134 @@ void Interface::createPanels()
 void Interface::createPrintDialog()
 {
     prints = new SPrintDialog(this);
+    prints->hlabel->setText("<font color='white'>Bonafide Certificate Printing</font>");
     prints->hide();
 }
 
-void Interface::createsession(QStringList lt)
+void Interface::showsessionpage(QStringList &sinfo)
 {
-    this->wframe->setEnabled(false);
-
     QPushButton *close;
-    QLabel *unamecs,*ltimecs,*ctotal,*cb,*cc,*ct,*unamels, *ltimels,*lotimels;
+    QLabel *unamecs,*ltimecs,*cb,*cc,*ct,*unamels, *ltimels,*lotimels;
+    QLabel *blast,*clast,*tlast;
+    QFont sfont("Segoe UI",11);
+    sfont.setBold(true);
+
     QWidget *widget = new QWidget;
+    widget->setFont(sfont);
     widget->setGeometry(0,0,555,564);
 
     close = new QPushButton(widget);
-    close->setObjectName(QString::fromUtf8("close"));
+    close->setText("Close");
     close->setGeometry(QRect(470, 10, 75, 23));
     unamecs = new QLabel(widget);
+    unamecs->setText(sinfo.at(0));
     unamecs->setGeometry(QRect(320, 130, 221, 21));
     unamecs->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
     ltimecs = new QLabel(widget);
+    ltimecs->setText(sinfo.at(1));
     ltimecs->setGeometry(QRect(320, 170, 221, 21));
     ltimecs->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-    ctotal = new QLabel(widget);
-    ctotal->setGeometry(QRect(450, 215, 91, 21));
-    ctotal->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
     cb = new QLabel(widget);
+    cb->setText(sinfo.at(2));
     cb->setGeometry(QRect(450, 260, 91, 21));
     cb->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    blast = new QLabel(widget);
+    blast->setText(sinfo.at(3));
+    blast->setObjectName(QString::fromUtf8("blast"));
+    blast->setGeometry(QRect(280, 260, 121, 21));
+    blast->setAlignment(Qt::AlignCenter);
+
     cc = new QLabel(widget);
+    cc->setText(sinfo.at(4));
     cc->setGeometry(QRect(450, 300, 91, 21));
     cc->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    clast = new QLabel(widget);
+    clast->setText(sinfo.at(5));
+    clast->setObjectName(QString::fromUtf8("clast"));
+    clast->setGeometry(QRect(280, 300, 121, 21));
+    clast->setAlignment(Qt::AlignCenter);
+
     ct = new QLabel(widget);
+    ct->setText(sinfo.at(6));
     ct->setGeometry(QRect(450, 340, 91, 21));
     ct->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    tlast = new QLabel(widget);
+    tlast->setText(sinfo.at(7));
+    tlast->setGeometry(QRect(280, 340, 121, 21));
+    tlast->setAlignment(Qt::AlignCenter);
+
     unamels = new QLabel(widget);
+    unamels->setText(sinfo.at(8));
     unamels->setGeometry(QRect(350, 440, 191, 21));
     unamels->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
     ltimels = new QLabel(widget);
+    ltimels->setText(sinfo.at(9));
     ltimels->setGeometry(QRect(350, 480, 191, 21));
     ltimels->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
     lotimels = new QLabel(widget);
+    lotimels->setText(sinfo.at(10));
     lotimels->setGeometry(QRect(350, 520, 191, 21));
     lotimels->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-    QPixmap pixmap("./dhome.png");
+    QPixmap pixmap("./Images/session.png");
     QPalette palette;
-    palette.setBrush(this->backgroundRole(), QBrush(QImage("./dhome.png")));
+    palette.setBrush(this->backgroundRole(), QBrush(QImage("./Images/session.png")));
     widget->setMask(pixmap.mask());
     widget->setPalette(palette);
     sproxy = new QGraphicsProxyWidget;
 
     sproxy = cscene->addWidget(widget);
+    sproxy->setZValue(z + 1);
+    pic[0]->setOpacity(0.0);
+    pic[1]->setOpacity(0.0);
+    this->setenabled(false);
 
-    // Gather Session Info form settings
+    sproxy->setPos(CView->mapToScene(CView->viewport()->width() / 2 - 277,
+                                     CView->viewport()->height() / 2 - 282));
 
-    connect(close,SIGNAL(pressed()),this,SLOT(closesessionpage()));
+    connect(close,SIGNAL(released()),this,SLOT(closesessionpage()));
 }
 
-// createShortCuts()
-// Key Board ShortCuts
+
 void Interface::createShortCuts()
 {
     Bsc = new QShortcut(QKeySequence(tr("F1")),this);
     Csc = new QShortcut(QKeySequence(tr("F2")),this);
-    help = new QShortcut(QKeySequence(tr("Ctrl + h")),this);
 }
 
-void Interface::setStatusBar(QString user, int c)
+void Interface::setStatusBar()
 {
-    QLabel *ulb = new QLabel;
-    QLabel *timelb = new QLabel;
+    ulb = new QLabel;
+    timelb = new QLabel;
+    dq = new QLabel;
     mode = new QLabel;
 
-    ulb->setText("User Logged In : " + tr("<b>") + user + "<b>");
-    timelb->setText("Login Time : " + tr("<b>") + QDateTime::currentDateTime().toString() + "<b>");
-    if(c)
-        mode->setText("Mode : " + tr("<b>") + "Database" + tr("<b>"));
-    else
-        mode->setText("Mode : " + tr("<b>") + "Manual" + tr("<b>"));
-
     timelb->setAlignment(Qt::AlignCenter);
-    mode->setAlignment(Qt::AlignRight);
+    mode->setAlignment(Qt::AlignCenter);
+    dq->setAlignment(Qt::AlignRight);
 
     sBar->addWidget(ulb,1);
     sBar->addWidget(timelb,1);
     sBar->addWidget(mode,1);
+    sBar->addWidget(dq,1);
+}
+
+void Interface::setSBText(QString user, bool c)
+{
+    ulb->setText("User Logged In : " + tr("<b>") + user + "<b>");
+    timelb->setText("Login Time : " + tr("<b>") + QDateTime::currentDateTime().toString("dddd hh:mm:ss AP MMM yyyy") + "<b>");
+    if(c)
+        mode->setText("Mode : " + tr("<b>") + "Database" + tr("<b>"));
+    else
+        mode->setText("Mode : " + tr("<b>") + "Manual" + tr("<b>"));
+    dq->setText("<b>DocmaQ</b> ");
 }
 
 /* void set_ct(Student *)
@@ -522,7 +694,6 @@ void Interface::set_ct(Student *student)
        fname->setPlainText(student->father_name);
        roll->setPlainText(student->roll);
        co->setPlainText(student->co);
-
        cdetails->setPlainText(student->cdetails);
        purpose->setPlainText(student->purpose);
 
@@ -530,6 +701,7 @@ void Interface::set_ct(Student *student)
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[0]));
        else
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[1]));
+
     }
    else
    {
@@ -537,7 +709,6 @@ void Interface::set_ct(Student *student)
        fname->setText(student->father_name);
        roll->setPlainText(student->roll);
        co->setPlainText(student->co);
-
        cdetails->setText(student->cdetails);
        purpose->setPlainText(student->purpose);
 
@@ -558,28 +729,24 @@ void Interface::set_ct(Student *student)
 
 void Interface::set_tc(Student *student)
 {
+    tc_sno->setPlainText(temp.sprintf("%05d",student->c_sno[0]));
     stname->setPlainText(student->name);
     fname->setPlainText(student->father_name);
     roll->setPlainText(student->roll);
 
-    stname->setPos(214,186);
-    fname->setPos(202,228);
-    roll->setPos(82,149);
-    cdate->setPos(542,149);
-
-   // tc_type->setPlainText(student->std_ex->type);
+    tc_type->setPlainText(student->std_ex->type);
     admno->setPlainText(student->roll);
-    dob->setText(student->std_ex->dob);
-    doa->setText(student->std_ex->doa);
-    course->setText(student->course);
-    branch->setText(student->branch);
-
-    dol->setText(student->std_ex->dol);
-    qlf->setPlainText(student->std_ex->qualified);
-    dues->setPlainText(student->std_ex->dues);
-    dis->setPlainText(student->std_ex->disp_m);
-    conduct->setPlainText(student->std_ex->conduct);
-    community->setPlainText(student->std_ex->community);
+    tcitems->at(0)->setPlainText(student->std_ex->dob);
+    tcitems->at(1)->setPlainText(student->std_ex->doa);
+    tcitems->at(2)->setPlainText(student->course);
+    tcitems->at(3)->setPlainText(student->branch);
+    tcitems->at(4)->setPlainText(student->std_ex->dol);
+    tcitems->at(5)->setPlainText(student->std_ex->qualified);
+    tcitems->at(6)->setPlainText(student->std_ex->dues);
+    tcitems->at(7)->setPlainText(student->std_ex->disp_m);
+    tcitems->at(8)->setPlainText(student->std_ex->conduct);
+    tcitems->at(9)->setPlainText(student->std_ex->community);
+    tcitems->at(10)->setPlainText(student->std_ex->remarks);
 }
 
 void Interface::show_ct(int vpic)
@@ -590,32 +757,31 @@ void Interface::show_ct(int vpic)
         pic[0]->setOpacity(1.0);
         pic[1]->setOpacity(0.0);
 
+        sno->setPos(168,131);
+        cdate->setPos(515,129);
         stname->setPos(230,191);
+        co->setPos(505,191);
         fname->setPos(115,216);
         roll->setPos(206,244);
-        cdate->setPos(515,132);
-        co->setPos(505,191);
         cdetails->setPos(273,271);
-        sno->setPos(168,131);
+
         break;
     case 1: // Conduct
         pic[0]->setOpacity(0.0);
         pic[1]->setOpacity(1.0);
 
-        cdate->setPos(520,59);
+        sno->setPos(148,52);
+        cdate->setPos(520,56);
         stname->setPos(164,143);
         co->setPos(502,143);
         fname->setPos(57,175);
-        roll->setPos(152,205);
-        cdetails->setPos(227,235);
-        sno->setPos(100,100);
-
+        roll->setPos(152,203);
+        cdetails->setPos(227,233);
       }
 }
 
 void Interface::resetView(int i)
 {
-
     stname->setPlainText("");
     fname->setPlainText("");
     roll->setPlainText("");
@@ -623,29 +789,15 @@ void Interface::resetView(int i)
     sno->setPlainText("");
     cdetails->setPlainText("");
     purpose->setPlainText("");
-
     show_ct(i);
 }
 
 void Interface::showTc(bool var)
 {
-    admno->setVisible(var);
-    dob->setVisible(var);
-    doa->setVisible(var);
-    course->setVisible(var);
-    branch->setVisible(var);
-    dol->setVisible(var);
-    qlf->setVisible(var);
-    dues->setVisible(var);
-    dis->setVisible(var);
-    conduct->setVisible(var);
-    community->setVisible(var);
     pic[2]->setVisible(var);
 
     var = !var;
 
-    stname->setVisible(var);
-    fname->setVisible(var);
     co->setVisible(var);
     cdetails->setVisible(var);
     sno->setVisible(var);
@@ -704,6 +856,9 @@ void Interface::viewresized()
         lproxy->setPos(pt);
         rproxy->setPos(pt2);
     }
+
+    if(tpl)
+        tpanel->setPos(CView->mapToScene(mw - 215, h - 50));
 }
 
 void Interface::fnscreen()
@@ -738,14 +893,28 @@ void Interface::report(int type, QString msg)
 void Interface::closesessionpage()
 {
     cscene->removeItem(sproxy);
-    this->wframe->setEnabled(true);
+    this->setenabled(true);
     this->rollnoLe->setFocus();
+}
+
+void Interface::setenabled(bool v)
+{
+    larrow->enable(v);
+    rarrow->enable(v);
+    uarrow->enable(v);
+    darrow->enable(v);
+    menu->enable(v);
+    session->enable(v);
+    rollboxGb->setEnabled(v);
+    printButton->setEnabled(v);
 }
 
 void Interface::about_docmaq()
 {
     About_DocmaQ *abt = new About_DocmaQ(this);
+    abt->move(this->width()/2 - 202, this->height()/2 - 218);
     abt->show();
+    aboutb->setDown(false);
 }
 
 void Interface::closeEvent(QCloseEvent *event)

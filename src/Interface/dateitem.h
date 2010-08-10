@@ -3,20 +3,18 @@
 
 #include <QtGui>
 
-class CredentialScene;
-
 class DateItem : public QGraphicsTextItem
 {
     Q_OBJECT
 
 public:
-    DateItem(CredentialScene *,QGraphicsItem *parent,int);
+    DateItem(QGraphicsScene *,QGraphicsItem *parent,int);
     void constructWidgets();
     void itemName(QString);
     void setText(QString);
 
 private:
-    CredentialScene *scene;
+    QGraphicsScene *scene;
     QWidget *Form;
     QString iname;
     QGraphicsProxyWidget *proxy;

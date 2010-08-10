@@ -6,6 +6,8 @@
 class CredentialScene;
 class Student;
 
+//extern int var_yr,var_sem;
+
 class CourseItem : public QGraphicsTextItem
 {
 Q_OBJECT

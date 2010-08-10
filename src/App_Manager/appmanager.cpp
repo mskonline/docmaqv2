@@ -1,3 +1,21 @@
+/* DocmaQ v2.0, Credential Publishing System
+    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "appmanager.h"
 #include "../Database_Manager/cdatabase.h"
 #include "../interface/interface.h"
@@ -7,35 +25,36 @@
 #include "../Settings_Manager/getsettings.h"
 #include "../Log_Manager/log.h"
 
+#include "thread.h"
 #include <QDebug>
 
 AppManager::AppManager()
 {
-    /*splash = new QSplashScreen;
-    splash->setPixmap(QPixmap("./stpic.png"));
+    splash = new QSplashScreen;
+    splash->setPixmap(QPixmap("./images/stpic.png"));
     splash->show();
 
     Qt::Alignment bottomleft = Qt::AlignLeft | Qt::AlignBottom;
-    splash->showMessage(QObject::tr("Initializing..."),bottomleft, Qt::white);*/
+    splash->showMessage("Initializing...",bottomleft, Qt::white);
 
     // Initialize few essential flags
     st_ptr = 0;
-    et =p_lock = 0;
+    et = 0;
     fg_rollLe = 1;
 
     c_type[0] = 1;
     c_type[1] = 0;
+    vpic = 0;
+    c_mode = p_type =  0;
 
-    c_mode = p_type = 0;
-
-    c_sno.append(0);
-    c_sno.append(0);
+    admn = 0;
     c_count.append(0);
     c_count.append(0);
 
     this->rtype = this->btype =  "B";
     st_plist = new QList <Student *>;
 
+    Delay::sleep(1);
     // load the initial modules
     load_init_modules();
 }
@@ -46,60 +65,98 @@ AppManager::AppManager()
  */
 void AppManager::load_init_modules()
 {
-    // Load DB, Auth, Settings
-    cdb = new CDatabase();
-    cdb->connect();
+    Qt::Alignment bottomleft = Qt::AlignLeft | Qt::AlignBottom;
+    splash->showMessage("Loading Settings...",bottomleft, Qt::white);
 
-    ad=new AuthenDialog();
+    // Load DB, Auth, Settings
+    settings=new GetSettings();
+    settings->getMode(d_mode);
+    Delay::sleep(1);
+
+    splash->showMessage("Connecting to Database...",bottomleft, Qt::white);
+    cdb = new CDatabase();
+
+    if(d_mode)
+    {
+        settings->getDatabaseDetails(dblist);
+        cdb->connect(dblist);
+    }
+
+    Delay::sleep(1);
+    splash->close();
+
+    ad=new AuthenDialog(d_mode,cdb->is_connected,cdb->dbstatus);
     ad->show();
 
-    log= new logs(new QTextEdit);
-    settings=new GetSettings();
+    if(!cdb->is_connected)
+    {
+        d_mode = false;
+        settings->setMode(d_mode);
+    }
 
-
-    connect(ad,SIGNAL(isAdmin(QString)),cdb,SLOT(get_user_password(QString)));
-    connect(ad,SIGNAL(userAuthenticated()),this,SLOT(load_final_modules()));
+    connect(ad,SIGNAL(checkuser(QString)),cdb,SLOT(get_user_password(QString)));
+    connect(ad,SIGNAL(userAuthenticated(int)),this,SLOT(load_final_modules(int)));
     connect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
+
+    delete splash;
 }
 
 /* load_final_modules()
  * Called by AuthenDialog only when the
  * Username & password are valid
  */
-void AppManager::load_final_modules()
+void AppManager::load_final_modules(int admn)
 {
+    this->admn = admn;
+
+    switch(admn)
+    {
+    case 0 : cdb->username = "Staff";
+        cdb->user_id = "Staff";
+        break;
+    case 1 : cdb->username = "Admin";
+        cdb->user_id = "Admin";
+    }
+
+    lg = new d_log;
+    lg->startSession(cdb->user_id,cdb->username);
+
+    // Interface Initialization from settings , (csno,cdate,acyears)
+    settings->getSno(c_sno);
+    r_sno[0] = c_sno[0];
+    r_sno[1] = c_sno[1];
+
+    settings->getDateAcademicYear(dlist);
+
     //Load Interface, Log, Print
     interface = new Interface();
+    interface->set_items(dlist);
     interface->rollnoLe->setFocus();
 
-    if(cdb->is_connected)
-        d_mode = 1;
-    else
-        d_mode = 0;
-
     // Set Status bar
-    interface->setStatusBar(cdb->username,d_mode);
+    interface->setSBText(cdb->username,d_mode);
     interface->rbb->setChecked(true);
 
-    // Interface Initialization from settings , csno
-
     cprinter = new CPrinter(c_sno,dlist);
-    //cprinter->updateList(settings->getPrintPositions(0),0);
+    settings->getPrinter(cprinter->p);
+    settings->getPrintPositions(cprinter->blist,0);
+    settings->getPrintPositions(cprinter->clist,1);
+    cprinter->st_list = st_plist;
 
     bg_ctype = new QButtonGroup;
     bg_ctype->addButton(interface->bCb,0);
     bg_ctype->addButton(interface->cCb,1);
     bg_ctype->setExclusive(false);
 
-
     bg_ptype = new QButtonGroup;
     bg_ptype->addButton(interface->rbb,0);
     bg_ptype->addButton(interface->rbc,1);
     bg_ptype->setExclusive(true);
 
-     // Interface
+    // Interface
     connect(interface->btable,SIGNAL(cellPressed(int,int)),this,SLOT(btableclicked(int,int)));
     connect(interface->btable,SIGNAL(removeSt(int)),this,SLOT(removeSt(int)));
+    connect(interface->btable,SIGNAL(cellChanged(int,int)),this,SLOT(revertDetails(int)));
 
     connect(interface->stname,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
     connect(interface->fname,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
@@ -110,30 +167,36 @@ void AppManager::load_final_modules()
     connect(interface->rollnoLe,SIGNAL(returnPressed()),this,SLOT(onRollEntry()));
     connect(interface->rollnoLe,SIGNAL(rollfocus()),this,SLOT(rollfocus()));
 
-    connect(interface->printButton,SIGNAL(pressed()),this,SLOT(print()));
-    connect(interface->tcb,SIGNAL(pressed()),this,SLOT(TC_mode()));
+    connect(interface->printButton,SIGNAL(released()),this,SLOT(print()));
+    connect(interface->tcb,SIGNAL(released()),this,SLOT(TC_mode()));
+    connect(interface->settingsb,SIGNAL(released()),this,SLOT(createSettingsUI()));
+    connect(interface->logb,SIGNAL(released()),this,SLOT(createLogUI()));
+    connect(interface->pdfb,SIGNAL(released()),this,SLOT(pdfprint()));
+
     connect(interface->larrow,SIGNAL(pressed()),this,SLOT(toLeft()));
     connect(interface->rarrow,SIGNAL(pressed()),this,SLOT(toRight()));
     connect(interface->uarrow,SIGNAL(pressed()),this,SLOT(toup()));
     connect(interface->darrow,SIGNAL(pressed()),this,SLOT(todown()));
-    connect(interface->prints->nbutton,SIGNAL(pressed()),cprinter,SLOT(printc()));
+    connect(interface->session,SIGNAL(pressed()),this,SLOT(createSessionPage()));
 
+    connect(interface->prints->nprint,SIGNAL(released()),cprinter,SLOT(printc()));
     connect(interface,SIGNAL(quit()),this,SLOT(quit()));
-    connect(cdb,SIGNAL(report(int,QString)),interface,SLOT(report(int,QString)));
-
-    connect(interface->settingsb,SIGNAL(pressed()),settings,SLOT(createSettingsInterface()));
-    connect(interface->logb,SIGNAL(pressed()),log,SLOT(createLogManager()));
-    connect(interface->prints->nbutton,SIGNAL(pressed()),cprinter,SLOT(printc()));
 
     connect(interface->Bsc,SIGNAL(activated()),this,SLOT(b_print()));
     connect(interface->Csc,SIGNAL(activated()),this,SLOT(c_print()));
-    //connect(interface->help,SIGNAL(activated()),this,SLOT());
 
-    // Settings
-    //connect(,SIGNAL(update(int)),this,SLOT(updatevalues(int)));
-    // Native
+    connect(cdb,SIGNAL(report(int,QString)),interface,SLOT(report(int,QString)));
+
+    connect(cprinter,SIGNAL(pcomplete(int)),this,SLOT(pcomplete(int)));
+    connect(cprinter,SIGNAL(tc_pcomplete()),this,SLOT(tc_pcomplete()));
     connect(bg_ctype,SIGNAL(buttonClicked(int)),this,SLOT(updatetype(int)));
     connect(bg_ptype,SIGNAL(buttonClicked(int)),this,SLOT(update_print_type(int)));
+
+    disconnect(ad,SIGNAL(checkuser(QString)),cdb,SLOT(get_user_password(QString)));
+    disconnect(ad,SIGNAL(userAuthenticated(int)),this,SLOT(load_final_modules(int)));
+    disconnect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
+
+    interface->showMaximized();
 }
 
 /* onRollEntry()
@@ -143,6 +206,24 @@ void AppManager::load_final_modules()
  */
 void AppManager::onRollEntry()
 {
+    // Check if it is in TC Mode
+    if(c_mode)
+    {
+        tc_student->roll = interface->troll->text().toUpper();
+        tc_student->st_filled = 0;
+        tc_student->c_sno[0] = c_sno[2];
+
+        if(!cdb->fetch_ex(tc_student))
+        {
+            tc_student->st_filled = 0;
+            return;
+        }
+        cdb->format_tc(tc_student);
+        interface->set_tc(tc_student);
+
+        return;
+    }
+
     // Extract Roll Number
     roll =  interface->rollnoLe->text().toUpper();
 
@@ -156,28 +237,10 @@ void AppManager::onRollEntry()
         }
         else
         {
-            this->init_print(p_type);
+            this->print();
             return;
         }
     }
-
-    // Check if it is in TC Mode
-    if(c_mode)
-    {
-        tc_student = new Student;
-        tc_student->roll = roll;
-        if(!cdb->fetch_ex(tc_student))
-        {
-            delete tc_student;
-            return;
-        }
-        interface->rollnoLe->setDisabled(true);
-        interface->set_tc(tc_student);
-        interface->btable->add_roll(tc_student->roll,"TC");
-        interface->rollnoLe->clear();
-        return;
-    }
-
 
     student = new Student;
     student->c_type[0] = c_type[0];
@@ -190,10 +253,15 @@ void AppManager::onRollEntry()
         if(!cdb->fetch(student))
         {
             delete student;
+            rollfocus();
             return;
         }
+
+        cdb->format_course(student);
     }
 
+    // Set List Pointer
+    st_ptr = interface->btable->rc;
 
     // Make Entry into the table
     interface->btable->add_roll(student->roll,rtype);
@@ -203,96 +271,109 @@ void AppManager::onRollEntry()
     interface->rollnoLe->setFocus();
 
     // Update the count of each certificates
-    c_count.replace(0 ,c_count.at(0) + student->c_type[0]);
-    interface->bcl->setText(temp.sprintf("%d",c_count.at(0)));
-    c_count.replace(1 ,c_count.at(1) + student->c_type[1]);
-    interface->ccl->setText(temp.sprintf("%d",c_count.at(1)));
+    c_count[0] = c_count[0] + student->c_type[0];
+    interface->blcd->display(c_count[0]);
+    c_count[1] = c_count[1] + student->c_type[1];
+    interface->clcd->display(c_count[1]);
 
     // Assign Serial No. to this entry (bonafide or conduct only)
-    int i;
-    for(i = 0; i < 2 ; ++i)
+    for(int i = 0; i < 2 ; ++i)
     {
         if(student->c_type[i])
-            student->c_sno[i] = c_sno.at(i) + c_count.at(i);
+        {
+            student->c_sno[i] = r_sno[i];
+            r_sno[i] = r_sno[i] % 9999 + 1;
+        }
     }
+
     // Append to the print List
     this->st_plist->append(student);
 
     // Set the interface
-    interface->set_ct(student);
-}
-
-void AppManager::previewLastRoll()
-{
-    // To get a preview of the last Roll Number printed
+    interface->set_ct(student);  
 }
 
 /* itemchanged(int,const QString)
  * Called by each QGraphicTextItem upon change
- * in it Contents.
+ * in its Contents.
  */
 void AppManager::itemchanged(int id, const QString &data)
 {
-
     if(id < 0 )
     {
-        interface->wframe->setEnabled(false);
-        interface->larrow->setAcceptHoverEvents(false);
-        interface->rarrow->setAcceptHoverEvents(false);
+        interface->setenabled(false);
         et += id;
-        p_lock -= 1;
         return;
     }
 
     switch(id)
     {
-    case 1: if(c_mode)
-                    tc_student->name =data;
-                else
-                    st_plist->at(st_ptr)->name = data;
+    case 1: st_plist->at(st_ptr)->name = data;
         break;
     case 2: st_plist->at(st_ptr)->co = data;
         break;
-    case 3: if(c_mode)
-                    tc_student->father_name = data;
-                else
-                    st_plist->at(st_ptr)->father_name = data;
+    case 3: st_plist->at(st_ptr)->father_name = data;
         break;
     case 4: st_plist->at(st_ptr)->cdetails = data;
         break;
     case 5: st_plist->at(st_ptr)->purpose = data;
         break;
-    case 6: tc_student->std_ex->dob = data;
-        break;
-    case 7: tc_student->std_ex->doa = data;
-        break;
-    case 8: tc_student->std_ex->course = data;
-        break;
-    case 9: tc_student->std_ex->branch = data;
-        break;
-    case 10 : tc_student->std_ex->dol = data;
-        break;
-    case 11: tc_student->std_ex->qualified = data;
-        break;
-    case 12: tc_student->std_ex->dues = data;
-        break;
-    case 13: tc_student->std_ex->disp_m = data;
-        break;
-    case 14: tc_student->std_ex->conduct = data;
-        break;
-    case 15: tc_student->std_ex->community = data;
     }
 
     et += id;
-    p_lock += 1;
 
     if(et == 0)
+        interface->setenabled(true);
+}
+
+/* revertDetails(int)
+ * Called when User Selects 'Revert Details' option in
+ * the context menu of a roll entry
+ * Performs details retrival for changed Roll Number
+ */
+void AppManager::revertDetails(int r)
+{
+    if(interface->rollnoLe->hasFocus())
+        return;
+
+    // Check if its in DB Mode
+    if(d_mode)
     {
-        interface->wframe->setEnabled(true);
-        interface->larrow->setAcceptHoverEvents(true);
-        interface->rarrow->setAcceptHoverEvents(true);
+        st_plist->at(r)->roll = interface->btable->item(r,0)->text().toUpper();
+        st_plist->at(r)->st_filled = 0;
+        // Database Mode
+        if(!cdb->fetch(st_plist->at(r)))
+        {
+            QMessageBox msgBox;
+            msgBox.setParent(interface);
+            msgBox.setWindowFlags(Qt::Window);
+            msgBox.setInformativeText("Do you wish to Continue editing this entry or want to Remove it ?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            int ret = msgBox.exec();
+
+            switch(ret)
+            {
+            case QMessageBox::Yes : interface->btable->openPersistentEditor(interface->btable->item(r,0));
+                return;
+                break;
+            case QMessageBox::No : removeSt(r);
+            }
+        }
+
+        cdb->format_course(st_plist->at(r));
+        interface->btable->closePersistentEditor(interface->btable->item(r,0));
+        interface->set_ct(st_plist->at(r));
+    }
+    else
+    {
+        // Manual Mode
+        st_plist->at(r)->roll = interface->btable->item(r,0)->text();
+        interface->btable->closePersistentEditor(interface->btable->item(r,0));
+        interface->set_ct(st_plist->at(r));
     }
 }
+
 
 /* btableclicked(int,int)
  * Called when a btable cell is clicked
@@ -301,14 +382,12 @@ void AppManager::itemchanged(int id, const QString &data)
  */
 void AppManager::btableclicked(int row,int col)
 {
-    if(c_mode)
-        return;
     student = st_plist->at(row);
 
     interface->set_ct(student);
     fg_rollLe = 0;
     interface->btable->st_ptr = st_ptr = row;
-    interface->cstack->setStyleSheet(BTABLE_FRAME_COLOR);
+    interface->cframe->setStyleSheet(BTABLE_FRAME_COLOR);
 
     for(int i = 0;i < 2; ++i)
     {
@@ -325,12 +404,9 @@ void AppManager::btableclicked(int row,int col)
  */
 void AppManager::updatetype(int i)
 {
-    btype = "";
-    rtype = "";
-
     if(!fg_rollLe) // Table update
     {
-
+        btype = "";
         if(bg_ctype->button(i)->isChecked())
         {
             student->c_type[i] = 1;
@@ -339,14 +415,16 @@ void AppManager::updatetype(int i)
         else
         {
             student->c_type[i] = 0;
-            update_counts(i,-1);
             // Atleast one type needs to be checked !
             if(student->c_type[0] + student->c_type[1] == 0)
             {
+                student->c_type[i] = 1;
+                bg_ctype->button(i)->setChecked(true);
                 //report error
                 interface->report(INFO,"Atleast One Certificate needs to be Selected.");
-                bg_ctype->button(i)->setChecked(true);
             }
+            else
+                update_counts(i,-1);
         }
 
         for(int j = 0;j < 2; ++j)
@@ -363,12 +441,11 @@ void AppManager::updatetype(int i)
         }
 
         interface->btable->item(st_ptr,1)->setText(btype);
-
-
         interface->set_ct(student);
     }
     else
     {
+        rtype = "";
         if(bg_ctype->button(i)->isChecked())
             c_type[i] = 1;
         else
@@ -379,16 +456,17 @@ void AppManager::updatetype(int i)
             if(c_type[0] + c_type[1] == 0)
             {
                 //report error
+                c_type[i] = 1;
                 interface->report(INFO,"Atleast One Certificate needs to be Selected.");
                 bg_ctype->button(i)->setChecked(true);
             }
         }
 
-        for(int i = 0;i < 2; ++i)
+        for(int j = 0; j < 2 ; ++j)
         {
-            if(c_type[i])
+            if(c_type[j])
             {
-                switch(i)
+                switch(j)
                 {
                 case 0 : rtype += "B ";
                     break;
@@ -397,6 +475,15 @@ void AppManager::updatetype(int i)
             }
         }
 
+        for(int i =0; i < 2;++i)
+        {
+            if(c_type[i])
+            {
+                interface->show_ct(i);
+                vpic = i;
+                break;
+            }
+        }
     }
 }
 
@@ -406,37 +493,55 @@ void AppManager::updatetype(int i)
  */
 void AppManager::removeSt(int i)
 {
-    if(c_mode)
+    // i = -1 implies clearing all entries
+    if(i == -1)
     {
-        interface->rollnoLe->setDisabled(false);
-        delete tc_student;
+        // Set all Counts to Zero
+        c_count[0] = 0;
+        c_count[1] = 0;
+
+        // Set the Count Displays
+        interface->blcd->display(c_count[0]);
+        interface->clcd->display(c_count[1]);
+
+        // Delete all entries
+        for(int j = 0; j < st_plist->count() ; ++j)
+            delete st_plist->at(j);
+
+        st_plist->clear();
+
+        r_sno[0] = c_sno[0];
+        r_sno[1] = c_sno[1];
+
+        qDebug() << "All cleared" << st_plist->count();
+
+        rollfocus();
         return;
     }
 
-
-    int j, k;
     // Update Counts
-    c_count.replace(0, c_count.at(0) - st_plist->at(i)->c_type[0]);
-    interface->bcl->setText(temp.sprintf("%d",c_count.at(0)));
-    c_count.replace(1, c_count.at(1) - st_plist->at(i)->c_type[1]);
-    interface->bcl->setText(temp.sprintf("%d",c_count.at(1)));
+    c_count[0] = c_count[0] - st_plist->at(i)->c_type[0];
+    interface->blcd->display(c_count[0]);
 
+    c_count[1] = c_count[1] - st_plist->at(i)->c_type[1];
+    interface->clcd->display(c_count[1]);
 
-    // Update Serial No.
-    for(j = 0 ; j < 2; ++j)
-    {
-        if(st_plist->at(i)->c_type[j])
-        {
-            for(k = i + 1; k < st_plist->count() ; ++k)
-            {
-                st_plist->at(k)->c_sno[j] -= 1;
-            }
-        }
-    }
+    int c_type[2];
+    c_type[0] = st_plist->at(i)->c_type[0];
+    c_type[1] = st_plist->at(i)->c_type[1];
 
     // Release the memory & clean up the entry
     delete this->st_plist->at(i);
     this->st_plist->removeAt(i);
+
+    // Update Serial No.
+    for(int j = 0 ; j < 2; ++j)
+    {
+        if(c_type[j])
+            this->recalculate_csno(j);
+    }
+
+    rollfocus();
 }
 
 /* rollfocus()
@@ -444,11 +549,13 @@ void AppManager::removeSt(int i)
  */
 void AppManager::rollfocus()
 {
+    if(c_mode)
+        return;
+
     //rollnoLe now has the focus
-    interface->rollnoLe->setCursorPosition(0);
     fg_rollLe = 1;
 
-    interface->cstack->setStyleSheet(FRAME_COLOR);
+    interface->cframe->setStyleSheet(FRAME_COLOR);
     interface->btable->clearSelection();
 
     int i;
@@ -461,7 +568,9 @@ void AppManager::rollfocus()
             break;
     }
 
-   interface->resetView(i);
+    interface->btable->st_ptr = st_ptr = -1;
+    vpic = i;
+    interface->resetView(i);
 }
 
 /* Right & Left Navigation works only when
@@ -469,39 +578,44 @@ void AppManager::rollfocus()
  */
 void AppManager::toRight()
 {
-    // Make Sure btable entry is selected
     if(fg_rollLe)
-        return;
-
-    student->vpic = (student->vpic + 1) % 2;
-
-    for(int j=0; j<2;++j)
     {
-        if(student->c_type[student->vpic])
-            break;
-        student->vpic = (student->vpic + 1) % 2;
+        if(c_type[!vpic])
+        {
+            interface->show_ct(!vpic);
+            vpic = !vpic;
+        }
+        return;
     }
 
-    interface->show_ct(student->vpic);
+    if(student->c_type[!student->vpic])
+    {
+        interface->pic[student->vpic]->setOpacity(0.0);
+        student->vpic = !student->vpic;
+        interface->sno->setPlainText(temp.sprintf("%04d",st_plist->at(st_ptr)->c_sno[student->vpic]));
+        interface->show_ct(student->vpic);
+    }
 }
 
 void AppManager::toLeft()
 {
-    // Make Sure btable is selected
     if(fg_rollLe)
-        return;
-
-    interface->pic[student->vpic]->setOpacity(0.0);
-    student->vpic = (student->vpic + 3) % 2;
-
-    for(int j=0; j<2;++j)
     {
-        if(student->c_type[student->vpic])
-            break;
-        student->vpic = (student->vpic + 3) % 2;
+        if(c_type[!vpic])
+        {
+            interface->show_ct(!vpic);
+            vpic = !vpic;
+        }
+        return;
     }
 
-    interface->show_ct(student->vpic);
+    if(student->c_type[!student->vpic])
+    {
+        interface->pic[student->vpic]->setOpacity(0.0);
+        student->vpic = !student->vpic;
+        interface->sno->setPlainText(temp.sprintf("%04d",st_plist->at(st_ptr)->c_sno[student->vpic]));
+        interface->show_ct(student->vpic);
+    }
 }
 
 void AppManager::toup()
@@ -531,29 +645,45 @@ void AppManager::update_print_type(int r)
     switch(r)
     {
     case 0 : // All Bonafides
-        interface->prints->hlabel->setText("Bonafide Certificate Printing");
+        interface->prints->hlabel->setText("<font color='white'>Bonafide Certificate Printing</font>");
         interface->prints->tlabel->setText("Bonafide");
         break;
     case 1: // All Conduct
-        interface->prints->hlabel->setText("Conduct Certificate Printing");
+        interface->prints->hlabel->setText("<font color='white'>Conduct Certificate Printing</font>");
         interface->prints->tlabel->setText("Conduct");
     }
 
     cprinter->p_type = p_type = r;
 }
 
+/* void b_print()
+ * Called when user presses F1 key
+ */
 void AppManager::b_print()
 {
-    if(!interface->btable->rowCount())
+    // printing is locked, an item is being changed
+    if(!interface->btable->isEnabled())
         return;
+
+    if(!c_count[0])
+        return;
+
     update_print_type(0);
     init_print(0);
 }
 
+/* void c_print()
+ * Called when user presses F2 key
+ */
 void AppManager::c_print()
 {
-    if(!interface->btable->rowCount())
+    // printing is locked, an item is being changed
+    if(!interface->btable->isEnabled())
         return;
+
+    if(!c_count[1])
+        return;
+
     update_print_type(1);
     init_print(1);
 }
@@ -563,137 +693,329 @@ void AppManager::c_print()
  */
 void AppManager::print()
 {
-    if(!interface->btable->rowCount())
+    // Check for TC Mode
+    if(c_mode)
+    {
+        if(tc_student->st_filled)
+            init_print(2);
         return;
+    }
+
+    // Check for zero count
+    if(!c_count[p_type])
+        return;
+
     init_print(p_type);
 }
 
 /* init_print()
- * Called by print(), b_print(), c_print(),t_print()
+ * Called by print(), b_print(), c_print()
  * Performs mandatory initializations
  */
 void AppManager::init_print(int lp_type)
 {
-    // printing is locked, an item is being changed
-    if(p_lock < 0)
-        return;
-
     if(c_mode)
     {
-        if(tc_student->std_ex->is)
+        if(admn == 1)
         {
-            DIssueDialog *dis = new DIssueDialog(tc_student);
-            connect(dis,SIGNAL(print()),this,SLOT(Tc_dissue()));
+            cprinter->processTC();
+
+            cprinter->admin = 0;
+            cprinter->count = 2;
+            TC_mode();
+            relogin();
             return;
         }
 
-        interface->prints->hlabel->setText("Transfer Certificate Printing");
-        interface->prints->tlabel->setText("Transfer");
-        interface->prints->clabel->setText("1");
-        cprinter->tc_student = tc_student;
-        cprinter->p_type = lp_type;
-
-        if(tc_student->std_ex->is == 0)
+        if(tc_student->std_ex->is)
         {
+            interface->dissue= new DIssueDialog(interface,tc_student);
+            interface->dissue->move(interface->width()/2 - 225 , interface->height()/2 - 259);
+            interface->dissue->show();
+            connect(interface->dissue,SIGNAL(print()),this,SLOT(TC_dissue()));
+            return;
+        }
+
+        // Print Dialog Box
+        QMessageBox msgBox;
+        msgBox.setParent(interface);
+        msgBox.setWindowFlags(Qt::Window);
+        msgBox.setText("This is the First Issue of Transfer Certificate for " + tc_student->roll);
+        msgBox.setInformativeText("Do you want to print it ?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+
+        switch(ret)
+        {
+        case QMessageBox::Yes :
             if(cdb->log_tc(tc_student))
                 return;
+
+            cprinter->processTC();
+            break;
+        case QMessageBox::No : return;
         }
     }
     else
     {
         interface->prints->clabel->setText(QString().sprintf("%d",c_count.at(lp_type)));
-        cprinter->pList(st_plist);
-     }
-
-
-
-    // Show the Print Dialogue
-    interface->prints->move(interface->width()/2 - 240 , interface->height()/2 - 94);
-    interface->prints->show();
+        // Show the Print Dialogue
+        interface->prints->move(interface->width()/2 - 230 , interface->height()/2 - 94);
+        interface->prints->show();
+        cprinter->p_type = lp_type;
+    }
 }
 
-void AppManager::Tc_dissue()
+/* pdfprint()
+ * Called wneh user selects 'Print PDF' button in left panel'
+ * Performs PDF printing
+ */
+void AppManager::pdfprint()
 {
-    // replace dissue date to cdate
+    if(c_mode)
+        return;
 
-    cprinter->tc_student = tc_student;
-    if(!cdb->update_dissue(tc_student))
-        cprinter->printTC();
+    interface->pdfb->setDown(false);
+    if(interface->btable->rowCount() == 0)
+        return;
+    cprinter->pdfprint(c_count[0],c_count[1]);
 }
 
+/* TC_dissue
+ * Called by Issue Duplicate Button of 'Issue Duplicate' Widget
+ * Performs Duplicate Issue Printing
+ */
+void AppManager::TC_dissue()
+{
+    // replace dissue date to cdate,issued_by
+    QString dt = QDate::currentDate().toString("yyyy-MM-dd");
+    tc_student->std_ex->dissue->replace(3,dt);
+    tc_student->std_ex->dissue->replace(4,cdb->username);
+
+    if(!cdb->update_dissue(tc_student))
+        cprinter->processTC();
+}
+
+void AppManager::tc_type(int s)
+{
+    if(s == 0)
+    {
+        interface->tc_type->setPlainText("DUPLICATE");
+        cprinter->t = 1;
+    }
+    else
+    {
+        interface->tc_type->setPlainText("ORIGINAL");
+        cprinter->t = 0;
+    }
+}
+
+void AppManager::sno_changed(int t)
+{
+    tc_student->c_sno[0] = t;
+    interface->tc_sno->setPlainText(temp.sprintf("%05d",tc_student->c_sno[0]));
+}
+
+/* pcomplete(int)
+ * Called by CPrinter::printB(), CPrinter::printC()
+ * Performs btable and st_plist cleanup
+ */
 void AppManager::pcomplete(int ctype)
 {
-    
-    if(ctype == 2)
-    {
-        interface->btable->clearContents();
-        interface->rollnoLe->setDisabled(false);
-        return;
-    }
+    interface->prints->hide();
+    rollfocus();
 
-    for(int j=0; j<= st_plist->count();++j)
+    for(int j = 0; j < st_plist->count(); ++j)
     {
-        st_plist->at(j)->c_type[ctype] = 0;
-
-        // Entry has no certificates
-        if(st_plist->at(j)->c_type[!ctype]  == 0)
+        if(st_plist->at(j)->c_type[ctype])
         {
-            delete st_plist->at(j);
-            st_plist->removeAt(j);
-            interface->btable->removeRow(j);
-            --j;
+            st_plist->at(j)->c_type[ctype] = 0;
+
+            // write log
+            lg->writeCertificateLog(st_plist->at(j)->roll,ctype);
+
+            // Entry has no certificates
+            if(st_plist->at(j)->c_type[!ctype]  == 0)
+            {
+                delete st_plist->at(j);
+                st_plist->removeAt(j);
+                interface->btable->removeRow(j);
+                --j;
+                --interface->btable->rc;
+            }
+            else // Update Entry
+            {
+                if(ctype)
+                    temp = "B ";
+                else
+                    temp = " C";
+                interface->btable->item(j,1)->setText(temp);
+            }
+
+            if(!interface->btable->rowCount())
+            {
+                interface->btable->rc = 0;
+                break;
+            }
         }
     }
 
-    c_count.replace(ctype , 0);
+    c_count[ctype] = 0;
+
+    if(!ctype)
+        interface->blcd->display(c_count[0]);
+    else
+        interface->clcd->display(c_count[1]);
 }
 
-
-
-void AppManager::updatevalues(int i)
+void AppManager::tc_pcomplete()
 {
-    switch(i)
-    {
-    case 0 :
-        break;
-    case 1:
-        break;
-    case 2:
-        break;
-    case 3:
-        break;
-    case 4:
-        break;
+    if(admn != 1)
+         c_sno[2] = c_sno[2] % 99999 + 1;
 
+    // write log
+    lg->writeCertificateLog(tc_student->roll,2);
+
+    interface->tc_sno->setPlainText("");
+    interface->tc_type->setPlainText("");
+    interface->stname->setPlainText("");
+    interface->fname->setPlainText("");
+    interface->roll->setPlainText("");
+    interface->admno->setPlainText("");
+
+    for(int i = 0 ; i < 11 ;++i)
+        interface->tcitems->at(i)->setPlainText("");
+
+    tc_student->st_filled = 0;
+    interface->tprint->setFocus();
+}
+
+/* updatevalues()
+ * Called by Settings
+ * Performs updations of details
+ */
+void AppManager::updatevalues(QList <int> &ulist)
+{
+    if(ulist.isEmpty())
+        return;
+
+    qDebug() << ulist;
+
+    for(int i = 0; i < ulist.count(); ++i)
+    {
+        switch(ulist[i])
+        {
+            case 0 : // Mode
+                settings->getMode(d_mode);
+                if(d_mode)
+                {
+                    settings->getDatabaseDetails(dblist);
+                    if(!cdb->reconnect(dblist))
+                    {
+                        interface->report(2,tr("An Error Occured while Connecting to the Database.") +
+                                          "Please Check the Connection details.The Application will now run in <b>Manual Mode</b><br><br>" +
+                                          tr("MySQL Reports : ") + cdb->dbstatus );
+                        d_mode = false;
+                        settings->setMode(d_mode);
+                    }
+                    else
+                    {
+                        if(cdb->username == "Staff")
+                            relogin();
+                    }
+                }
+                else
+                {
+                    if(c_mode)
+                    {
+                        d_mode = 1;
+                        TC_mode();
+                        d_mode = 0;
+                    }
+                }
+                modechange();
+                break;
+            case 1 : // Serial No.
+                settings->getSno(c_sno);
+                if(!st_plist->isEmpty())
+                {
+                    recalculate_csno(0);
+                    recalculate_csno(1);
+                }
+                else if(c_mode)
+                {
+                    tc_student->c_sno[0] = c_sno[2];
+                    interface->tc_sno->setPlainText(temp.sprintf("%05d",c_sno[2]));
+                }
+                break;
+            case 2 : // Date , Academic years
+                if(c_mode)
+                    break;
+
+                settings->getDateAcademicYear(dlist);
+                interface->set_items(dlist);
+                break;
+            case 3 : // Printer
+                settings->getPrinter(cprinter->p);
+                cprinter->setPrinter();
+
+                if(c_mode)
+                {
+                    cprinter->setTCprint(0);
+                    cprinter->setTCprint(1);
+                }
+                break;
+            case 4 : // Bonafide Print Positions
+                settings->getPrintPositions(cprinter->blist,0);
+                break;
+            case 5 : // Conduct Print Positions
+                settings->getPrintPositions(cprinter->blist,1);
+                break;
+            case 6: // TC Print Positions
+                if(c_mode)
+                    settings->getPrintPositions(cprinter->clist,2);
+         }
     }
 
+    lg->openlog();
+    rollfocus();
 }
 
 void AppManager::update_counts(int ctype, int c)
 {
-    c_count.replace(ctype ,c_count.at(ctype) + c);
+    c_count[ctype] = c_count[ctype] + c;
 
     if(ctype)
-        interface->ccl->setText(temp.sprintf("%d",c_count.at(ctype)));
+        interface->clcd->display(c_count.at(ctype));
     else
-        interface->bcl->setText(temp.sprintf("%d",c_count.at(ctype)));
+        interface->blcd->display(c_count.at(ctype));
 
     // Updating Serial Numbers of this type
-    if(ctype == 2)
-        return;
-    else
-    {
-        for(int i = st_ptr + 1 ; i < interface->btable->rc ; ++i)
-            st_plist->at(i)->c_sno[ctype] += c;
-    }
+    recalculate_csno(ctype) ;
 }
 
-void AppManager::modechange(int i)
+void AppManager::recalculate_csno(int i)
 {
-    // Database Mode : mode = 1
-    // Manual Mode : mode = 0
-    d_mode = i;
-    if(i)
+    int j, s;
+    s = c_sno[i];
+    for(j = 0 ; j < st_plist->count(); ++j)
+    {
+        if(st_plist->at(j)->c_type[i])
+        {
+            st_plist->at(j)->c_sno[i] = s;
+            s = s % 9999 + 1;
+        }
+    }
+
+    this->r_sno[i] = s;
+}
+
+void AppManager::modechange()
+{
+    // Database Mode : mode = true
+    // Manual Mode : mode = false
+    if(d_mode)
         interface->mode->setText("Mode : " + tr("<b>") + "Database" + tr("<b>"));
     else
         interface->mode->setText("Mode : " + tr("<b>") + "Manual" + tr("<b>"));
@@ -701,81 +1023,89 @@ void AppManager::modechange(int i)
 
 void AppManager::TC_mode()
 {
-    QString btype;
-    c_mode = !c_mode;
-
     // TC Modes requires application to be in DB Mode
-    if(c_mode == 1 and d_mode == 0)
+    if(d_mode == 0)
     {
-        interface->report(ERROR, "TC Can be only issued in Database Mode.");
-        c_mode = 0;
+        interface->report(ERROR, "TC can be issued only in <b>Database Mode.</b>");
+        interface->tcb->setDown(false);
         return;
     }
+
+    c_mode = !c_mode;
 
     switch(c_mode)
     {
     case 0 : // Set to Normal Mode
-                interface->set_TC_Items(0);
-                interface->tcb->setText("Issue TC");
-                interface->rbb->setChecked(true);
-                interface->cstack->setCurrentIndex(0);
-                interface->bcgroup->setDisabled(false);
+        interface->wframe->setVisible(true);
+        interface->set_TC_Items(0);
+        interface->tcb->setText("Issue TC");
+        interface->cdate->setPlainText(dlist.at(0));
 
-                // Check if st_plist is empty.
-                if(!st_plist->isEmpty())
-                {
-                    for(int i = 0 ; i < st_plist->count() ; ++i)
-                    {
-                        for(int j = 0;j < 2; ++j)
-                        {
-                            if(student->c_type[j])
-                            {
-                                switch(j)
-                                {
-                                case 0 : btype += "B ";
-                                    break;
-                                case 1 : btype += "C ";
-                                }
-                            }
-                        }
-
-                        interface->btable->add_roll(student->roll,rtype);
-                        btype = "";
-                    }
-                }
-
-                p_type = 0;
-                break;
-
+        cprinter->setTCprint(false);
+        delete tc_student->std_ex->dissue;
+        delete tc_student->std_ex;
+        delete tc_student;
+        cprinter->tc_student = 0;
+        interface->rollnoLe->setFocus();
+        break;
     case 1: // Set to TC Mode
-                interface->cstack->setCurrentIndex(1);
-                interface->tcb->setText("Close TC");
-                interface->set_TC_Items(1);
-                interface->cdate->setEnabled(false);
-                interface->btable->clearContents();
-                interface->bcgroup->setDisabled(true);
-                interface->btable->rc = 0;
-                p_type = 2;
+        interface->wframe->setVisible(false);
+        interface->set_TC_Items(1);
+        interface->tcb->setText("Close TC");
+        interface->cdate->setPlainText(QDate::currentDate().toString("dd.MMM.yyyy"));
 
-                connect(interface->doa,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->dob,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->dol,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->course,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->branch,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->qlf,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->dues,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->dis,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->conduct,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
-                connect(interface->community,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
+        // Check if Admin is logged in.
+        if(admn == 1)
+        {
+            cprinter->admin = admn;
+            interface->report(INFO,"As Admin, you can Modify Serial No. and Certificate Type in <b>One</b> Issue Only.");
+
+            interface->typecb->setEnabled(true);
+            interface->sersb->setEnabled(true);
+
+            connect(interface->typecb,SIGNAL(stateChanged(int)),this,SLOT(tc_type(int)));
+            connect(interface->sersb,SIGNAL(valueChanged(int)),this,SLOT(sno_changed(int)));
+        }
+
+        cprinter->setTCprint(true);
+        settings->getPrintPositions(cprinter->tlist,2);
+        tc_student = new Student;
+        tc_student->std_ex = new Student_ex;
+        tc_student->std_ex->dissue = new QStringList;
+        cprinter->tc_student = tc_student;
+
+        connect(interface->tprint,SIGNAL(released()),this,SLOT(print()));
+        connect(interface->troll,SIGNAL(returnPressed()),this,SLOT(onRollEntry()));
     }
 }
 
-void AppManager::topdf()
+void AppManager::createLogUI()
 {
-    qDebug() << "to pdf";
+    lg->createlogmanager(interface);
+    interface->logb->setDown(false);
 }
 
+void AppManager::createSettingsUI()
+{
+    lg->closelog();
 
+    settings->createSettingsInterface(interface,admn);
+    connect(settings->st,SIGNAL(sendSignal(QList<int>&)),this,SLOT(updatevalues(QList <int> &)));
+
+    interface->settingsb->setDown(false);
+}
+
+void AppManager::createSessionPage()
+{
+    QStringList sinfo;   
+    settings->getSessionInfo(sinfo);
+    interface->showsessionpage(sinfo);
+}
+
+/* void quit()
+ * Called upon interface Close Event
+ *  Checks for any entries left in btable for printing
+ */
 void AppManager::quit()
 {
     // Check if any entries in btable
@@ -784,25 +1114,61 @@ void AppManager::quit()
         QMessageBox msgBox;
         msgBox.setParent(interface);
         msgBox.setWindowFlags(Qt::Window);
-        msgBox.setText("They are Roll Entries waiting for Printing");
-        msgBox.setInformativeText("Do you want to print them ?");
+        msgBox.setText("They are Roll Numbers waiting to be Printed      ");
+        msgBox.setInformativeText("Do you want to <b>Quit</b> without Printing them ?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
         int ret = msgBox.exec();
 
         switch(ret)
         {
-        case QMessageBox::Yes :
+        case QMessageBox::Yes : lg->endSession();
+            qApp->quit();
             break;
-        case QMessageBox::No : qApp->quit();
+        case QMessageBox::No :;
         }
     }
     else
+    {
+        lg->endSession();
         qApp->quit();
+    }
 }
 
+void AppManager::relogin()
+{
+    interface->hide();
+    ad=new AuthenDialog(d_mode,cdb->is_connected,cdb->dbstatus);
+    ad->show();
+
+    connect(ad,SIGNAL(checkuser(QString)),cdb,SLOT(get_user_password(QString)));
+    connect(ad,SIGNAL(userAuthenticated(int)),this,SLOT(userchange(int)));
+    connect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
+    lg->endSession();
+}
+
+void AppManager::userchange(int admn)
+{
+    this->admn = admn;
+    settings->getMode(d_mode);
+
+    switch(admn)
+    {
+    case 0 : cdb->username = "Staff";
+        cdb->user_id = "Staff";
+        break;
+    case 1 : cdb->username = "Admin";
+        cdb->user_id = "Admin";
+    }
+
+    interface->setSBText(cdb->username,d_mode);
+    interface->showMaximized();
+    lg->startSession(cdb->user_id,cdb->username);
+    rollfocus();
+}
 
 AppManager::~AppManager()
 {
-
+    delete cdb;
+    delete settings;
 }

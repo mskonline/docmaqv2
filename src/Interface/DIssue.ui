@@ -9,20 +9,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>451</width>
-    <height>528</height>
+    <width>450</width>
+    <height>542</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>450</width>
+    <height>542</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>450</width>
+    <height>542</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Duplicate TC Issue</string>
   </property>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>291</width>
-     <height>41</height>
+     <x>0</x>
+     <y>-10</y>
+     <width>451</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="font">
@@ -33,88 +45,89 @@
     </font>
    </property>
    <property name="text">
-    <string>Duplicate Certificate Issue</string>
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="../resources/res.qrc">:/Images/DIssue.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QStackedWidget" name="stack">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>50</y>
+     <y>40</y>
      <width>431</width>
-     <height>471</height>
+     <height>501</height>
     </rect>
    </property>
    <property name="currentIndex">
     <number>0</number>
    </property>
    <widget class="QWidget" name="page">
-    <widget class="QPushButton" name="pushButton_2">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>440</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>10</y>
+       <y>170</y>
        <width>431</width>
-       <height>301</height>
+       <height>191</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
      <property name="title">
       <string>Previous Issue Details</string>
      </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
      <widget class="QTextEdit" name="remarks">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>190</y>
-        <width>411</width>
-        <height>101</height>
+        <x>7</x>
+        <y>119</y>
+        <width>417</width>
+        <height>61</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
-      <property name="text">
-       <string>Roll Number :</string>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>100</y>
-        <width>81</width>
+        <x>8</x>
+        <y>30</y>
+        <width>131</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Date of Issue :</string>
+       <string>Duplicate Issued On :</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>130</y>
+        <x>8</x>
+        <y>60</y>
         <width>61</width>
         <height>21</height>
        </rect>
@@ -126,86 +139,40 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>71</width>
+        <x>8</x>
+        <y>91</y>
+        <width>101</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Remarks :</string>
+       <string>Remarks Given :-</string>
       </property>
      </widget>
-     <widget class="QLabel" name="roll">
+     <widget class="QLabel" name="dio">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>20</y>
-        <width>181</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>18</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>06311A0574</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="dos">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>100</y>
+        <x>180</x>
+        <y>30</y>
         <width>131</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>TextLabel</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="isby">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>130</y>
-        <width>131</width>
+        <x>180</x>
+        <y>60</y>
+        <width>231</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>No. of Issues :</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="nsl">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>70</y>
-        <width>91</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>text</string>
+       <string/>
       </property>
      </widget>
     </widget>
@@ -213,36 +180,218 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>320</y>
-       <width>411</width>
+       <y>360</y>
+       <width>431</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+      </font>
      </property>
      <property name="text">
       <string>In Case if you want to Issue another Certificate, please fill in the following Remarks.</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit">
+    <widget class="QTextEdit" name="nremarks">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>350</y>
+       <y>390</y>
        <width>431</width>
-       <height>81</height>
+       <height>61</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>264</x>
+       <y>460</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/Images/delete.png</normaloff>:/Images/delete.png</iconset>
      </property>
     </widget>
     <widget class="QPushButton" name="bnext">
      <property name="geometry">
       <rect>
        <x>350</x>
-       <y>440</y>
+       <y>460</y>
        <width>81</width>
-       <height>23</height>
+       <height>31</height>
       </rect>
      </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
      <property name="text">
-      <string>Next</string>
+      <string>Next  </string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/Images/next.png</normaloff>:/Images/next.png</iconset>
+     </property>
+    </widget>
+    <widget class="QLabel" name="roll">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>24</y>
+       <width>171</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>06311A0574</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Original Issued On :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Original Issued By :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="oio">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>70</y>
+       <width>231</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="oib">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>100</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Roll Number :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>161</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>No. of Duplicates Issued  :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ndi">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>137</y>
+       <width>41</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -250,27 +399,35 @@
     <widget class="QPushButton" name="bback">
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>440</y>
-       <width>75</width>
-       <height>23</height>
+       <x>220</x>
+       <y>460</y>
+       <width>91</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Back</string>
      </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/Images/back.png</normaloff>:/Images/back.png</iconset>
+     </property>
     </widget>
     <widget class="QPushButton" name="bprint">
      <property name="geometry">
       <rect>
-       <x>334</x>
-       <y>440</y>
-       <width>91</width>
-       <height>23</height>
+       <x>320</x>
+       <y>460</y>
+       <width>111</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Print Duplicate</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">
@@ -284,7 +441,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Times New Roman</family>
+       <family>Segoe UI</family>
        <pointsize>12</pointsize>
        <kerning>false</kerning>
       </font>
@@ -304,7 +461,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Times New Roman</family>
+       <family>Segoe UI</family>
        <pointsize>12</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -319,6 +476,25 @@
    </widget>
   </widget>
  </widget>
- <resources/>
- <connections/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>DIssue</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>308</x>
+     <y>497</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>481</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -1,12 +1,29 @@
+/* DocmaQ v2.0, Credential Publishing System
+    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "logmanager.h"
 #include <QMenu>
 #include <QProgressDialog>
 #include <QSettings>
-#include <QDebug>
-#include "logmanager.h"
+#include <QTextStream>
 
-Logmanager::Logmanager(QWidget *parent): QWidget(parent)
+Logmanager::Logmanager(QWidget *parent): QWidget(parent,Qt::Window)
 {
-
     setupUi(this);
 
     searchCurrentAction=new QAction(" in current log ",this);
@@ -24,44 +41,51 @@ Logmanager::Logmanager(QWidget *parent): QWidget(parent)
     connect(searchAllAction,SIGNAL(triggered()),this,SLOT(searchAll()));
     QMetaObject::connectSlotsByName(this);
 
-    path="./logs/certificate/";
-
-    directory=QDir(path);
-
-    table=certificateTable;
-
-    label=logFlagLabel;
-
+    certificateTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    sessionTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     QDate date=QDate::currentDate();
 
-    sdate=" Log View: "+date.toString("dd-MMM-yyyy")+" ";// to enable first time change of tabwidget
+    sdate=" Log : "+date.toString("dd.MMM.yyyy")+" ";// to enable first time change of tabwidget
 
-    loadTextFile(date);//load cert log
-
-    sfound=" Records Found: "+QString().setNum(table->rowCount())+" ";
-
+    path = "./logs/session/";
     table=sessionTable;
     label=logFlagLabel2;
     loadTextFile(date);//load session log,same as sdate for first time
+    sfound=" Records Found: "+QString().setNum(table->rowCount())+" ";
 
+    path="./logs/certificate/";
+    directory=QDir(path);
+    table=certificateTable;
+    label=logFlagLabel;
+    loadTextFile(date);//load cert log
+
+    cfound=" Records Found: "+QString().setNum(table->rowCount())+" ";
+
+    recordsLabel->setText(cfound);
 
     label=logFlagLabel;
     table=certificateTable;//reverting to initial table
 
+    searchGB->hide();
     searchMsgLabel->hide();
 
+    QSettings settings(QSettings::SystemScope,"Qogency","DocmaQ");
+
+    settings.beginGroup("certificate");
+
+    nPrintsLabel1->setText("Total:"+settings.value("total").toString()+"     B: "+settings.value("bonafide/count/total",0).toString()+"   C: "+settings.value("conduct/count/total",0).toString()+"   T: "+settings.value("tc/count/total",0).toString());
+    nPrintsLabel2->setText("Total(today): "+settings.value("totaltoday",0).toString()+"     B: "+settings.value("bonafide/count/today",0).toString()+"   C:"+settings.value("conduct/count/today",0).toString()+"   T: "+settings.value("tc/count/today",0).toString());
+    nPrintsLabel3->setText("Total(session): "+settings.value("sessiontotal",0).toString()+"     B: "+settings.value("bonafide/count/session",0).toString()+"   C:"+settings.value("conduct/count/session",0).toString()+"   T: "+settings.value("tc/count/session",0).toString());
+    settings.endGroup();
     currentAction=0;
-
 }
-
 
 void Logmanager::on_viewLogButton_clicked()
 {
     table->setAlternatingRowColors(true);
-
     loadTextFile(dateEdit->date());
+    recordsLabel->setText(" Records Found: "+QString().setNum(table->rowCount())+" ");  
 }
-
 
 void Logmanager::loadTextFile(const QDate& date)
 {
@@ -72,21 +96,13 @@ void Logmanager::loadTextFile(const QDate& date)
 
     dateEdit->setDate(date);
 
-    modeLabel->setText(" Log View: "+date.toString("dd-MMM-yyyy")+" ");
+    modeLabel->setText(" Log : "+date.toString("dd.MMM.yyyy")+" ");
 
     QFile inputFile(path+filename+".Log");
-
-    if(!inputFile.exists())
-    {
-        if(QFile::exists(path+filename+".Logc"))
-            inputFile.setFileName(path+filename+".Logc");
-    }
-
 
     int recordsFound=0;
     if (inputFile.open(QIODevice::ReadOnly|QIODevice::Text))
     {
-
         table->setRowCount(0);
         QTextStream in(&inputFile);
 
@@ -94,7 +110,6 @@ void Logmanager::loadTextFile(const QDate& date)
 
         while (!in.atEnd())
         {
-
             line=in.readLine();
 
             if (!line.isEmpty())
@@ -102,30 +117,22 @@ void Logmanager::loadTextFile(const QDate& date)
                 recordsFound++;
                 enterRecord(line);
             }
-
         }
-
         inputFile.close();
-
     }
-
     else
     {
-        label->show();
+        label->setText("No Log Recorded found on " + filename);
         table->hide();
         clearTable();
     }
 
-    recordsLabel->setText(" Records Found: "+QString().setNum(recordsFound)+" ");
-
     if(table->objectName().startsWith("s")&&date==QDate::currentDate())
     {
         QSettings settings(QSettings::SystemScope,"Qogency","DocmaQ");
-        table->setItem((table->rowCount()-1),5,new QTableWidgetItem(settings.value("certificate/sessiontotal").toString()));
-        table->setItem((table->rowCount()-1),4,new QTableWidgetItem("Logged in now"));
-
+        table->item((table->rowCount()-1),4)->setText("Logged in now");
+        table->item((table->rowCount()-1),5)->setText(settings.value("certificate/sessiontotal",-1).toString());
     }
-
 }
 
 void Logmanager::clearTable()
@@ -139,23 +146,19 @@ void Logmanager::clearTable()
     }
 }
 
-
 void Logmanager::currentChanged(int index)
 {
-
     if(index==0)
     {
         label=logFlagLabel;
         table=certificateTable;
         path="./logs/certificate/";
 
-
         sdate=modeLabel->text();
         modeLabel->setText(cdate);
 
         sfound=recordsLabel->text();
         recordsLabel->setText(cfound);
-
     }
     else
     {
@@ -168,11 +171,8 @@ void Logmanager::currentChanged(int index)
 
         cfound=recordsLabel->text();
         recordsLabel->setText(sfound);
-
     }
-
 }
-
 
 void Logmanager::prepareSearch()
 {
@@ -180,50 +180,19 @@ void Logmanager::prepareSearch()
 
     if(searchLE->text()!="")
     {
-        searchType();
+        if(currentAction==0)
+            searchCurrent();
+        else
+            searchAll();
     }
     else
     {
         if(currentAction==0)
             searchTip->setText("Type text to search");
         else
-
             searchTip->setText("Type text and press\n    Enter to search");
-
-    }
-
-}
-
-
-void Logmanager::searchType()
-{
-    if(currentAction==0)
-        searchCurrent();
-    else
-    {
-
-        searchAll();
     }
 }
-
-
-/*void Logmanager::keyPressEvent(QKeyEvent *e)
-{
-    switch (e->key())
-    {
-    case Qt::Key_Enter:
-        {
-            if(searchLE->text()!="")
-                searchType();
-        }
-        break;
-
-    case Qt::Key_Backspace:
-        searchLE->clear();
-        break;
-    }
-}*/
-
 
 void Logmanager::searchCurrent()
 {
@@ -239,13 +208,11 @@ void Logmanager::searchCurrent()
     }
     else
     {
-
         modeLabel->setText(" Search Results: Search Current");
 
         if(searchLE->text()!="")
         {
             table->setAlternatingRowColors(false);
-
             highlightItems();
         }
         else
@@ -253,7 +220,6 @@ void Logmanager::searchCurrent()
     }
     searchLE->setFocus();
 }
-
 
 void Logmanager::highlightItems()
 {
@@ -265,7 +231,7 @@ void Logmanager::highlightItems()
     else
         searchMsgLabel->hide();
 
-    recordsLabel->setText(" Records Found: "+QString().setNum(nitems)+" ");
+    recordsLabel->setText(" Matches Found: "+QString().setNum(nitems)+" ");
 
     for(int i=0;i<nitems;i++)
     {
@@ -273,7 +239,6 @@ void Logmanager::highlightItems()
         items[i]->setFont(QFont ("Verdana", 8, QFont::Bold));
         items[i]->setForeground(Qt::white);
     }
-
 }
 
 void Logmanager::unHighlightItems()
@@ -307,25 +272,20 @@ void Logmanager::searchAll()
             table->setAlternatingRowColors(false);
             find();
         }
-
     }
     if(prevText!="")
         highlightItems();
     searchLE->setFocus();
 }
 
-
-
-
 void Logmanager::find()
 {
-
     table->setRowCount(0);
 
     QString text = searchLE->text();
 
     QStringList files,ext;
-    ext<<"*.Log"<<"*.Logc";
+    ext<<"*.Log";
 
     directory.setPath(path);
 
@@ -340,26 +300,26 @@ void Logmanager::find()
     else
         searchMsgLabel->hide();
 
-
     if (!text.isEmpty()&&nfiles!=0)
         findFiles(directory, files, text);
-
 }
 
 void Logmanager::findFiles(const QDir &directory, const QStringList &files,
                            const QString &text)
 {
+    //table->setSortingEnabled(false);
     QProgressDialog progressDialog(this);
     progressDialog.setCancelButtonText(tr("&Cancel"));
     progressDialog.setRange(0, files.size());
-    progressDialog.setWindowTitle(tr("Finding Log Files...."));
+    progressDialog.setWindowTitle(tr("Finding Log Files..."));
+    progressDialog.show();
 
     int recordsFound=0;
 
     for (int i = 0; i < files.size(); ++i)
     {
         progressDialog.setValue(i);
-        progressDialog.setLabelText(tr("Searching file number %1 of %2...")
+        progressDialog.setLabelText(tr("Searching file %1 of %2...")
                                     .arg(i).arg(files.size()));
         qApp->processEvents();
 
@@ -373,12 +333,10 @@ void Logmanager::findFiles(const QDir &directory, const QStringList &files,
             QString line;
             QTextStream in(&logfile);
 
-
             while (!in.atEnd())
             {
                 if (progressDialog.wasCanceled())
                     break;
-
 
                 line=in.readLine();
 
@@ -386,22 +344,21 @@ void Logmanager::findFiles(const QDir &directory, const QStringList &files,
                 {
                     enterRecord(line);
                     recordsFound++;
-
                 }
             }
         }
     }
-    recordsLabel->setText(" Records Found: "+QString().setNum(recordsFound)+" ");
-}
 
+    progressDialog.close();
+    recordsLabel->setText(" Matches Found: "+QString().setNum(recordsFound)+" ");
+   // table->setSortingEnabled(true);
+}
 
 void Logmanager::enterRecord(const QString &line)
 {
     QStringList recordField;
 
-    table->setSortingEnabled(false);
-
-    recordField=line.split(" ");
+    recordField=line.split("~");
 
     int row = table->rowCount();
 
@@ -411,15 +368,19 @@ void Logmanager::enterRecord(const QString &line)
 
     for(int i=0;i<columnCount;i++)
     {
-        table->setItem(row,i,new QTableWidgetItem(recordField[i]));
+        item = new QTableWidgetItem(recordField[i]);
+        table->setItem(row,i, item);
+        item->setTextAlignment(Qt::AlignCenter);
     }
+
     recordField.clear();
-
-    table->setSortingEnabled(true);
-
 }
 
+void Logmanager::closeEvent(QCloseEvent *e)
+{
+    emit lmclose();
+    e->accept();
+}
 
 Logmanager::~Logmanager()
-{
-}
+{}

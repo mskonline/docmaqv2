@@ -1,36 +1,61 @@
+/* DocmaQ v2.0, Credential Publishing System
+    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "cdatabase.h"
-#include "QDebug"
 #include <QString>
 
 CDatabase::CDatabase()
 {
-    qp1 = "select STUDENT_ID from student_admission where STUDENT_ROLLNO=";
+    qp1 = "select student_id from student_admission where student_rollno=";
     qp2 = "select student_name,father_name,gender from student_info where student_id=" ;
     qp3 = "select course,branch_id,current_sem,current_year from student_academic where student_id=" ;
     qp4 = "select date_of_birth,caste from student_info where student_id=";
     qp5 = "select date_of_adm from student_admission where student_id=" ;
-    qpc = "select status from tc_log where student_id=";
+    qpc = "select duplicates from tc_log where student_id=";
+
+    dbstatus = "    Manual Mode";
+    is_connected = false;
 }
 
-bool CDatabase::connect() //QStringList dbdetails)
+void CDatabase::connect(QStringList dbinfo)
 {
-        db = QSqlDatabase::addDatabase("QMYSQL");
-        db.setDatabaseName("sreenidhi");
-        db.setPort(3306);
-        db.setHostName("localhost");
-        db.setUserName("root");
-        db.setPassword("123");
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","docmaq");
+    db.setDatabaseName(dbinfo.at(0));
+    db.setHostName(dbinfo.at(1));
+    db.setPort(dbinfo.at(2).toInt());
+    db.setUserName(dbinfo.at(3));
+    db.setPassword(dbinfo.at(4));
 
-        is_connected = db.open();
+    is_connected = db.open();
 
-        return is_connected;
+    if(db.lastError().isValid())
+        dbstatus = db.lastError().databaseText();
+    else
+        dbstatus = "    Connected to Database";
 }
 
 bool CDatabase::reconnect(QStringList dbdetails)
 {
-    db.close();
-    //return connect(dbdetails);
-    return true;
+    if(QSqlDatabase::contains("docmaq"))
+        QSqlDatabase::removeDatabase("docmaq");
+
+    connect(dbdetails);
+    return is_connected;
 }
 
 /* bool fetch(Student *)
@@ -39,7 +64,7 @@ bool CDatabase::reconnect(QStringList dbdetails)
 bool CDatabase::fetch(Student *student)
 {
     QString q;
-    QSqlQuery query(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
 
     if(!student->st_filled)
     {
@@ -51,7 +76,8 @@ bool CDatabase::fetch(Student *student)
 
         if( student->id.isEmpty() )
         {
-            emit report(ERROR,"No Details Found for : " + student->roll + " . Check whether you have entered the Roll Number Correctly or Whether the Database is Configured Correctly. ");
+            emit report(ERROR,"No Details Found for : " + student->roll + " . Check whether you have entered the Roll Number Correctly or Whether the Database is Configured Correctly.\n\n" +
+                        "MySQL Reports : " + query.lastError().databaseText()) ;
             return false;
         }
 
@@ -64,12 +90,7 @@ bool CDatabase::fetch(Student *student)
         gender = query.value(2).toString();
 
         if ( student->name.isEmpty() && student->father_name.isEmpty() && gender.isEmpty() )
-        {
             emit report(WARNING , "Few Empty Details in Database for : " + student->roll + ". Please Fill them Manually.");
-            student->st_filled = 0;
-        }
-        else
-            student->st_filled  = 1;
 
         // third query,fetches course details
         q = qp3 + student->id;
@@ -80,42 +101,25 @@ bool CDatabase::fetch(Student *student)
         sem = query.value(2).toString();
         year = query.value(3).toString();
 
-
         if ( student->course.isEmpty() &&  student->bid == 0 && year.isEmpty() && sem.isEmpty())
-        {
             emit report(WARNING , "Few Empty Details in Database for : " + student->roll + ". Please Fill them Manually.");
-            student->st_filled = 0;
-        }
-        else
-            student->st_filled = 1;
 
-        format_course(student);
+        student->st_filled = 1;
     }
 
     return true;
 }
 
-
 bool CDatabase::fetch_ex(Student *student)
 {
-     QSqlQuery query(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
 
     if(fetch(student))
     {
-        student->std_ex = new Student_ex;
         QString c,q;
 
-
         if(check_duplicate_issue(student))
-        {
-            emit report(ERROR,"An Error occurred while checking for any previous issues of TC for : " + student->roll + " . Please check if the Database is properly configured");
             return false;
-        }
-
-        if(student->std_ex->is)
-            student->std_ex->type = "Duplicate";
-        else
-            student->std_ex->type = "Original";
 
         q = qp4 + student->id;
         query.exec(q);
@@ -130,10 +134,22 @@ bool CDatabase::fetch_ex(Student *student)
 
         d_a = query.value(0).toDate();
 
-        student->std_ex->dob = d_b.toString("dd.MM.yyyy");
-        student->std_ex->doa = d_a.toString("dd.MM.yyyy");
+        student->std_ex->dob = d_b.toString("dd.MMM.yyyy");
+        student->std_ex->doa = d_a.toString("dd.MMM.yyyy");
 
-        student->std_ex->dol = QDate::currentDate().toString("dd.MM.yyyy");
+        if(student->std_ex->is)
+        {
+            QDate dt;
+            dt = QDate().fromString(student->std_ex->dissue->at(1),"yyyy-MM-dd");
+            student->std_ex->type = "DUPLICATE";
+            student->std_ex->dol = dt.toString("dd.MMM.yyyy");
+        }
+        else
+        {
+            student->std_ex->type = "ORIGINAL";
+            student->std_ex->dol = QDate::currentDate().toString("dd.MMM.yyyy");
+        }
+
         student->std_ex->qualified = "Yes";
         student->std_ex->dues = "No";
         student->std_ex->disp_m = "None";
@@ -146,62 +162,70 @@ bool CDatabase::fetch_ex(Student *student)
             student->std_ex->community = "None";
 
         student->stx_filled = 1;
-     }
+    }
     return true;
 }
 
-
 int CDatabase::check_duplicate_issue(Student *student)
 {
-    QSqlQuery query(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
+    QString q;
 
-    qpc = qpc + student->id;
-    query.exec(qpc);
+    q = qpc + student->id;
+    query.exec(q);
 
     if(query.lastError().type() != QSqlError::NoError)
-           return 1;
-
+    {
+        emit report(ERROR,"An Error occurred while checking for any previous issues of TC for : " + student->roll + " . Please check if the Database is properly configured.\n\n" +
+                    "MySQL Reports : " + query.lastError().databaseText()) ;
+        return 1;
+    }
 
     query.next();
 
     if(!query.value(0).toString().isEmpty())
     {
-        student->std_ex->dissue =  new QStringList;
-        QString q = "Select status,date_of_issue,issued_by, remarks from tc_log where student_id=" + student->id;
+        QString q = "Select duplicates, org_issued_on, org_issued_by,dup_issued_on, dup_issued_by, remarks from tc_log where student_id=" + student->id;
         query.exec(q);
+
         query.next();
 
-        student->std_ex->dissue->append(query.value(0).toString()); // Status
-        student->std_ex->dissue->append(query.value(1).toString()); // Date_of_issue
-        student->std_ex->dissue->append(query.value(2).toString()); // Issued_by
-        student->std_ex->dissue->append(query.value(3).toString()); // Remarks
+        student->std_ex->dissue->clear();
+        student->std_ex->dissue->append(query.value(0).toString()); // duplicates
+        student->std_ex->dissue->append(query.value(1).toString()); // org_issued_on
+        student->std_ex->dissue->append(query.value(2).toString()); // org_issued_by
+        student->std_ex->dissue->append(query.value(3).toString()); // dup_issued_on
+        student->std_ex->dissue->append(query.value(4).toString()); // dup_issued_by
+        student->std_ex->dissue->append(query.value(5).toString()); // Remarks
 
         student->std_ex->is = 1;
     }
+    else
+        student->std_ex->is = 0;
 
     return 0;
 }
 
-
 int CDatabase::update_dissue(Student *student)
 {
     QString q ;
-    QSqlQuery query(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
 
     QString d,i,r ;
 
-    d = "'" + student->std_ex->dissue->at(1) + "'";
-    i = "'" + student->std_ex->dissue->at(2) + "'";
-    r = "'" + student->std_ex->dissue->at(3) + "'";
+    d = "'" + student->std_ex->dissue->at(3) + "'";
+    i = "'" + student->std_ex->dissue->at(4) + "'";
+    r = "'" + student->std_ex->dissue->at(5) + "'";
 
 
-    q = "update tc_log set status=" + student->std_ex->dissue->at(0) + "," +tr(" date_of_issue=") +  d +  "," + tr(" issued_by=") +
-          i  +  "," + tr(" remarks=") + r + " where student_id=" + student->id;
+    q = "update tc_log set duplicates =" + student->std_ex->dissue->at(0) + "," +tr(" dup_issued_on=") +  d +  "," + tr(" dup_issued_by=") +
+        i  +  "," + tr(" remarks=") + r + " where student_id=" + student->id;
 
     query.exec(q);
     if(query.lastError().type() != QSqlError::NoError)
     {
-        emit report(ERROR,"An Error occurred while updating Remarks of TC for : " + student->roll + " . Please check if the Database is properly configured");
+        emit report(ERROR,"An Error occurred while updating Remarks of TC for : " + student->roll + " . Please check if the Database is properly configured\n\n" +
+                    "MySQL Reports : " + query.lastError().databaseText()) ;
         return -1;
     }
 
@@ -210,30 +234,28 @@ int CDatabase::update_dissue(Student *student)
 
 /* void log_tc(QStringList)
  * Called after Printing is completed & is logged in the TC Log
- * Record is created when TC is issued for the first time
+ * Record is created when TC is issued for the FIRST TIME
  */
 int CDatabase::log_tc(Student *student)
 {
-    QString q;
-    QStringList *lt = student->std_ex->dissue;
-    QSqlQuery query(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
+    QString q,d,i;
 
-    QString d,i,r ;
+    d = "'"+ QDate::currentDate().toString("yyyy-MM-dd") + "'"; // Date format : yyyy-MM-dd
+    i = "'" + username + "'";
 
-    d = "'" + lt->at(1) + "'";
-    i = "'" + lt->at(2) + "'";
-    r = "'" + lt->at(3) + "'";
-
-    q = "insert into tc_log(student_id,status,date_of_issue,issued_by,remarks) values(" + student->id + "," +
-        lt->at(0) + "," +  d +  "," + i + "," + r + ")";
+    q = "insert into tc_log(student_id,duplicates,org_issued_on,org_issued_by) values(" + student->id + "," +
+        tr("0") + "," +  d +  "," + i + ")";
 
     query.exec(q);
 
     if(query.lastError().type() != QSqlError::NoError)
     {
-           report (ERROR,"An Error occurred while Recording an issue of TC for : " + student->roll + " . Please check if the Database is properly configured") ;
-           return -1;
+        report (ERROR,"An Error occurred while Recording an issue of TC for : " + student->roll + " . Please check if the Database is properly configured \n\n" +
+                "MySQL Reports : " + query.lastError().databaseText()) ;
+        return -1;
     }
+
     return 0;
 }
 
@@ -243,8 +265,8 @@ int CDatabase::log_tc(Student *student)
 void CDatabase::get_user_password(QString userid)
 {
     QString q1,q2,passwd;
-    QSqlQuery query(QSqlDatabase::database());
-    QSqlQuery query2(QSqlDatabase::database());
+    QSqlQuery query(QSqlDatabase::database("docmaq"));
+    QSqlQuery query2(QSqlDatabase::database("docmaq"));
 
     q1 = "select passwd from login_info where user_name='" + userid + "' and role='academic'" ;
 
@@ -258,17 +280,16 @@ void CDatabase::get_user_password(QString userid)
         q2 = "select teacher_name from teacher_info where teacher_code='" + userid + "'";
         query2.exec(q2);
         query2.next();
-
+        this->user_id = userid;
         username = query2.value(0).toString();
     }
-
 
     emit user_passwd(passwd);
 }
 
 void CDatabase::format_course(Student *student)
 {
-    int  var_yr = year.toInt();
+    int var_yr = year.toInt();
 
     // Year
     switch ( var_yr )
@@ -282,7 +303,7 @@ void CDatabase::format_course(Student *student)
     case 4: year = ", IV year";
     }
 
-    int  var_sem = sem.toInt();
+    int var_sem = sem.toInt();
 
     // B'tech 1st year don't have semester system
     if (student->course == "B.Tech" and var_yr == 1)
@@ -313,7 +334,7 @@ void CDatabase::format_course(Student *student)
         break;
     case 5 : student->branch ="Mech";
         break;
-    case 6 : student->branch ="Bio-Tech";
+    case 6 : student->branch ="Bio - Tech";
         break;
     case 9 : student->branch ="ECM";
         break;
@@ -325,15 +346,15 @@ void CDatabase::format_course(Student *student)
         break;
     case 14 : student->branch ="EET";
         break;
-    case 15 : student->branch ="ECE";
+    case 15 : student->branch ="EPE";
         break;
-    case 16 : student->branch ="BSCE";
+    case 16 : student->branch ="DSCE";
         break;
     case 17 : student->branch ="VLSI";
         break;
     case 19 : student->branch ="SE";
         break;
-    case 20 : student->branch ="CAD-CAM";
+    case 20 : student->branch ="CAD - CAM";
         break;
     case 21 : student->branch ="Bio-Tech";
         break;
@@ -343,10 +364,10 @@ void CDatabase::format_course(Student *student)
 }
 
     QString temp2 = student->branch;
-    student->branch = !student->branch.isEmpty() ? " - " + student->branch : "";
+    temp2 = !temp2.isEmpty() ? " - " + temp2 : "";
 
     // constructing course details.
-    student->cdetails = student->course + student->branch + year + sem;
+    student->cdetails = student->course + temp2 + year + sem;
 
     if(gender == "Male")
     {
@@ -358,4 +379,54 @@ void CDatabase::format_course(Student *student)
         student->name = "Ms. " + student->name;
         student->co = "D/o";
     }
+}
+
+void CDatabase::format_tc(Student *student)
+{
+    switch ( student->bid )
+    {
+    case 1 : student->branch ="Electricals and Electronics Engineering";
+        break;
+    case 2 : student->branch ="Computer Science and Engineering";
+        break;
+    case 3 : student->branch ="Electronics and Communication Engineering";
+        break;
+    case 4 : student->branch ="Information Technology";
+        break;
+    case 5 : student->branch ="Mechanical Engineering";
+        break;
+    case 6 : student->branch ="Bio Tech Engineering";
+        break;
+    case 9 : student->branch ="Electronics and Computer Engineering";
+        break;
+    case 10 : student->branch ="Science & Humanities";
+        break;
+    case 12 : student->branch ="Master of Business Adminstration";//MBA
+        break;
+    case 13 : student->branch ="Airline Management";
+        break;
+    case 14 : student->branch ="Electronic Engineering Technology";
+        break;
+    case 15 : student->branch ="Electrical and Power Engineering";
+        break;
+    case 16 : student->branch ="Digital Systems and Computer Electronics";
+        break;
+    case 17 : student->branch ="VLSI and Embedded Systems";
+        break;
+    case 19 : student->branch ="Software Engineering";
+        break;
+    case 20 : student->branch ="CAD - CAM";
+        break;
+    case 21 : student->branch ="Bio Tech Engineering";
+        break;
+    case 22 : student->branch ="Master of Computer Application";//MCA
+        break;
+    default : student->branch = "";
+    }
+}
+
+CDatabase::~CDatabase()
+{
+    if(QSqlDatabase::contains("docmaq"))
+        QSqlDatabase::removeDatabase("docmaq");
 }

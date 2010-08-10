@@ -1,0 +1,51 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/backup_icon.jpg</file>
+        <file>Images/cc.png</file>
+        <file>Images/checkbox_checked.png</file>
+        <file>Images/checkbox_checked_hover.png</file>
+        <file>Images/checkbox_checked_pressed.png</file>
+        <file>Images/checkbox_unchecked.png</file>
+        <file>Images/checkbox_unchecked_hover.png</file>
+        <file>Images/checkbox_unchecked_pressed.png</file>
+        <file>Images/cpass.gif</file>
+        <file>Images/database-process-icon.png</file>
+        <file>Images/delete.png</file>
+        <file>Images/docmaq.png</file>
+        <file>Images/down_arrow.png</file>
+        <file>Images/down_arrow_disabled.png</file>
+        <file>Images/field-256.png</file>
+        <file>Images/frame.png</file>
+        <file>Images/icon_password.gif</file>
+        <file>Images/lin_agt_wrench-256.png</file>
+        <file>Images/log48.png</file>
+        <file>Images/measuring_tape.jpg</file>
+        <file>Images/Note-Book-Icon.png</file>
+        <file>Images/pagefold.png</file>
+        <file>Images/password-icon.png</file>
+        <file>Images/printer.png</file>
+        <file>Images/pushbutton.png</file>
+        <file>Images/pushbutton_hover.png</file>
+        <file>Images/pushbutton_pressed.png</file>
+        <file>Images/radiobutton_checked.png</file>
+        <file>Images/radiobutton_checked_hover.png</file>
+        <file>Images/radiobutton_checked_pressed.png</file>
+        <file>Images/radiobutton_unchecked.png</file>
+        <file>Images/radiobutton_unchecked_hover.png</file>
+        <file>Images/radiobutton_unchecked_pressed.png</file>
+        <file>Images/reg file.png</file>
+        <file>Images/Search2-64.png</file>
+        <file>Images/sizegrip.png</file>
+        <file>Images/spindown.png</file>
+        <file>Images/spindown_hover.png</file>
+        <file>Images/spindown_off.png</file>
+        <file>Images/spindown_pressed.png</file>
+        <file>Images/spinup.png</file>
+        <file>Images/spinup_hover.png</file>
+        <file>Images/spinup_off.png</file>
+        <file>Images/spinup_pressed.png</file>
+        <file>Images/up_arrow.png</file>
+        <file>Images/up_arrow_disabled.png</file>
+        <file>Images/users.png</file>
+    </qresource>
+</RCC>
