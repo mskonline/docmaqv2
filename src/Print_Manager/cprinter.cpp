@@ -420,8 +420,8 @@ void CPrinter::printTC()
        painter->drawText (pt,tc_student->course);
 
        // Branch
-       pt.setX(blist.at(20) * tvalw);
-       pt.setY(blist.at(21) * tvalh);
+       pt.setX(tlist.at(20) * tvalw);
+       pt.setY(tlist.at(21) * tvalh);
        painter->drawText (pt,tc_student->branch);
 
        // Dol
