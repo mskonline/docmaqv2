@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     QSharedMemory sharedMemory("docmaq");
     if (sharedMemory.create(1) && sharedMemory.error() != QSharedMemory::AlreadyExists)
     {
-        //a.addLibraryPath("./plugins");
+        a.addLibraryPath("./plugins");
         AppManager *app = new AppManager();
         return a.exec();
     }
