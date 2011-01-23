@@ -242,6 +242,13 @@ void AppManager::onRollEntry()
         }
     }
 
+    // Check if roll already exits.
+    if(!interface->btable->findItems(roll,Qt::MatchCaseSensitive).isEmpty())
+    {
+        interface->report(ERROR,"Roll " + roll + " already exits in Roll Box.");
+        return;
+    }
+
     student = new Student;
     student->c_type[0] = c_type[0];
     student->c_type[1] = c_type[1];

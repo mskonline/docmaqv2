@@ -25,16 +25,30 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QSharedMemory sharedMemory("d_configure");
+    QSharedMemory sharedMemory("docmaq");
+
     if (sharedMemory.create(1) && sharedMemory.error() != QSharedMemory::AlreadyExists)
     {
-        a.addLibraryPath("./plugins");
-        GetConfig get;
-        return a.exec();
+        // Check if Configure is already running
+        QSharedMemory sm("d_configure");
+
+        if(sm.create(1) && sm.error() != QSharedMemory::AlreadyExists)
+        {
+            sharedMemory.detach();
+
+            a.addLibraryPath("./plugins");
+            GetConfig get;
+            return a.exec();
+        }
+        else
+        {
+            QMessageBox::critical(0,"DocmaQ Configure Error", " DocmaQ Configure is already running." );
+            return 0;
+        }
     }
     else
     {
-        QMessageBox::critical(0,"Docmaq Configure Error  ","Domaq Configure is already running.");
+        QMessageBox::critical(0,"DocmaQ Configure Error  ","DocmaQ is running. Please Close it first to open DocmaQ Configure.");
         return 0;
     }    
 }

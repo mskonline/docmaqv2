@@ -3,7 +3,7 @@
 # -------------------------------------------------
 QT += sql
 TARGET = DocmaQ_Configure
-CONFIG += release
+CONFIG += debug
 SOURCES += main.cpp \
     config.cpp \
     getconfig.cpp

@@ -24,20 +24,39 @@
 #include <QSharedMemory>
 #include <QMessageBox>
 
+#include <QDebug>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QSharedMemory sharedMemory("docmaq");
+    QSharedMemory sharedMemory("d_configure");
+
     if (sharedMemory.create(1) && sharedMemory.error() != QSharedMemory::AlreadyExists)
     {
-        a.addLibraryPath("./plugins");
-        AppManager *app = new AppManager();
-        return a.exec();
+        // Check if DocmaQ is already running
+        QSharedMemory sm("docmaq");
+
+        if(sm.create(1) && sm.error() != QSharedMemory::AlreadyExists)
+        {
+            sharedMemory.detach();
+
+            // Load plugins
+            a.addLibraryPath("./plugins");
+
+            // Main app class initialisation
+            AppManager *app = new AppManager();
+            return a.exec();
+        }
+        else
+        {
+            QMessageBox::critical(0,"DocmaQ Error             ","Application is already running.");
+            return 0;
+        }
     }
     else
     {
-        QMessageBox::critical(0,"Docmaq Error             ","Application is already running.");
+        QMessageBox::critical(0,"DocmaQ Error            ", " DocmaQ Configure is running. Please Close it first to open DocmaQ." );
         return 0;
     }
 }
