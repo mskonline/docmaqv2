@@ -1,0 +1,354 @@
+[General]
+FileVersion=1.1
+FileType=QSetupIniFile
+ComposerVersion=8.5.1.2
+OperatingSystem=WinXP  5.1  2600 (Service Pack 2)
+ProcessorNameString=Intel(R) Core(TM)2 Duo CPU   E6550 @ 2.33GHz
+ComputerRAM=1004 MB
+ProjectDrive=C:\  (54.64 GB Free)
+DateTime=15-AUG-2010  23:12:03
+OutputType=EXE
+Language=ENGLISH
+License=PRO
+
+[Project]
+ProjectName=DocmaQ
+ProjectDirectory=C:\deploy
+NonSFXDirectory=C:\deploy\NonSFX
+MediaFileName=DocmaQ v2.0 Setup
+CopyMediaToFName=
+ProgramDescriptiveName=DocmaQ
+ProgramVersion=
+CompanyName=
+ProgVerLiveUpdate=0
+RegisterAsApp=0
+LanguageFlag=1
+LanguageNames=|
+UseNonSFXDir=0
+ClrNonSFXDir=0
+BuildNonSFXTree=0
+CompressNonSFXFiles=0
+ForceCopyNonSFXFiles=0
+CompressionLevel=0
+SetupWillExpire=0
+ExpireByDate=1
+ExpireByDays=0
+ExpireDate=2009-11-04
+ExpireDays=90
+SpanCDs=0
+SpanCDsSize=650
+DebugWindow=0
+DebugOnThisPC=1
+DebugOnEveryPC=0
+MSI_UpgradeCode={B842DB48-016A-42EA-B10D-D2CE11D393A4}
+MSI_ProductCode={91B01A69-9297-4E2B-9697-000EB6CA6174}
+
+[Language]
+
+[LanguageShortcut]
+
+[LanguageCustomDLG]
+
+[Display]
+AddSetupBackground=0
+SetupBackground3D=1
+TopLabel=1
+TopLabelVer=1
+TopLabel2=1
+BottomLabel=1
+TopLabelText="DocmaQ"
+TopLabel2Text="A Certificate Printing Application"
+BottomLabelText="Copyright © 2010"
+BackgroundDesign=Light Source (Right)
+TopBackgroundColor=16777215
+BottomBackgroundColor=8388608
+AddBottomColor=1
+DlgBmp3DFrame=1
+DialogStyle=Modern
+AddDialogBitmap=1
+DialogBitmapFileName=C:\deploy\installpic.bmp
+AddBackgroundBitmap=1
+BackgroundBitmapFileName=
+BackgroundBitmapLocation=|Bottom/Left|0|0|
+AddBackgroundWave=0
+BgBmpTransparent=0
+BackgroundWaveFileName=
+BackgroundWaveLocation=|Top/Left|300|0|
+BackgroundWaveLoop=1
+BackgroundWaveDelay=0
+AddBackgroundWaveSlider=1
+BackgroundWaveSliderType=Fixed
+TopLabelSide=Left
+TopLabel2Side=Center
+BottomLabelSide=Left
+DialogLocation=|Center|0|0|
+TopLabelFont=|Arial|33|16777215|1|0|1|0|
+TopLabel2Font=|Verdana|21|16777215|1|2|1|0|
+BottomLabelFont=|Tahoma|10|16777215|1|0|1|0|
+CompanyUrl=www.Qogency.co.cc
+
+[TargetExe]
+TargetDirectory=<ProgramFilesDir>Qogency
+CommonDirectory=<CommonFilesDir>
+AuxDirectory=<FontDir>
+TargetExeName=<Application Folder>\DocmaQ.exe
+RunTimeDir_1=|0||0||0||1|0|0|c:\Progarm Files\SimpSol|1|0|0|<ProgramFilesDir>|0|0|0|0|0|0|
+
+[Dialogs]
+SelectedDialogs=*Welcome,License,*Readme,User Information,Setup Type,Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
+LicenseTextFile=C:\deploy\gpl.txt
+ReadmeTextFile=C:\deploy\require.txt
+ReadmeTextFile2=C:\deploy\README.txt
+UseNotepad=0
+SpaceReqOnDriveCheckBox=1
+SpaceReqOnDrive=25
+RequestUserName=1
+RequestCompanyName=1
+RequestSerialNumberAlso=0
+MandatoryUserName=1
+MandatoryCompanyName=1
+MandatorySerialNumber=1
+FromPcUserName=0
+FromPcCompanyName=0
+RequestSerialCheckDLL=0
+SerialCheckDll=
+RequestPredefinedSerial=0
+CaseSensitiveSerial=0
+RequestTokenizedSerial=0
+CDSetup=0
+ShowCompactSetupAlso=1
+ForcePartialSetup=0
+ShowProgBar2=1
+SilentSetup=0
+EnableCancelButton=1
+HiddenSetup=0
+ProposeReadme=1
+ProposeLaunch=0
+ProposeRestart=0
+ProposeReadmeChecked=0
+ProposeLaunchChecked=1
+ForceRestart=0
+ShowCloseRecommendation=0
+ShowAdwareDisclaimer=0
+ShowCopyrightWarning=0
+
+[Shortcuts]
+AddMainShortCut=1
+ForceRemoveShortcutFolder=1
+ProgramLinkFolder=DocmaQ
+ProgramLinkName=DocmaQ
+ProgramLinkParam=
+ProgramLinkWorkDir=<Application Folder>
+ProgramLinkRun=Normal Window
+ProgramLinkIconFile=<Application Folder>\DocmaQ.exe
+ProgramLinkIconNum=
+StartMenuLinkName=DocmaQ
+DesktopLinkName=DocmaQ
+SendToLinkName=
+StartUpLinkName=
+QuickLaunchLinkName=DocmaQ
+StartMenuCheckBox=1
+DesktopCheckBox=1
+SendToCheckBox=0
+StartUpCheckBox=0
+QuickLaunchCheckBox=1
+StartMenuChecked=1
+DesktopChecked=1
+SendToChecked=1
+StartUpChecked=1
+QuickLaunchChecked=1
+SetAllUsers=1
+SelectedByEndUser=0
+AddUninstallShortcut=0
+UnInstallSubFolder=0
+UnInstallSubFolderText=
+Item-000=*|Logs|<Application Folder>\log|DocmaQ|||Normal Window||0|1||0|0|
+Item-001=*|DocmaQ||DocmaQ||<Application Folder>|Normal Window||0|1||0|0|
+Item-002=*|DocmaQ||<Desktop>||<Application Folder>|Normal Window||0|1||0|0|
+Item-003=*|DocmaQ||<Start Menu>||<Application Folder>|Normal Window||0|1||0|0|
+Item-004=*|DocmaQ||<Quick Launch>||<Application Folder>|Normal Window||0|1||0|0|
+Item-005=*|Read Me|<Application Folder>\README.txt|DocmaQ|||Normal Window||0|1||0|0|
+Item-006=*|DocmaQ Configure|<Application Folder>\DocmaQ_Configure.exe|DocmaQ||<Application Folder>|Normal Window|<Application Folder>\DocmaQ_Configure.exe|0|1||0|0|
+
+[Billboard]
+AddBillboard=0
+Item-000=|1|0|0|1|0|Center|0|0|8388608|16711680|Verdana|14|16777215|1|0|360|360|0|1|0|1|
+
+[SplitSetup]
+SplitSetup=0
+ForceDownload=1
+DownloadURL_SPLIT=http://
+ConfirmSplitDownload=0
+
+[AutoUpdate]
+AutoUpdate=0
+CheckAUSetupEnd=0
+RunAutoUpdate=1
+AddAutoUpdateShortcut=1
+AutoUpdateLog=0
+AutoUpdateSubFolder=0
+AutoUpdateSubFolderText=
+ReqConfirmDownload=0
+ReqConfirmInstall=0
+ShutDownMethod=Don't Shut Down
+BackgroundUpdate=0
+RestartProcess=0
+InformFinish=0
+UpdateProjectFName=
+DownloadURL_UPDATE=
+NameOfUpdateFile=
+RunningProcess=
+VersionOriginal=1
+ValidVersions=
+VersionNew=1
+ReAskDays=0
+AutoUpdateProbeSpin=1
+AutoUpdateProbeText=Only at Agent Start
+SelectInformFile=1
+DownloadUrlInform=1
+DownloadURL_INFORM=http://
+NameOfInformFile=
+UpdateSetupPageIndex=0
+AutoInformW=360
+AutoInformH=360
+
+[Switches]
+OperatingSystems=All,95,98,ME,NT,2000,XP,2003,Vista
+OverwriteFlag=2
+CreateLogFile=1
+ConfirmExtract=0
+ShowActivityBar=1
+TestAdminRights=0
+TestAdminRightsUnInstall=0
+SetAllowFullAccess=1
+TestDotNetFramework=0
+InstallDotNetFx=0
+InstallDotNetFxText=
+InstallDotNetFxUrl=0
+InstallDotNetFxUrlText=http://
+DotNetFrameworkReqVer=1.0,1.1,2.0
+TestExeBeforeInstall=0
+TestExeBeforeUnInstall=1
+AutorunCreateInfFile=0
+AutorunTest=1
+AutorunStartApp=1
+AddAppToRunOnce=0
+AddAppToRun=0
+IfPreviousInstallationFound=1
+PreviousInstallationOp=UnInstall before Setup start
+UnInstallPreviousMode=Normal
+CreateUnInstall=1
+ScrambleUnInstallData=0
+SilentUnInstall=0
+HiddenUnInstall=0
+HideErrMsgUnInstall=1
+HideLogBtnUnInstall=1
+AddRemoveProgramsUnInstall=1
+AddChangeButtonUnInstall=1
+UnInstallExeStampSwitch=1
+UnInstallExeStamp=Uninstall-DocmaQ
+UnInstallExeDirSwitch=0
+UnInstallExeDir=
+
+[UnInstall]
+UnInstallDisplayName=DocmaQ
+UnInstallDisplayIcon=<Application Folder>\DocmaQ.exe
+UnInstallDisplayIconNum=
+UnInstallHelpLink=http://www.Qogency.co.cc
+UnInstallInfoAboutURL=Mail us at msk.mymails@gmail.com,praneethk@in.com
+
+[Registry]
+
+[IniFile]
+
+[Environment]
+
+[Association]
+OpenWith=0
+OpenWithName=
+OpenWithMenuText=Open with
+OpenWithExtensions=
+
+[VerInfo]
+CopyFromExe=0
+DefineManually=1
+Item-001=|Comments|Qt Based Application Developed by Praneeth,Sai Kumar,Kiran. Batch:2006-10|
+Item-002=|CompanyName|Qogency|
+Item-003=|FileDescription|Credential Publishing|
+Item-004=|FileVersion|2.0|
+Item-005=|InternalName|Credential Publishing System|
+Item-006=|LegalCopyright|Copyright (C) 2010|
+Item-007=|LegalTrademarks||
+Item-008=|OriginalFilename|DocmaQ.exe|
+Item-009=|ProductName|Credential Publishing Application for SNIST|
+Item-010=|ProductVersion|2.0|
+CopyIconFromTargetExe=1
+CopyIconFromOtherApp=0
+OtherIconAppFileName=C:\Documents and Settings\vineeth\Desktop\BonafidePrint\bin\print.ico
+Spin1=0
+Spin2=0
+
+[Execute]
+ExecuteDllCheckBox=0
+ExecutionDllFileName=
+Exec-000=*||Configure|Setup End|10|UnConditional|0|0|File Found||0|0|0|File Found||0|0|0|File Found||1|Run Executable||0|Display Message||0|Display Message||0|Display Message||0|Display Message||0|Display Message||1|
+Arg-000-2==
+Arg-000-6==
+Arg-000-10==
+Arg-000-13=<InstallDir><Application Folder>\DocmaQ_Configure.exe
+
+[MSI]
+Version=1
+AddMergeModule=0
+Msm2MsiData=|MSM2MSI_.msi|1|1|1|0|
+
+[GroupNames]
+Group-000=Main Group
+
+[Group-000]
+TypicalCompactData=15
+Description=This is the main group of files
+SizeInKB=0
+Item-000=Fol*<Application Folder>
+Item-001=Fil*C:\deploy\AUTHORS.txt
+Item-002=Fil*C:\deploy\COPYING.txt
+Item-003=Fil*C:\deploy\DocmaQ.exe
+Item-004=Fil*C:\deploy\DocmaQ_Configure.exe
+Item-005=Fil*C:\deploy\gpl.html
+Item-006=Fil*C:\deploy\libgcc_s_dw2-1.dll
+Item-007=Fil*C:\deploy\libmySQL.dll
+Item-008=Fil*C:\deploy\mingwm10.dll
+Item-009=Fil*C:\deploy\QtCore4.dll
+Item-010=Fil*C:\deploy\QtGui4.dll
+Item-011=Fil*C:\deploy\QtSql4.dll
+Item-012=Fil*C:\deploy\QtXml4.dll
+Item-013=Fil*C:\deploy\README.txt
+Item-014=Fil*C:\deploy\release notes.txt
+Item-015=Fil*C:\deploy\src.zip
+Item-016=Dir*<Application Folder>\fonts
+Item-017=Fil*C:\deploy\fonts\Bitstream Vera Serif.ttf
+Item-018=Fil*C:\deploy\fonts\ERASDEMI.TTF
+Item-019=Fil*C:\deploy\fonts\micross.ttf
+Item-020=Fil*C:\deploy\fonts\SEGOEUI.TTF
+Item-021=Fil*C:\deploy\fonts\verdana.ttf
+Item-022=Dir*<Application Folder>\images
+Item-023=Fil*C:\deploy\images\bonafide.png
+Item-024=Fil*C:\deploy\images\conduct.png
+Item-025=Fil*C:\deploy\images\docmaq.png
+Item-026=Fil*C:\deploy\images\intro.png
+Item-027=Fil*C:\deploy\images\session.png
+Item-028=Fil*C:\deploy\images\stpic.png
+Item-029=Fil*C:\deploy\images\tc.png
+Item-030=Dir*<Application Folder>\logs
+Item-031=Dir*<Application Folder>\logs\certificate
+Item-032=Dir*<Application Folder>\logs\session
+Item-033=Dir*<Application Folder>\plugins
+Item-034=Dir*<Application Folder>\plugins\sqldrivers
+Item-035=Fil*C:\deploy\plugins\sqldrivers\qsqlmysql4.dll
+Item-036=Fol*<FontDir>
+Item-037=Fil*C:\deploy\fonts\Bitstream Vera Serif.ttf
+Item-038=Fil*C:\deploy\fonts\ERASDEMI.TTF
+Item-039=Fil*C:\deploy\fonts\micross.ttf
+Item-040=Fil*C:\deploy\fonts\SEGOEUI.TTF
+Item-041=Fil*C:\deploy\fonts\verdana.ttf
+
