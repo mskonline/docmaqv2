@@ -1,0 +1,18 @@
+DocmaQ is a Credential Publishing Software which publishes/prints various Credentials of SNIST (Sreenidhi Institute of Science and Technology)
+
+REQUIREMENTS 
+
+- Personal computer with AMD or i386 or higher processor
+- LAN (for remote Database Operation only)
+- 100 MB hard disk space 
+- 128 MB RAM
+- Windows  Xp / Vista / 7
+
+- MySQL Server 5.0 (or higher)
+  - Database Tables :
+    - student_info
+    - student_academic
+    - student_admission
+    - teacher_info
+    - login_info
+    - tc_log

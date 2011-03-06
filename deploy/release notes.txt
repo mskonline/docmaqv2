@@ -1,0 +1,20 @@
+Version 1.0
+22 December 2009
+- Released
+
+version 1.1
+8 January 2010
+- Released
+- Fixed Academic year 
+- Fixed Semester Issue of B'tech 1st year
+- Removed unnecessary Checkable Settings
+
+Version 1.2
+29 Thursday 2010
+- Released
+- fixed Academic year (now can be saved & retrieved)
+- fixed layout
+- fixed bonafide image
+
+Version 2.0
+11 August
