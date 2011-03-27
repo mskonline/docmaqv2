@@ -24,15 +24,7 @@
 CPrinter::CPrinter(QList <int> &c_sno, QStringList &dlist )
     :c_sno(c_sno),dlist(dlist)
 {
-    printer = new QPrinter(QPrinter::HighResolution);
-    printer->setPrinterName(p);
-    printer->setPaperSize(QPrinter::A5);
-    printer->setOrientation(QPrinter::Landscape);
-    printer->setFullPage(true);
-   // printer->setOutputFormat(QPrinter::PdfFormat);
-
-    valw = (printer->width()/printer->widthMM());
-    valh = (printer->height()/printer->heightMM());
+    printer = 0;
 
     paintfont.setFamily("Bitstream Vera Serif");
     paintfont.setPointSize(11);
@@ -52,13 +44,14 @@ CPrinter::CPrinter(QList <int> &c_sno, QStringList &dlist )
 
 void CPrinter::setPrinter()
 {
-    delete printer;
+    if(printer)
+        delete printer;
+
     printer = new QPrinter(QPrinter::HighResolution);
     printer->setPrinterName(p);
     printer->setPaperSize(QPrinter::A5);
     printer->setOrientation(QPrinter::Landscape);
     printer->setFullPage(true);
-   // printer->setOutputFormat(QPrinter::PdfFormat);
 
     valw = (printer->width()/printer->widthMM());
     valh = (printer->height()/printer->heightMM());
@@ -143,8 +136,7 @@ void CPrinter::printB()
                 painter = new QPainter(pdf_printer);
             }
             else
-            {   // INT
-                //printer->setOutputFileName("./B/" + st_list->at(st_ptr)->roll + ".pdf");
+            {
                 printer->setDocName(st_list->at(st_ptr)->roll);
                 painter = new QPainter(printer);
             }
@@ -237,9 +229,8 @@ void CPrinter::printC()
                 painter = new QPainter(pdf_printer);
             }
             else
-            { // TODO
-                printer->setOutputFileName("./C/" + st_list->at(st_ptr)->roll + ".pdf");
-                //printer->setDocName(st_list->at(st_ptr)->roll);
+            {
+                printer->setDocName(st_list->at(st_ptr)->roll);
                 painter = new QPainter(printer);
             }
 
@@ -310,7 +301,6 @@ void CPrinter::setTCprint(bool v)
         tcprinter->setPrinterName(p);
         tcprinter->setPaperSize(QPrinter::A4);
         tcprinter->setOrientation(QPrinter::Portrait);
-        tcprinter->setOutputFormat(QPrinter::PdfFormat);
         tcprinter->setFullPage(true);
 
         tvalw = (tcprinter->width()/tcprinter->widthMM());
@@ -360,10 +350,10 @@ void CPrinter::printTC()
    // Original and Duplicate
    for(int i = 0; i < count ; ++i)
    {
-       if(i) //TODO
-            tcprinter->setOutputFileName("./T/" + tc_student->roll + ".pdf");
+       if(i)
+            tcprinter->setDocName(tc_student->roll + "-2");
        else
-            tcprinter->setOutputFileName("./T/" + tc_student->roll + "2.pdf");
+            tcprinter->setDocName(tc_student->roll + "-1");
        painter = new QPainter(tcprinter);
 
        painter->setFont(snofont);
