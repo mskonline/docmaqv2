@@ -149,8 +149,14 @@ void Interface::create_NItems()
     purpose->setPos(345,339);
     purpose->setZValue(z);
 
-    acyear =  new QGraphicsTextItem(pic[1]);
+    /*acyear =  new QGraphicsTextItem(pic[1]);
     acyear->setFont(ifont);
+    acyear->setPos(222,262);
+    acyear->setZValue(z);*/
+
+    acyear = new LineItem(cscene,92,pic[1]);
+    acyear->setFont(ifont);
+    acyear->id = 6;
     acyear->setPos(222,262);
     acyear->setZValue(z);
 
@@ -568,6 +574,9 @@ void Interface::showsessionpage(QStringList &sinfo)
     close = new QPushButton(widget);
     close->setText("Close");
     close->setGeometry(QRect(470, 10, 75, 23));
+    sfont.setBold(false);
+    close->setFont(sfont);
+
     unamecs = new QLabel(widget);
     unamecs->setText(sinfo.at(0));
     unamecs->setGeometry(QRect(320, 130, 221, 21));

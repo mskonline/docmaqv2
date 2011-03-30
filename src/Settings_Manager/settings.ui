@@ -240,27 +240,15 @@
        <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
+       <stylestrategy>NoAntialias</stylestrategy>
+       <kerning>false</kerning>
       </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
      </property>
      <property name="title">
       <string>Printing Positions</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
@@ -370,14 +358,15 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>62</x>
+        <x>59</x>
         <y>163</y>
-        <width>33</width>
-        <height>13</height>
+        <width>51</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <pointsize>8</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -392,14 +381,15 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>223</x>
+        <x>216</x>
         <y>164</y>
-        <width>37</width>
-        <height>13</height>
+        <width>51</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <pointsize>8</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -843,23 +833,6 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
      </property>
      <property name="autoFillBackground">
       <bool>false</bool>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
      </property>
      <property name="title">
       <string> Database Details</string>
@@ -4301,23 +4274,6 @@ p, li { white-space: pre-wrap; }
        <stylestrategy>PreferDefault</stylestrategy>
       </font>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
-     </property>
      <property name="title">
       <string>Change Password</string>
      </property>
@@ -4691,23 +4647,6 @@ p, li { white-space: pre-wrap; }
        <bold>true</bold>
       </font>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
-     </property>
      <property name="title">
       <string>Log Settings</string>
      </property>
@@ -4963,23 +4902,6 @@ p, li { white-space: pre-wrap; }
        <weight>75</weight>
        <bold>true</bold>
       </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
      </property>
      <property name="title">
       <string>Certificate Details</string>
@@ -5689,37 +5611,21 @@ p, li { white-space: pre-wrap; }
        <bold>true</bold>
       </font>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
-     </property>
      <property name="title">
-      <string>Export/Import Settings</string>
+      <string>Settings</string>
      </property>
      <widget class="QPushButton" name="importButton">
       <property name="geometry">
        <rect>
         <x>230</x>
         <y>50</y>
-        <width>130</width>
-        <height>30</height>
+        <width>151</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <pointsize>8</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -5750,7 +5656,7 @@ border-color: navy; /* make the default button prominent */
 }</string>
       </property>
       <property name="text">
-       <string>Import Settings &lt;&lt;</string>
+       <string>Import  &lt;&lt;</string>
       </property>
       <property name="iconSize">
        <size>
@@ -5764,7 +5670,7 @@ border-color: navy; /* make the default button prominent */
        <rect>
         <x>70</x>
         <y>50</y>
-        <width>141</width>
+        <width>151</width>
         <height>31</height>
        </rect>
       </property>
@@ -5801,7 +5707,7 @@ border-color: navy; /* make the default button prominent */
 }</string>
       </property>
       <property name="text">
-       <string>Export Settings &gt;&gt;</string>
+       <string>Export &gt;&gt;</string>
       </property>
       <property name="iconSize">
        <size>
@@ -5871,23 +5777,6 @@ p, li { white-space: pre-wrap; }
        <bold>true</bold>
       </font>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
-
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFFFFF, stop: 1 #E0E0E0);
-     border: 2px solid #00AAFF;
-     border-radius: 5px;
-     margin-top: 1ex; /* leave space at the top for the title */
- }
-
- QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     
- }</string>
-     </property>
      <property name="title">
       <string>Working Mode</string>
      </property>
@@ -5900,10 +5789,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QRadioButton" name="databaseRB">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>62</x>
         <y>30</y>
-        <width>73</width>
-        <height>13</height>
+        <width>121</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
@@ -5951,8 +5840,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>230</x>
         <y>30</y>
-        <width>60</width>
-        <height>13</height>
+        <width>131</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
@@ -6213,7 +6102,7 @@ color:rgb(0,0,0);
      min-width: 80px;
  }
 
-QLineEdit:hover {
+QLineEdit:focus {
 
      border: 2px solid #00aaff;
      border-radius: 3px;

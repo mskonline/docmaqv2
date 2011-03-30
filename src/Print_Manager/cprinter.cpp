@@ -275,7 +275,7 @@ void CPrinter::printC()
             // Academic Years
             pt.setX(clist.at(14) * valw);
             pt.setY(clist.at(15) * valh);
-            painter->drawText (pt,dlist.at(1) + " - " + dlist.at(2));
+            painter->drawText (pt,st_list->at(st_ptr)->acyear);
 
             // Incremant Count
             c_sno[1] = c_sno[1] % 9999 + 1;

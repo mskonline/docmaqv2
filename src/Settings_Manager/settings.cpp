@@ -343,8 +343,14 @@ void Settings::checkConnectivity()
             QMessageBox::critical(this,"DocmaQ Connection Error", "An Error Occured while Connecting to the Database." +
                                   tr("Please Check the Database details.\n\n") + "MySQL Reports : " + db.lastError().databaseText());
         db.close();
+
+        databaseRB->setChecked(ok);
+        manualRB->setChecked(!ok);
     }
+
     QSqlDatabase::removeDatabase("test");
+
+    f[0] = true;
 }
 
 void Settings::prepareAccountSettings()

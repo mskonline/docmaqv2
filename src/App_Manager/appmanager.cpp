@@ -28,6 +28,10 @@
 #include "thread.h"
 #include <QDebug>
 
+/* AppManager()
+  *
+  * Constructor
+  */
 AppManager::AppManager()
 {
     splash = new QSplashScreen;
@@ -55,6 +59,7 @@ AppManager::AppManager()
     st_plist = new QList <Student *>;
 
     Delay::sleep(1);
+
     // load the initial modules
     load_init_modules();
 }
@@ -65,6 +70,7 @@ AppManager::AppManager()
  */
 void AppManager::load_init_modules()
 {
+    // Splash Screen
     Qt::Alignment bottomleft = Qt::AlignLeft | Qt::AlignBottom;
     splash->showMessage("Loading Settings...",bottomleft, Qt::white);
 
@@ -76,6 +82,7 @@ void AppManager::load_init_modules()
     splash->showMessage("Connecting to Database...",bottomleft, Qt::white);
     cdb = new CDatabase();
 
+    // Check for Database Mode
     if(d_mode)
     {
         settings->getDatabaseDetails(dblist);
@@ -85,6 +92,7 @@ void AppManager::load_init_modules()
     Delay::sleep(1);
     splash->close();
 
+    // Bring up the Authentication Dialog
     ad=new AuthenDialog(d_mode,cdb->is_connected,cdb->dbstatus);
     ad->show();
 
@@ -138,10 +146,12 @@ void AppManager::load_final_modules(int admn)
     interface->rbb->setChecked(true);
 
     cprinter = new CPrinter(c_sno,dlist);
+    cprinter->setPrinter();
+    cprinter->st_list = st_plist;
+
     settings->getPrinter(cprinter->p);
     settings->getPrintPositions(cprinter->blist,0);
     settings->getPrintPositions(cprinter->clist,1);
-    cprinter->st_list = st_plist;
 
     bg_ctype = new QButtonGroup;
     bg_ctype->addButton(interface->bCb,0);
@@ -163,6 +173,7 @@ void AppManager::load_final_modules(int admn)
     connect(interface->co,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
     connect(interface->cdetails,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
     connect(interface->purpose,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
+    connect(interface->acyear,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
 
     connect(interface->rollnoLe,SIGNAL(returnPressed()),this,SLOT(onRollEntry()));
     connect(interface->rollnoLe,SIGNAL(rollfocus()),this,SLOT(rollfocus()));
@@ -221,6 +232,7 @@ void AppManager::onRollEntry()
         cdb->format_tc(tc_student);
         interface->set_tc(tc_student);
 
+        interface->setWindowTitle("DocmaQ : " + tc_student->roll);
         return;
     }
 
@@ -293,11 +305,16 @@ void AppManager::onRollEntry()
         }
     }
 
+    student->acyear = interface->acyear->toPlainText();
+
     // Append to the print List
     this->st_plist->append(student);
 
     // Set the interface
     interface->set_ct(student);  
+
+    // Set the Window Title
+    interface->setWindowTitle("DocmaQ : " + student->roll);
 }
 
 /* itemchanged(int,const QString)
@@ -325,6 +342,7 @@ void AppManager::itemchanged(int id, const QString &data)
         break;
     case 5: st_plist->at(st_ptr)->purpose = data;
         break;
+    case 6 : st_plist->at(st_ptr)->acyear = data;
     }
 
     et += id;
@@ -403,6 +421,9 @@ void AppManager::btableclicked(int row,int col)
         else
             bg_ctype->button(i)->setChecked(false);
     }
+
+    // Set Window Title
+    interface->setWindowTitle("DocmaQ : " + student->roll);
 }
 
 /* updatetype(int)
@@ -520,18 +541,19 @@ void AppManager::removeSt(int i)
         r_sno[0] = c_sno[0];
         r_sno[1] = c_sno[1];
 
-        qDebug() << "All cleared" << st_plist->count();
-
         rollfocus();
+
+        // Window Title
+        interface->setWindowTitle("DocmaQ");
         return;
     }
 
     // Update Counts
     c_count[0] = c_count[0] - st_plist->at(i)->c_type[0];
-    interface->blcd->display(c_count[0]);
+   // interface->blcd->display(c_count[0]);
 
     c_count[1] = c_count[1] - st_plist->at(i)->c_type[1];
-    interface->clcd->display(c_count[1]);
+    //interface->clcd->display(c_count[1]);
 
     int c_type[2];
     c_type[0] = st_plist->at(i)->c_type[0];
@@ -547,6 +569,9 @@ void AppManager::removeSt(int i)
         if(c_type[j])
             this->recalculate_csno(j);
     }
+
+    if(interface->btable->rowCount() == 0)
+         interface->setWindowTitle("DocmaQ");
 
     rollfocus();
 }
@@ -713,6 +738,8 @@ void AppManager::print()
         return;
 
     init_print(p_type);
+
+    interface->setWindowTitle("DocmaQ");
 }
 
 /* init_print()
@@ -787,6 +814,8 @@ void AppManager::pdfprint()
     if(interface->btable->rowCount() == 0)
         return;
     cprinter->pdfprint(c_count[0],c_count[1]);
+
+    interface->setWindowTitle("DocmaQ");
 }
 
 /* TC_dissue
@@ -879,10 +908,10 @@ void AppManager::pcomplete(int ctype)
 void AppManager::tc_pcomplete()
 {
     if(admn != 1)
+    {
          c_sno[2] = c_sno[2] % 99999 + 1;
-
-    // write log
-    lg->writeCertificateLog(tc_student->roll,2);
+         lg->writeCertificateLog(tc_student->roll,2);
+    }
 
     interface->tc_sno->setPlainText("");
     interface->tc_type->setPlainText("");
@@ -895,7 +924,9 @@ void AppManager::tc_pcomplete()
         interface->tcitems->at(i)->setPlainText("");
 
     tc_student->st_filled = 0;
-    interface->tprint->setFocus();
+
+    interface->troll->clear();
+    interface->troll->setFocus();
 }
 
 /* updatevalues()
@@ -906,8 +937,6 @@ void AppManager::updatevalues(QList <int> &ulist)
 {
     if(ulist.isEmpty())
         return;
-
-    qDebug() << ulist;
 
     for(int i = 0; i < ulist.count(); ++i)
     {
@@ -936,9 +965,9 @@ void AppManager::updatevalues(QList <int> &ulist)
                 {
                     if(c_mode)
                     {
-                        d_mode = 1;
+                        d_mode = true;
                         TC_mode();
-                        d_mode = 0;
+                        d_mode = false;
                     }
                 }
                 modechange();
@@ -950,17 +979,19 @@ void AppManager::updatevalues(QList <int> &ulist)
                     recalculate_csno(0);
                     recalculate_csno(1);
                 }
-                else if(c_mode)
+
+                if(c_mode)
                 {
                     tc_student->c_sno[0] = c_sno[2];
                     interface->tc_sno->setPlainText(temp.sprintf("%05d",c_sno[2]));
                 }
                 break;
             case 2 : // Date , Academic years
+                settings->getDateAcademicYear(dlist);
+
                 if(c_mode)
                     break;
 
-                settings->getDateAcademicYear(dlist);
                 interface->set_items(dlist);
                 break;
             case 3 : // Printer
@@ -977,11 +1008,11 @@ void AppManager::updatevalues(QList <int> &ulist)
                 settings->getPrintPositions(cprinter->blist,0);
                 break;
             case 5 : // Conduct Print Positions
-                settings->getPrintPositions(cprinter->blist,1);
+                settings->getPrintPositions(cprinter->clist,1);
                 break;
             case 6: // TC Print Positions
                 if(c_mode)
-                    settings->getPrintPositions(cprinter->clist,2);
+                    settings->getPrintPositions(cprinter->tlist,2);
          }
     }
 
@@ -1046,7 +1077,7 @@ void AppManager::TC_mode()
         interface->wframe->setVisible(true);
         interface->set_TC_Items(0);
         interface->tcb->setText("Issue TC");
-        interface->cdate->setPlainText(dlist.at(0));
+        interface->set_items(dlist);
 
         cprinter->setTCprint(false);
         delete tc_student->std_ex->dissue;
@@ -1111,7 +1142,7 @@ void AppManager::createSessionPage()
 
 /* void quit()
  * Called upon interface Close Event
- *  Checks for any entries left in btable for printing
+ * Checks for any entries left in btable for printing
  */
 void AppManager::quit()
 {

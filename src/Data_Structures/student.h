@@ -34,7 +34,7 @@ public :
         roll,
         father_name,
         co,purpose;
-        QString cdetails,branch,course;
+        QString cdetails,branch,course,acyear;
         int bid;
         int st_filled,stx_filled;
         int c_type[2], c_sno[2];

@@ -59,10 +59,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>3</x>
-     <y>1</y>
+     <x>4</x>
+     <y>4</y>
      <width>101</width>
-     <height>221</height>
+     <height>183</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -123,7 +123,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
 }</string>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
@@ -189,7 +189,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
     <enum>QListView::SinglePass</enum>
    </property>
    <property name="spacing">
-    <number>26</number>
+    <number>20</number>
    </property>
    <property name="viewMode">
     <enum>QListView::IconMode</enum>
@@ -252,19 +252,8 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <stylestrategy>PreferAntialias</stylestrategy>
     </font>
    </property>
-   <property name="styleSheet">
-    <string notr="true">
-QStackedWidget {
-
-
-     border: 1px solid #00AAFF;
-     border-radius: 0px;
-     
- }
-</string>
-   </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
@@ -280,7 +269,7 @@ QStackedWidget {
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>-1</y>
+       <y>1</y>
        <width>471</width>
        <height>183</height>
       </rect>
@@ -295,7 +284,7 @@ QStackedWidget {
       </font>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Box</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
@@ -323,7 +312,7 @@ QStackedWidget {
      <property name="geometry">
       <rect>
        <x>196</x>
-       <y>260</y>
+       <y>267</y>
        <width>82</width>
        <height>24</height>
       </rect>
@@ -405,7 +394,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>93</x>
-       <y>233</y>
+       <y>237</y>
        <width>54</width>
        <height>13</height>
       </rect>
@@ -434,7 +423,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>230</y>
+       <y>235</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -870,7 +859,7 @@ border-radius: 3px;
 min-width: 80px;
 }
 
-QLineEdit:hover {
+QLineEdit:focus {
 
 border: 1px solid #00aaff;
 border-radius: 3px;
@@ -885,7 +874,7 @@ min-width: 80px;
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>200</y>
+       <y>204</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -911,7 +900,7 @@ min-width: 80px;
      left: 1px;
  }
 
-QComboBox:hover {
+QComboBox:focus {
 
 border: 1px solid #00aaff;
 border-radius: 3px;
@@ -1062,7 +1051,7 @@ min-width: 80px;
    <property name="geometry">
     <rect>
      <x>3</x>
-     <y>252</y>
+     <y>280</y>
      <width>101</width>
      <height>51</height>
     </rect>

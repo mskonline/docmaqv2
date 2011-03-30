@@ -123,7 +123,7 @@ public:
     HoverItem *menu,*session;
     HoverItem *larrow,*rarrow, *uarrow, *darrow;
     LineItem *stname,*fname,*purpose;
-    LineItem  *cdetails;
+    LineItem  *cdetails,*acyear;
     ComboItem *course,*branch,*co;
     SPrintDialog *prints;
     Student *student;
@@ -133,7 +133,7 @@ public:
     QGraphicsPixmapItem *pic[3];
     QGraphicsProxyWidget *lproxy,*rproxy,*sproxy,*tpanel;
     QList <QGraphicsTextItem *> *tcitems;
-    QGraphicsTextItem *tyear, *fyear, *roll,*acyear, *sno ,*cdate, *tc_type;
+    QGraphicsTextItem *tyear, *fyear, *roll, *sno ,*cdate, *tc_type;
     QGraphicsTextItem *admno,*tc_sno;
     QToolButton *settingsb, *tcb,*fscreenb;
     QToolButton *logb, *pdfb,*aboutb;

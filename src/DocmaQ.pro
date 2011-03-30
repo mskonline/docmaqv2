@@ -46,6 +46,7 @@ FORMS += Authentication_Manager/authendialog.ui \
     Interface/interface.ui \
     Interface/about.ui \
     Log_Manager/logmanager.ui
-RESOURCES += resources/res.qrc
+RESOURCES += Resources/res.qrc
+win32:RC_FILE = Resources/resource.rc
 win32:MOC_DIR = temp/moc
 win32:OBJECTS_DIR = temp/obj

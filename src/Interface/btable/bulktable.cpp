@@ -45,12 +45,16 @@ BulkTable::BulkTable(QWidget *parent):QTableWidget(parent)
 
 void BulkTable::add_roll(QString roll,QString t)
 {
+    // Set Column 0 (Roll)
     insertRow(rc);
     setItem(rc,0,new QTableWidgetItem(roll));
+
+    // Set Column 1 (Certificate Type)
     QTableWidgetItem *item = new QTableWidgetItem(t);
     item->setFlags(Qt::NoItemFlags);
     item->setBackgroundColor(QColor(197,239,253));
     item->setTextAlignment(Qt::AlignCenter);
+
     setItem(rc,1,item);
     setRowHeight(rc,30);
     ++rc;

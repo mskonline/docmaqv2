@@ -74,6 +74,8 @@ AuthenDialog::AuthenDialog(bool mode,bool con, QString dbstatus,QDialog* parent)
     connect(details,SIGNAL(released()),this,SLOT(err_msg()));
     connect(loginButton,SIGNAL(released()),this,SLOT(loginPageAuthentication()));
     connect(anim,SIGNAL(finished()),this,SLOT(anim_stopped()));
+
+    passwordLE->setFocus();
 }
 
 void AuthenDialog::on_optionsList_currentRowChanged(int row)
