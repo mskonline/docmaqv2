@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -19,11 +19,16 @@
 #include "authendialog.h"
 #include <QtGui>
 
+/*
+ * Constructor
+ */
 AuthenDialog::AuthenDialog(bool mode,bool con, QString dbstatus,QDialog* parent) :QDialog(parent,Qt::WindowMaximizeButtonHint)
 {
+    // Setup Interface
     setupUi(this);
     fig1->setPixmap(QPixmap(QString::fromUtf8("./images/docmaq.png")));
 
+    // Check mode. mode is passed on from App Manager
     if(mode)
     {
         if(con)
@@ -52,6 +57,7 @@ AuthenDialog::AuthenDialog(bool mode,bool con, QString dbstatus,QDialog* parent)
     this->dbstatus = dbstatus;
     this->mode = mode;
 
+    // Setup the About Animation
     QGraphicsScene *scene =  new QGraphicsScene;
     pix = new Pixmap(QPixmap("./images/intro.png"));
 
@@ -67,17 +73,24 @@ AuthenDialog::AuthenDialog(bool mode,bool con, QString dbstatus,QDialog* parent)
     anim->setLoopCount(1);
 
     QCoreApplication::setAttribute ( Qt::AA_ImmediateWidgetCreation);
+    // QSettings Object
     settings= new QSettings( QSettings::SystemScope,"DocmaQ","App");
 
-    //---------------first page
+    // Connections
     connect(passwordLE,SIGNAL(returnPressed()),loginButton,SLOT(animateClick()));
     connect(details,SIGNAL(released()),this,SLOT(err_msg()));
     connect(loginButton,SIGNAL(released()),this,SLOT(loginPageAuthentication()));
     connect(anim,SIGNAL(finished()),this,SLOT(anim_stopped()));
 
-    passwordLE->setFocus();
+    // Set Focus to Username Combo Box
+    comboBox->setFocus();
 }
 
+/* on_optionsList_currentRowChanged(int)
+ * Called : When User selects the options : Login
+ * or About
+ * Performs : Starts or Stops the About Animation
+ */
 void AuthenDialog::on_optionsList_currentRowChanged(int row)
 {
     if(row)
@@ -93,6 +106,11 @@ void AuthenDialog::on_optionsList_currentRowChanged(int row)
     }
 }
 
+/* anim_stopped()
+ * Called : When Animation ends i.e. when the About
+ * Image reaches the End
+ * Performs : Restarts the Animation
+ */
 void AuthenDialog::anim_stopped()
 {
     if(optionsList->currentRow() == 0)
@@ -101,18 +119,30 @@ void AuthenDialog::anim_stopped()
         QTimer::singleShot(10000,this,SLOT(reset_anim()));
 }
 
+/* reset_anim()
+ * Called : by anim_stopped()
+ * Performs : Resets the Image and restarts the animation
+ */
 void AuthenDialog::reset_anim()
 {
     pix->setPos(0,0);
     on_optionsList_currentRowChanged(1);
 }
 
+/* err_msg()
+ * Called : when User clicks Details Button
+ * Performs : Shows the Error Message (occured while connecting to DB)
+ */
 void AuthenDialog::err_msg()
 {
     QMessageBox::information(this,"Database Connection Error", "Attempt to Connect to Database failed.\n\n MySQL Reports :" + dbstatus +
                                         "\n\n You can still Login in Manual Mode");
 }
 
+/* loginPageAuthentication()
+ * Called : When User Clicks Login Button
+ * Performs : Authenticates the User
+ */
 void AuthenDialog::loginPageAuthentication()
 {
     if(comboBox->currentText().isEmpty() or passwordLE->text().isEmpty() )
@@ -129,6 +159,11 @@ void AuthenDialog::loginPageAuthentication()
     else {}
 }
 
+/* authenticate1(QString)
+ * Called : by loginPageAuthentication()
+ * Performs : Checks whether the entered Password is matching
+ * with the one stored in Windows Registry
+ */
 void AuthenDialog::authenticate1(QString name)
 {
     QCryptographicHash hashed(QCryptographicHash::Sha1);
@@ -165,6 +200,9 @@ void AuthenDialog::authenticate(const QString& passwd)
     }
 }
 
+/*
+ * Message Box
+ */
 inline void AuthenDialog::messageBox(QString title,QString message)
 {
     QMessageBox::information(this,title,message,
@@ -172,11 +210,17 @@ inline void AuthenDialog::messageBox(QString title,QString message)
                              QMessageBox::NoButton,QMessageBox::NoButton);
 }
 
+/*
+ * CloseEvent
+ */
 void AuthenDialog::closeEvent(QCloseEvent *e)
 {
     qApp->quit();
 }
 
+/*
+ * Destructor
+ */
 AuthenDialog::~AuthenDialog()
 {
 }

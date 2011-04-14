@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -131,14 +131,15 @@ public:
 
     QGraphicsScene *cscene;
     QGraphicsPixmapItem *pic[3];
-    QGraphicsProxyWidget *lproxy,*rproxy,*sproxy,*tpanel;
+    QGraphicsProxyWidget *lproxy,*rproxy,*sproxy,*tpanel,*rollproxy;
+    QGraphicsRectItem *up_stp,*dn_stp;
     QList <QGraphicsTextItem *> *tcitems;
     QGraphicsTextItem *tyear, *fyear, *roll, *sno ,*cdate, *tc_type;
     QGraphicsTextItem *admno,*tc_sno;
     QToolButton *settingsb, *tcb,*fscreenb;
     QToolButton *logb, *pdfb,*aboutb;
     QShortcut *Bsc, *Csc;
-    QLabel *mode,*ulb,*timelb,*dq;
+    QLabel *mode,*ulb,*timelb,*dq,*rollDisp;
     QCheckBox *typecb;
     QSpinBox *sersb;
     QPushButton *tprint;
@@ -158,7 +159,7 @@ public:
     void setenabled(bool);
 
 private:
-    QWidget *lframe, *rframe;
+    QWidget *lframe, *rframe,*rollframe;
     QPropertyAnimation *anim;
     QStateMachine *machine;
     QState *s1, *s2;

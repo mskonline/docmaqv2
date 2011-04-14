@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -19,6 +19,9 @@
 #include "interface.h"
 #include <QDebug>
 
+/*
+ * Constructor
+ */
 Interface::Interface()
 {
     setupUi(this);
@@ -36,6 +39,12 @@ Interface::Interface()
     uarrow->enable(true);
     darrow = new HoverItem(QPixmap(":/Images/dnarrow.png"));
     darrow->enable(true);
+
+    up_stp = new QGraphicsRectItem();
+    up_stp->setBrush(QBrush(QColor("black")));
+
+    dn_stp = new QGraphicsRectItem();
+    dn_stp->setBrush(QBrush(QColor("black")));
 
     menu->setPos(CView->mapToScene(QPoint(0,0)));
     session->setPos(CView->mapToScene(QPoint(CView->rect().width() - 87,0)));
@@ -64,8 +73,8 @@ Interface::Interface()
 }
 
 /* create_NItems
- * Called by Interface()
- * Performs initialization of Graphic Items
+ * Called : By Interface()
+ * Performs : Initialization of Graphic Items
  */
 void Interface::create_NItems()
 {
@@ -149,19 +158,26 @@ void Interface::create_NItems()
     purpose->setPos(345,339);
     purpose->setZValue(z);
 
-    /*acyear =  new QGraphicsTextItem(pic[1]);
-    acyear->setFont(ifont);
-    acyear->setPos(222,262);
-    acyear->setZValue(z);*/
-
     acyear = new LineItem(cscene,92,pic[1]);
     acyear->setFont(ifont);
     acyear->id = 6;
+    acyear->itemName("YYYY - YYYY");
     acyear->setPos(222,262);
     acyear->setZValue(z);
 
-    uarrow->setZValue(z);
-    darrow->setZValue(z);
+    up_stp->setZValue(z);
+    dn_stp->setZValue(z);
+
+    int uz = up_stp->zValue() + 1;
+    int dz = up_stp->zValue() + 1;
+
+    menu->setZValue(uz);
+    session->setZValue(uz);
+    uarrow->setZValue(dz);
+    darrow->setZValue(dz);
+    larrow->setZValue(dz);
+    rarrow->setZValue(dz);
+
     cscene->addItem(menu);
     cscene->addItem(session);
     cscene->addItem(larrow);
@@ -182,6 +198,9 @@ void Interface::create_NItems()
     cscene->addItem(cdate);
     cscene->addItem(co);
 
+    cscene->addItem(up_stp);
+    cscene->addItem(dn_stp);
+
     CView->setScene(cscene);
     CView->setBackgroundBrush(QBrush(QColor("grey")));
 
@@ -190,8 +209,8 @@ void Interface::create_NItems()
 }
 
 /* set_TC_Items(int)
- * Called by AppManager::TC_mode()
- * Performs initialization/Removal of Graphic Items of TC
+ * Called : By AppManager::TC_mode()
+ * Performs : Initialization/Removal of Graphic Items of TC
  */
 void Interface::set_TC_Items(int s)
 {
@@ -346,17 +365,20 @@ void Interface::set_TC_Items(int s)
 }
 
 /* set_items(QStringList &)
- * Called by Interface()
- * Performs data initialization of Items
+ * Called : By Interface()
+ * Performs : Data initialization of Items
  */
 void Interface::set_items(QStringList &dlist)
 {
     cdate->setPlainText(dlist.at(0));
     fyear->setPlainText(dlist.at(1));
     tyear->setPlainText(dlist.at(2));
-    acyear->setPlainText(dlist.at(1) + " - " + dlist.at(2));
 }
 
+/* create_TC_Panels()
+ * Called : in Interface()
+ * Performs : Creates the TC Panel
+ */
 void Interface::create_TC_Panel()
 {
     QLabel *label;
@@ -424,8 +446,8 @@ void Interface::create_TC_Panel()
 }
 
 /* createPanels()
- * Called by Interface()
- * Performs initialisation of Interface Panels
+ * Called : By Interface()
+ * Performs : Initialisation of Interface Panels
  */
 void Interface::createPanels()
 {
@@ -524,6 +546,25 @@ void Interface::createPanels()
     lproxy->setZValue(z + 10);
     rproxy->setZValue(z + 10);
 
+    // Roll Display frame
+    rollframe = new QWidget;  
+    rollframe->setGeometry(0,0,178,32);
+    rollDisp = new QLabel(rollframe);
+    rollDisp->setGeometry(QRect(9, 0, 160, 30));
+    QFont font2;
+    font2.setFamily(QString::fromUtf8("Verdana"));
+    font2.setPointSize(17);
+    font2.setBold(true);
+    font2.setWeight(75);
+    rollDisp->setFont(font2);
+    rollDisp->setAlignment(Qt::AlignCenter);
+
+    QPalette p;
+    p.setColor(QPalette::Background,Qt::black);
+    rollframe->setPalette(p);
+    rollproxy = cscene->addWidget(rollframe);
+    rollproxy->setZValue(up_stp->zValue() + 1);
+
     // Parallel Animations for Both Panels
     QParallelAnimationGroup *group = new QParallelAnimationGroup;
     anim = new QPropertyAnimation(lproxy,"pos");
@@ -552,6 +593,9 @@ void Interface::createPanels()
     machine->start();
 }
 
+/*
+ * Sets up the Print Dialog
+ */
 void Interface::createPrintDialog()
 {
     prints = new SPrintDialog(this);
@@ -559,6 +603,10 @@ void Interface::createPrintDialog()
     prints->hide();
 }
 
+/* Interface::showsessionpage(QStringList &)
+ * Called : By AppManager::createSessionPage()
+ * Performs : Sets up the Session info in View
+ */
 void Interface::showsessionpage(QStringList &sinfo)
 {
     QPushButton *close;
@@ -653,13 +701,18 @@ void Interface::showsessionpage(QStringList &sinfo)
     connect(close,SIGNAL(released()),this,SLOT(closesessionpage()));
 }
 
-
+/*
+ * Creates Shortcuts
+ */
 void Interface::createShortCuts()
 {
     Bsc = new QShortcut(QKeySequence(tr("F1")),this);
     Csc = new QShortcut(QKeySequence(tr("F2")),this);
 }
 
+/*
+ * Sets Status Bar
+ */
 void Interface::setStatusBar()
 {
     ulb = new QLabel;
@@ -677,6 +730,9 @@ void Interface::setStatusBar()
     sBar->addWidget(dq,1);
 }
 
+/*
+ * Sets the Status Bar Information
+ */
 void Interface::setSBText(QString user, bool c)
 {
     ulb->setText("User Logged In : " + tr("<b>") + user + "<b>");
@@ -689,7 +745,7 @@ void Interface::setSBText(QString user, bool c)
 }
 
 /* void set_ct(Student *)
- * Called to fill the student details with Line Items
+ * Called : to fill the student details with Line Items
  * suitable only in DB mode
  */
 void Interface::set_ct(Student *student)
@@ -705,6 +761,7 @@ void Interface::set_ct(Student *student)
        co->setPlainText(student->co);
        cdetails->setPlainText(student->cdetails);
        purpose->setPlainText(student->purpose);
+       acyear->setText(student->acyear);
 
        if(student->c_type[0])
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[0]));
@@ -720,6 +777,7 @@ void Interface::set_ct(Student *student)
        co->setPlainText(student->co);
        cdetails->setText(student->cdetails);
        purpose->setPlainText(student->purpose);
+       acyear->setText(student->acyear);
 
        if(student->c_type[0])
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[0]));
@@ -736,6 +794,10 @@ void Interface::set_ct(Student *student)
    show_ct(i);
 }
 
+/* set_tc(Student *)
+ * Called :
+ * Performs :
+ */
 void Interface::set_tc(Student *student)
 {
     tc_sno->setPlainText(temp.sprintf("%05d",student->c_sno[0]));
@@ -758,6 +820,10 @@ void Interface::set_tc(Student *student)
     tcitems->at(10)->setPlainText(student->std_ex->remarks);
 }
 
+/* show_ct(int)
+ * Called : By set_ct(), resetView()
+ * Performs : Displays the appropriate Certificate
+ */
 void Interface::show_ct(int vpic)
 {
     switch(vpic)
@@ -789,6 +855,9 @@ void Interface::show_ct(int vpic)
       }
 }
 
+/*
+ * Resets View
+ */
 void Interface::resetView(int i)
 {
     stname->setPlainText("");
@@ -801,6 +870,9 @@ void Interface::resetView(int i)
     show_ct(i);
 }
 
+/*
+ * Hides/Shows Details
+ */
 void Interface::showTc(bool var)
 {
     pic[2]->setVisible(var);
@@ -823,29 +895,45 @@ void Interface::showTc(bool var)
     pic[1]->setVisible(var);
 }
 
+/*
+ * Window Resize Event
+ */
 void Interface::viewresized()
 {
     int w = CView->viewport()->width();
     int h = CView->viewport()->height();
     int mw = w/2;
-    int mh = h / 2 - 70;
+    int x = mw - 107;
+
+    up_stp->setPos(CView->mapToScene(CView->viewport()->pos()));
+    up_stp->setRect(0,0,w,30);
+
+    dn_stp->setPos(CView->mapToScene(0,h-30));
+    dn_stp->setRect(0,0,w,30);
 
     // re position menu and session buttons
     menu->setPos(CView->mapToScene(CView->viewport()->pos()));
     session->setPos(CView->mapToScene(QPoint(w - 87,0)));
 
     // re position the arrow buttons
-    larrow->setPos(CView->mapToScene(0,mh));
+    /*larrow->setPos(CView->mapToScene(0,mh));
     rarrow->setPos(CView->mapToScene(w - 21,mh));
     uarrow->setPos(CView->mapToScene(mw - 145, h - 20));
     darrow->setPos(CView->mapToScene(mw + 5, h - 20));
+    */
+
+    larrow->setPos(CView->mapToScene(x,h-27));
+    uarrow->setPos(CView->mapToScene(x + 55,h-27));
+    darrow->setPos(CView->mapToScene(x + 110,h-27));
+    rarrow->setPos(CView->mapToScene(x + 165,h-27));
+    rollproxy->setPos(CView->mapToScene(QPoint(mw - 89,0)));
 
     // re postion panels
     QPointF pt,pt2;
-    pt = CView->mapToScene(QPoint(-87,h - 241));
+    pt = CView->mapToScene(QPoint(-87,h - 275));
     s1->assignProperty(lproxy,"pos",pt);
 
-    pt2 = CView->mapToScene(QPoint(w, h - 241));
+    pt2 = CView->mapToScene(QPoint(w, h - 275));
     s1->assignProperty(rproxy,"pos",pt2);
 
     if(machine->configuration().contains(s1))
@@ -870,6 +958,9 @@ void Interface::viewresized()
         tpanel->setPos(CView->mapToScene(mw - 215, h - 50));
 }
 
+/*
+ * Full Screen Mode
+ */
 void Interface::fnscreen()
 {
     if(this->isFullScreen())
@@ -884,6 +975,9 @@ void Interface::fnscreen()
     }
 }
 
+/*
+ * Displays Various Message Boxes
+ */
 void Interface::report(int type, QString msg)
 {
     switch(type)
@@ -899,6 +993,9 @@ void Interface::report(int type, QString msg)
     }
 }
 
+/*
+ * Closes Session Page
+ */
 void Interface::closesessionpage()
 {
     cscene->removeItem(sproxy);
@@ -906,6 +1003,9 @@ void Interface::closesessionpage()
     this->rollnoLe->setFocus();
 }
 
+/*
+ * Enables View Navigations
+ */
 void Interface::setenabled(bool v)
 {
     larrow->enable(v);
@@ -918,6 +1018,9 @@ void Interface::setenabled(bool v)
     printButton->setEnabled(v);
 }
 
+/*
+ * Shows About Box
+ */
 void Interface::about_docmaq()
 {
     About_DocmaQ *abt = new About_DocmaQ(this);
@@ -926,6 +1029,9 @@ void Interface::about_docmaq()
     aboutb->setDown(false);
 }
 
+/*
+ * Close Event
+ */
 void Interface::closeEvent(QCloseEvent *event)
 {
    event->ignore();

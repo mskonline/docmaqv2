@@ -19,7 +19,7 @@
    <string>DocmaQ</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/res.qrc">
+   <iconset resource="../Resources/res.qrc">
     <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
   </property>
   <property name="styleSheet">
@@ -485,7 +485,7 @@ border: 2px solid #00AAFF;
              <number>3</number>
             </property>
             <property name="segmentStyle">
-             <enum>QLCDNumber::Filled</enum>
+             <enum>QLCDNumber::Flat</enum>
             </property>
             <property name="value" stdset="0">
              <double>0.000000000000000</double>
@@ -524,7 +524,7 @@ border: 2px solid #00AAFF;
              <number>3</number>
             </property>
             <property name="segmentStyle">
-             <enum>QLCDNumber::Filled</enum>
+             <enum>QLCDNumber::Flat</enum>
             </property>
             <property name="value" stdset="0">
              <double>0.000000000000000</double>
@@ -641,7 +641,7 @@ border-color: navy; /* make the default button prominent */
               <string>Print</string>
              </property>
              <property name="icon">
-              <iconset resource="../resources/res.qrc">
+              <iconset resource="../Resources/res.qrc">
                <normaloff>:/Images/docmaq.png</normaloff>:/Images/docmaq.png</iconset>
              </property>
              <property name="iconSize">
@@ -701,7 +701,7 @@ border-color: navy; /* make the default button prominent */
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/res.qrc"/>
+  <include location="../Resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,6 +25,9 @@
 #include <QCryptographicHash>
 #include <QPrinterInfo>
 
+/*
+ * Constructor
+ */
 GetSettings::GetSettings()
 {
     settings=new QSettings(QSettings::SystemScope,"Qogency","DocmaQ");
@@ -59,6 +62,9 @@ GetSettings::GetSettings()
     }
 }
 
+/*
+ * Setup the Windows Registry
+ */
 void GetSettings::setupRegistry()
 {
     settings->setValue("installdate",QDateTime::currentDateTime().toString());
@@ -167,6 +173,9 @@ void GetSettings::setupRegistry()
      }
 }
 
+/*
+ * Get Database Details
+ */
 void GetSettings::getDatabaseDetails(QStringList &databaseDetails)
 {
     databaseDetails.clear();
@@ -179,6 +188,9 @@ void GetSettings::getDatabaseDetails(QStringList &databaseDetails)
     settings->endGroup();
 }
 
+/*
+ * Get Session Information
+ */
 void GetSettings::getSessionInfo(QStringList &info)
 {
     QSettings *settings1=new QSettings(QSettings::SystemScope,"DocmaQ","App");
@@ -200,7 +212,9 @@ void GetSettings::getSessionInfo(QStringList &info)
     delete settings1;
 }
 
-//this will called for each cert type.type is set in log class(writeCertificateLog) and will be available here as cert
+/*
+ * Get Serial No.
+ */
 void GetSettings::getSno(QList<int>& sno)
 {
     sno.clear();
@@ -209,6 +223,9 @@ void GetSettings::getSno(QList<int>& sno)
         sno << settings->value("certificate/"+cert[i]+"/serialno",0).toInt();
 }
 
+/*
+ * Get Date,Academic Year
+ */
 void GetSettings::getDateAcademicYear(QStringList& info)
 {
     info.clear();
@@ -218,6 +235,9 @@ void GetSettings::getDateAcademicYear(QStringList& info)
     info << settings->value("certificate/to","").toString();
 }
 
+/*
+ * Sets Print Positions
+ */
 void GetSettings::getPrintPositions(QList<int>& pos,int type)
 {
     pos.clear();
@@ -237,21 +257,33 @@ void GetSettings::getPrintPositions(QList<int>& pos,int type)
     settings->endGroup();
 }
 
+/*
+ * Get Mode
+ */
 void GetSettings::getMode( bool & mode)
 {
     mode=settings->value("general/mode",true).toBool();
 }
 
+/*
+ * Set Mode
+ */
 void GetSettings::setMode(bool &mode)
 {
     settings->setValue("general/mode",mode);
 }
 
+/*
+ * Get Printer Details
+ */
 void GetSettings::getPrinter( QString& printer)
 {
     printer= settings->value("general/printer","").toString();
 }
 
+/*
+ * Setup Settings Interface
+ */
 void  GetSettings::createSettingsInterface(QWidget *parent,int user)
 {
     st = new Settings(user,settings,this,parent);
@@ -260,6 +292,9 @@ void  GetSettings::createSettingsInterface(QWidget *parent,int user)
     st->show();
 }
 
+/*
+ * Destructor
+ */
 GetSettings::~GetSettings()
 {
 }

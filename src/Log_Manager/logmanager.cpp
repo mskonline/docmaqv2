@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -22,6 +22,9 @@
 #include <QSettings>
 #include <QTextStream>
 
+/*
+ * Constructor
+ */
 Logmanager::Logmanager(QWidget *parent): QWidget(parent,Qt::Window)
 {
     setupUi(this);
@@ -80,6 +83,9 @@ Logmanager::Logmanager(QWidget *parent): QWidget(parent,Qt::Window)
     currentAction=0;
 }
 
+/*
+ * View Log Button Clicked
+ */
 void Logmanager::on_viewLogButton_clicked()
 {
     table->setAlternatingRowColors(true);
@@ -87,6 +93,10 @@ void Logmanager::on_viewLogButton_clicked()
     recordsLabel->setText(" Records Found: "+QString().setNum(table->rowCount())+" ");  
 }
 
+/* loadTextFile(const QDate&)
+ * Called : Constructor, on_viewLogButton_clicked()
+ * Performs : Loads the Log file of a particular Date
+ */
 void Logmanager::loadTextFile(const QDate& date)
 {
     label->hide();
@@ -135,6 +145,9 @@ void Logmanager::loadTextFile(const QDate& date)
     }
 }
 
+/*
+ * Clears the Table
+ */
 void Logmanager::clearTable()
 {
     if(table)
@@ -146,6 +159,9 @@ void Logmanager::clearTable()
     }
 }
 
+/*
+ * Toggle Certificate/Session Mode
+ */
 void Logmanager::currentChanged(int index)
 {
     if(index==0)
@@ -174,6 +190,9 @@ void Logmanager::currentChanged(int index)
     }
 }
 
+/*
+ * prepare Search
+ */
 void Logmanager::prepareSearch()
 {
     unHighlightItems();
@@ -194,6 +213,10 @@ void Logmanager::prepareSearch()
     }
 }
 
+/* searchCurrent()
+ * Called : By prepareSearch(), searchCurrentAction Action
+ * Performs : Search in Current Log
+ */
 void Logmanager::searchCurrent()
 {
     searchTip->setText("Type text to search");
@@ -221,6 +244,9 @@ void Logmanager::searchCurrent()
     searchLE->setFocus();
 }
 
+/*
+ * Highlight Items
+ */
 void Logmanager::highlightItems()
 {
     items=table->findItems(searchLE->text(),Qt::MatchContains);
@@ -241,6 +267,9 @@ void Logmanager::highlightItems()
     }
 }
 
+/*
+ * Unhighlight Items
+ */
 void Logmanager::unHighlightItems()
 {
     nitems=items.size();
@@ -252,6 +281,10 @@ void Logmanager::unHighlightItems()
     }
 }
 
+/* searchAll()
+ * Called : By prepareSearch(), searchAll Action
+ * Performs : Performs Search in the Entire Log
+ */
 void Logmanager::searchAll()
 {
     searchTip->setText("Type text and press\n    Enter to search");
@@ -278,6 +311,10 @@ void Logmanager::searchAll()
     searchLE->setFocus();
 }
 
+/* find()
+ * Called : By searchAll()
+ * Performs : Find the text in the Log Files
+ */
 void Logmanager::find()
 {
     table->setRowCount(0);
@@ -304,10 +341,13 @@ void Logmanager::find()
         findFiles(directory, files, text);
 }
 
+/* findFiles(const QDir &,const QStringList &,const QString &)
+ * Called : By find()
+ * Performs : Checks text in the Log Files
+ */
 void Logmanager::findFiles(const QDir &directory, const QStringList &files,
                            const QString &text)
 {
-    //table->setSortingEnabled(false);
     QProgressDialog progressDialog(this);
     progressDialog.setCancelButtonText(tr("&Cancel"));
     progressDialog.setRange(0, files.size());
@@ -351,9 +391,12 @@ void Logmanager::findFiles(const QDir &directory, const QStringList &files,
 
     progressDialog.close();
     recordsLabel->setText(" Matches Found: "+QString().setNum(recordsFound)+" ");
-   // table->setSortingEnabled(true);
 }
 
+/* enterRecord(const QString &)
+ * Called : By loadTextFile(), findFiles()
+ * Performs : Enters log Record in the Table
+ */
 void Logmanager::enterRecord(const QString &line)
 {
     QStringList recordField;
@@ -376,11 +419,17 @@ void Logmanager::enterRecord(const QString &line)
     recordField.clear();
 }
 
+/*
+ * Close Event
+ */
 void Logmanager::closeEvent(QCloseEvent *e)
 {
     emit lmclose();
     e->accept();
 }
 
+/*
+ * Destructor
+ */
 Logmanager::~Logmanager()
 {}

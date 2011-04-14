@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -19,6 +19,9 @@
 #include "bulktable.h"
 #include <QKeyEvent>
 
+/*
+ * Constructor
+ */
 BulkTable::BulkTable(QWidget *parent):QTableWidget(parent)
 {
     rc = 0;
@@ -43,6 +46,10 @@ BulkTable::BulkTable(QWidget *parent):QTableWidget(parent)
     connect(CAct,SIGNAL(triggered()),this,SLOT(clearTable()));
 }
 
+/* add_roll(QString,QString)
+ * Called : By AppManager::onRollEntry()
+ * Performs : Adds Roll in the btable
+ */
 void BulkTable::add_roll(QString roll,QString t)
 {
     // Set Column 0 (Roll)
@@ -60,16 +67,25 @@ void BulkTable::add_roll(QString roll,QString t)
     ++rc;
 }
 
+/*
+ * Edit Action
+ */
 void BulkTable::editAct()
 {
     openPersistentEditor(item(st_ptr,0));
 }
 
+/*
+ * Refresh Action
+ */
 void BulkTable::refreshAct()
 {
     emit cellChanged(st_ptr,0);
 }
 
+/*
+ * Clearing Table
+ */
 void BulkTable::clearTable()
 {
     if(rc == 0)
@@ -85,6 +101,9 @@ void BulkTable::clearTable()
     emit removeSt(-1);
 }
 
+/*
+ * Clearing Row
+ */
 void BulkTable::clearRow()
 {
     this->removeRow(st_ptr);
@@ -93,6 +112,9 @@ void BulkTable::clearRow()
     emit removeSt(st_ptr);
 }
 
+/*
+ * Key Press Event
+ */
 void BulkTable::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
@@ -101,6 +123,9 @@ void BulkTable::keyPressEvent(QKeyEvent *e)
     }
 }
 
+/*
+ * Context Menu Event
+ */
 void BulkTable::contextMenuEvent(QContextMenuEvent *event)
 {
     if(st_ptr != -1 )

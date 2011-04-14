@@ -1,5 +1,5 @@
-/* DocmaQ Configure, Configuration Interface for DocmaQ v2.0
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ Configure, Configuration Interface for DocmaQ v2.1
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,6 +24,9 @@
 #include <QCryptographicHash>
 #include <QPrinterInfo>
 
+/*
+ * Constructor
+ */
 GetConfig::GetConfig()
 {
     settings=new QSettings(QSettings::SystemScope,"Qogency","DocmaQ");
@@ -40,6 +43,9 @@ GetConfig::GetConfig()
     createSettingsInterface();
 }
 
+/*
+ * Setup the Windows Registry
+ */
 void GetConfig::setupRegistry()
 {
     settings->setValue("installdate",QDateTime::currentDateTime().toString());
@@ -155,6 +161,9 @@ void GetConfig::setupRegistry()
     }
 }
 
+/*
+ * Get Database Details
+ */
 void GetConfig::getDatabaseDetails(QStringList &databaseDetails)
 {
     databaseDetails.clear();
@@ -167,11 +176,16 @@ void GetConfig::getDatabaseDetails(QStringList &databaseDetails)
     settings->endGroup();
 }
 
-
+/*
+ * Setup Config Interface
+ */
 void  GetConfig::createSettingsInterface()
 {
     Config *st = new Config(settings,this);
 }
 
+/*
+ * Destructor
+ */
 GetConfig::~GetConfig()
 {}

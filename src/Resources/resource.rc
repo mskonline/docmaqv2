@@ -29,7 +29,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
         BLOCK "04090025"
         {
             VALUE "Comments", "Qt Based Publishing Application Developed by Praneeth,Sai Kumar,Kiran. Batch:2006-10"
-            VALUE "CompanyName", "Qogency Corporation"
+            VALUE "CompanyName", ""
             VALUE "FileDescription", "Credential Publishing"
             VALUE "FileVersion", "2.0"
             VALUE "InternalName", "Credential Publishing System"

@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -21,6 +21,9 @@
 #include <QFileDialog>
 #include "../Data_Structures/student.h"
 
+/*
+ * Constructor
+ */
 CPrinter::CPrinter(QList <int> &c_sno, QStringList &dlist )
     :c_sno(c_sno),dlist(dlist)
 {
@@ -42,6 +45,10 @@ CPrinter::CPrinter(QList <int> &c_sno, QStringList &dlist )
     admin = 0;
 }
 
+/* setPrinter()
+ * Called : By AppManager::load_final_modules()
+ * Performs : Sets the Printer
+ */
 void CPrinter::setPrinter()
 {
     if(printer)
@@ -58,8 +65,8 @@ void CPrinter::setPrinter()
 }
 
 /* printc()
- * Called by AppManager::init_print()
- * Performs as a Switch function for
+ * Called : By AppManager::init_print()
+ * Performs : As a Switch function for
  * Bonafide & Conduct Printing
  */
 void CPrinter::printc()
@@ -76,8 +83,8 @@ void CPrinter::printc()
 }
 
 /* pdfprint(int,int)
- * Called by AppManager::pdfprint()
- * Performs pdf printing of Bonafide and Conduct Certificates
+ * Called : By AppManager::pdfprint()
+ * Performs : Pdf printing of Bonafide and Conduct Certificates
  */
 void CPrinter::pdfprint(int bc,int cc)
 {
@@ -119,8 +126,8 @@ void CPrinter::pdfprint(int bc,int cc)
 }
 
 /* printB()
- * Called by printc()
- * Performs Printing of Bonafide Certificate
+ * Called : By printc()
+ * Performs : Printing of Bonafide Certificate
  */
 void CPrinter::printB()
 {
@@ -212,8 +219,8 @@ void CPrinter::printB()
 }
 
 /* printC()
- * Called by printc()
- * Performs Printing of Conduct Certificate
+ * Called : By printc()
+ * Performs : Printing of Conduct Certificate
  */
 void CPrinter::printC()
 {
@@ -290,8 +297,8 @@ void CPrinter::printC()
 }
 
 /* setTCprint(bool)
- * Called by AppManager::TC_mode()
- * Performs initialisation for TC printing
+ * Called : By AppManager::TC_mode()
+ * Performs : Initialisation for TC printing
  */
 void CPrinter::setTCprint(bool v)
 {
@@ -321,8 +328,8 @@ void CPrinter::setTCprint(bool v)
 }
 
 /* processTC()
- * Called by AppManager::init_print()
- * performs checks for Admn Mode
+ * Called : By AppManager::init_print()
+ * Performs : Checks for Admn Mode
  */
 void CPrinter::processTC()
 {
@@ -341,8 +348,8 @@ void CPrinter::processTC()
 }
 
 /* printTC()
- * Called by processTC()
- * Performs Printing of TC
+ * Called : By processTC()
+ * Performs : Printing of TC
  */
 void CPrinter::printTC()
 {

@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -25,6 +25,9 @@
 #include <QSettings>
 #include <QProgressDialog>
 
+/*
+ * Constructor
+ */
 d_log::d_log()
 {
     path="./logs/certificate/";
@@ -84,6 +87,10 @@ d_log::d_log()
     sessionFile.setFileName("./logs/session/"+dt+".Log");
 }
 
+/* startSession(const QString&)
+ * Called :
+ * Performs :
+ */
 void d_log::startSession(const QString& userid,const QString& username)
 {
     settings->beginGroup("certificate");
@@ -111,6 +118,10 @@ void d_log::startSession(const QString& userid,const QString& username)
     out.setDevice(&file);
 }
 
+/*
+ * Called :
+ * Performs :
+ */
 void d_log::writeCertificateLog(const QString& rollno,const int &c)
 {
     QString str;
@@ -146,6 +157,10 @@ void d_log::closelog()
     file.close();
 }
 
+/*
+ * Called :
+ * Performs :
+ */
 void d_log::openlog()
 {
     file.setFileName(path+ dt + ".Log");
@@ -153,6 +168,10 @@ void d_log::openlog()
     out.setDevice(&file);
 }
 
+/*
+ * Called :
+ * Performs :
+ */
 void d_log::endSession()
 {
     QString c;
@@ -181,6 +200,10 @@ void d_log::endSession()
     delete settings1;
 }
 
+/*
+ * Called :
+ * Performs :
+ */
 void d_log::createlogmanager(QWidget *parent)
 {
     file.flush();
@@ -193,11 +216,17 @@ void d_log::createlogmanager(QWidget *parent)
     connect(lm,SIGNAL(lmclose()),this,SLOT(openlog()));
 }
 
+/*
+ * Close Event
+ */
 void d_log::closeEvent(QCloseEvent *e)
 {
     file.close();
 }
 
+/*
+ * Destructor
+ */
 d_log::~d_log()
 {
 }

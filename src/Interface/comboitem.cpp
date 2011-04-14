@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -18,6 +18,9 @@
 
 #include "comboitem.h"
 
+/*
+ * Constructor
+ */
 ComboItem::ComboItem(QGraphicsScene *scene,int comboWidth,QStringList list, QGraphicsItem *parent):QGraphicsTextItem(parent)
 {
     this->scene = scene;
@@ -38,6 +41,10 @@ void ComboItem::setText(QString t)
         this->setPlainText(t);
 }
 
+/* constructWidgets()
+ * Called : By mousePressEvent()
+ * Performs : Displays a input widget to modify item data
+ */
 void ComboItem::constructWidgets()
 {
     // Report an item being changed
@@ -62,6 +69,11 @@ void ComboItem::constructWidgets()
     proxy->setPos(this->pos());
 }
 
+/* done()
+ * Called : When Ok Button is Pressed
+ * Performs : signals AppManager and Passes the
+ * Modified data
+ */
 void ComboItem::done()
 {
     this->setPlainText(cb->currentText());
@@ -69,6 +81,9 @@ void ComboItem::done()
     emit itemchanged(id,this->toPlainText());
 }
 
+/*
+ * Destructor
+ */
 ComboItem::~ComboItem()
 {
     list.clear();

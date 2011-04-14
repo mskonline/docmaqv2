@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
                                 K.Praneeth <praneethk@in.com>
                                 M.Kiran <mola.kiran@gmail.com>
 
@@ -23,8 +23,6 @@
 #include <QtGui/QApplication>
 #include <QSharedMemory>
 #include <QMessageBox>
-
-#include <QDebug>
 
 int main(int argc, char *argv[])
 {

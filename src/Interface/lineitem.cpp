@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -18,6 +18,9 @@
 
 #include "lineitem.h"
 
+/*
+ * Constructor
+ */
 LineItem::LineItem(QGraphicsScene *scene,int lineWidth, QGraphicsItem *parent) : QGraphicsTextItem(parent)
 {
     this->scene = scene;
@@ -42,6 +45,10 @@ void LineItem::reset()
     this->setPlainText(iname);
 }
 
+/* constructWidgets()
+ * Called : By mousePressEvent()
+ * Performs : Displays a input widget to modify item data
+ */
 void LineItem::constructWidgets()
 {
     // Report an item is being changed
@@ -78,6 +85,11 @@ void LineItem::constructWidgets()
     proxy->setPos(this->pos());
 }
 
+/* done()
+ * Called : When Ok Button is Pressed
+ * Performs : signals AppManager and Passes the
+ * Modified data
+ */
 void LineItem::done()
 {
     if( !le->text().compare(iname) or le->text().isEmpty())

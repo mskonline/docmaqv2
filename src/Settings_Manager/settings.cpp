@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,6 +28,9 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 
+/*
+ * Constructor
+ */
 Settings::Settings(int user,QSettings *settings,GetSettings* getSettings,QWidget *parent)
     : QWidget(parent,Qt::Window |Qt::WindowCloseButtonHint)
 {
@@ -102,6 +105,10 @@ Settings::Settings(int user,QSettings *settings,GetSettings* getSettings,QWidget
     au = false;
 }
 
+/* selectFunction()
+ * Called : On StackWidget Tab Changed
+ * Performs : Controls Setting up of Tabs
+ */
 void Settings::selectFunction(int id)
 {
     //showing authentication only when required
@@ -131,6 +138,9 @@ void Settings::selectFunction(int id)
     }
 }
 
+/*
+ * Set up Print Settings
+ */
 void Settings::preparePrintSettings()
 {
     //this fuction is only called once
@@ -155,6 +165,9 @@ void Settings::preparePrintSettings()
     insertFields();
 }
 
+/*
+ * Setup the Certificate Dimensions Text
+ */
 void Settings::decideCert1( )
 {
     QString previous=cert1;
@@ -183,19 +196,27 @@ void Settings::decideCert1( )
     }
 }
 
+/*
+ * Inserting Field Values
+ */
 void Settings::insertFields()
 {
-    //one flag is set we need not have the signals as the settings are saved only at ok
+    //once the flag is set, we need not have the signals as the settings are saved only at ok
     disconnect(fieldCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(setXY(int)));
 
-    fieldCombo->clear();//to avoid append of insertion during revisit
+    //to avoid append of insertion during revisit
+    fieldCombo->clear();
     fieldCombo->insertItems(0,fields[type1]);
 
     connect(fieldCombo,SIGNAL(currentIndexChanged(int)),this,SLOT(setXY(int)));
 
-    setXY(0);//setting first fields X,Y for view
+    //setting first fields X,Y for view
+    setXY(0);
 }
 
+/*
+ * Setting up X,Y Print Position Spin Box
+ */
 void Settings::setXY(int index)
 {
     if(pos[type1].contains(index))
@@ -216,6 +237,9 @@ void Settings::setXY(int index)
     }
 }
 
+/*
+ * Set up Print Positions
+ */
 void Settings::setPrintPositionsFlag()
 {
     int index=fieldCombo->currentIndex();
@@ -244,12 +268,19 @@ void Settings::setPrintPositionsFlag()
         f[6]=true;
 }
 
+/*
+ * Set up DB Settings
+ */
 void Settings::prepareDatabaseSettings()
 {
     flag[1]=true;
     adminPasswordLE->setFocus();
 }
 
+/* adminAuthentication()
+ * Called : When Users hits Enter key on Admin Password LineEdit
+ * Performs : Checks for Admin
+ */
 void Settings::adminAuthentication()
 {
     QString passwd=adminPasswordLE->text();
@@ -294,6 +325,9 @@ void Settings::adminAuthentication()
     }
 }
 
+/*
+ * Set up DB Settings
+ */
 void Settings::fillDatabaseSettings()
 {
     databasenameLE->setText(databaseDetails.at(0));
@@ -305,6 +339,9 @@ void Settings::fillDatabaseSettings()
     reconnectButton->setEnabled(false);
 }
 
+/*
+ * DB Settings Connections
+ */
 void Settings::databaseSettingsChanged()
 {
     f[7]=true;
@@ -317,6 +354,9 @@ void Settings::databaseSettingsChanged()
     disconnect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
 }
 
+/*
+ * Enable Reconnect Button
+ */
 void Settings::enableReconnectButton()
 {
     if(databasenameLE->text().isEmpty()||hostnameLE->text().isEmpty()|| portLE->text().isEmpty()||usernameLE->text().isEmpty())
@@ -325,6 +365,10 @@ void Settings::enableReconnectButton()
         reconnectButton->setEnabled(true);
 }
 
+/* checkConnectivity()
+ * Called : When User Clicks Reconnect Button
+ * Performs : Checks Connectivity
+ */
 void Settings::checkConnectivity()
 {
     bool ok;
@@ -344,6 +388,7 @@ void Settings::checkConnectivity()
                                   tr("Please Check the Database details.\n\n") + "MySQL Reports : " + db.lastError().databaseText());
         db.close();
 
+        settings->setValue("general/mode",ok);
         databaseRB->setChecked(ok);
         manualRB->setChecked(!ok);
     }
@@ -353,12 +398,18 @@ void Settings::checkConnectivity()
     f[0] = true;
 }
 
+/*
+ * Set up Account setting
+ */
 void Settings::prepareAccountSettings()
 {
     flag[2]=true;
     adminPasswordLE->setFocus();
 }
 
+/*
+ * Password Line Edit Event
+ */
 void Settings::on_newPasswordLE_textEdited()
 {
     if (!newPasswordLE->text().isEmpty())
@@ -367,6 +418,10 @@ void Settings::on_newPasswordLE_textEdited()
         changeButton->setEnabled(false);
 }
 
+/* on_changeButton_clicked()
+ * Called : When User Clicks Change Button
+ * Performs : Saves Changes to Admin/User Password
+ */
 void Settings::on_changeButton_clicked()
 {
     if (newPasswordLE->text()==confirmPasswordLE->text() && !newPasswordLE->text().isEmpty())
@@ -402,17 +457,26 @@ void Settings::on_changeButton_clicked()
 
 }
 
+/*
+ * Preparing Log Settings
+ */
 void Settings::prepareLogSettings()
 {
     flag[3]=true;
     adminPasswordLE->setFocus();
 }
 
+/*
+ * Fillup Log Settings Event
+ */
 void Settings::fillLogSettings()
 {
     logPathLE->setFocus();
 }
 
+/*
+ * Browse Button Click Event
+ */
 void Settings::on_browseButton_clicked()
 {
     QFileDialog::Options options = QFileDialog::ShowDirsOnly;
@@ -430,7 +494,10 @@ void Settings::on_browseButton_clicked()
     logPathLE->setText(directory);
 }
 
-
+/* on_backupButton_clicked()
+ * Called : When User Clicks Backup Button
+ * Performs : Bakeup of Log
+ */
 void Settings::on_backupButton_clicked()
 {
     if(logPathLE->text().isEmpty())
@@ -441,6 +508,7 @@ void Settings::on_backupButton_clicked()
     logpath<<"./logs/certificate/"<<"./logs/session/";
     logdir<<"certificate"<<"session";
     int q=0;
+
     for(int k=0;k<2;k++)
     {
         path=logpath[k];
@@ -454,7 +522,8 @@ void Settings::on_backupButton_clicked()
         if(!QDir(directory+dir).exists())
         {
             QDir().mkdir(directory);
-            QDir().mkdir(directory+dir);//create a directory if dir doesn't exist
+            //create a directory if dir doesn't exist
+            QDir().mkdir(directory+dir);
         }
 
         QProgressDialog progressDialog(this);
@@ -490,9 +559,12 @@ void Settings::on_backupButton_clicked()
     }
 }
 
+/*
+ * Creating Server File
+ */
 bool Settings::createServerFile( QString& filename, QString &path, QString &dir)
 {
-      QString localfile=path+filename;
+    QString localfile=path+filename;
     QFile::copy( localfile,directory+dir+"/"+filename);//copying to central repository
 
     if(QFile().error())
@@ -501,6 +573,10 @@ bool Settings::createServerFile( QString& filename, QString &path, QString &dir)
     return true;
 }
 
+/* prepareCertificateSettings()
+ * Called : By selectFunction()
+ * Performs : Sets up the Certificate Settings Tab
+ */
 void Settings::prepareCertificateSettings()
 {
     flag[4]=true;
@@ -521,6 +597,10 @@ void Settings::prepareCertificateSettings()
     settings->endGroup();
 }
 
+/* decideCert2()
+ * Called : When User Clicks bonafide,Conduct,TC RadioBox
+ * Performs : Sets the Corresponding Certificate Spin Box
+ */
 void Settings::decideCert2()
 {
     QString previous=cert2;
@@ -544,12 +624,18 @@ void Settings::decideCert2()
     serialSB->setValue(ser[type2]);
 }
 
+/*
+ * On Serial Spin Box Editing Completed Event
+ */
 void Settings::on_serialSB_editingFinished()
 {
     f[1]=true;
     ser[type2]=serialSB->value();
 }
 
+/*
+ * Setting up Date,Academic Year Flag
+ */
 void Settings::setDateAcademicYearFlag()
 {
     f[2]=true;
@@ -560,12 +646,18 @@ void Settings::setDateAcademicYearFlag()
     disconnect(toSB,0,this,SLOT(setDateAcademicYearFlag()));
 }
 
+/* prepareGeneralSettings()
+ * Called : By selectFunction()
+ * Performs : Sets up the General Settings Tab
+ */
 void Settings::prepareGeneralSettings()
 {
     flag[5]=true;
 
-    //once flag is set we need not have the signals as the settings are saved only at ok
-    disconnect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(setPrinterFlag( const QString&)));
+    //once flag is set we need not have the signals as
+    //the settings are saved only at ok
+    disconnect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,
+               SLOT(setPrinterFlag( const QString&)));
     databaseRB->setChecked(settings->value("general/mode",true).toBool());
     manualRB->setChecked(!settings->value("general/mode",false).toBool());
 
@@ -580,12 +672,14 @@ void Settings::prepareGeneralSettings()
 
     QString temp,dprinter=pinfo.defaultPrinter().printerName();
     temp=dprinter;
-    temp+="(Default)";//highlighting default printer
+    //highlighting default printer
+    temp+="(Default)";
     printers.replace(printers.indexOf(dprinter),temp);
-    printersCombo->insertItems(0,printers);//inserting all the printers
+    //inserting all the printers
+    printersCombo->insertItems(0,printers);
+
     //checking whether the current printer is there in the list newly generated
     //if not there show a msg saying "No printer assigned"
-
     if(index==-1)
     {
         printersCombo->insertItem(0,"No Printer Assigned");
@@ -597,6 +691,9 @@ void Settings::prepareGeneralSettings()
     connect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(setPrinterFlag( const QString&)),Qt::UniqueConnection);
 }
 
+/*
+ * Setting Mode Flag
+ */
 void Settings::setModeFlag()
 {
     f[0]=true;
@@ -606,6 +703,9 @@ void Settings::setModeFlag()
     disconnect(manualRB,SIGNAL(clicked()),this,SLOT(setModeFlag()));
 }
 
+/*
+ * Setting Printer Flag
+ */
 void Settings::setPrinterFlag( const QString &printer)
 {
     f[3]=true;
@@ -614,6 +714,9 @@ void Settings::setPrinterFlag( const QString &printer)
     disconnect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(setPrinterFlag( const QString&)));
 }
 
+/*
+ * Export Button Click Event
+ */
 void Settings::on_exportButton_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("Export Settings"), QDir::homePath ()+"/Desktop"+"/DocmaQ Settings.drf", tr("DocmaQ Registration Files (*.drf)"));
@@ -628,6 +731,9 @@ void Settings::on_exportButton_clicked()
     QMessageBox::information(this,"DocmaQ Settings","Settings Successfully Exported");
 }
 
+/*
+ * Import Button Click Event
+ */
 void Settings::on_importButton_clicked()
 {
     fileName.clear();
@@ -640,6 +746,10 @@ void Settings::on_importButton_clicked()
     }
 }
 
+/* saveSettings()
+ * Called : When User Clicks okButton Button
+ * Performs : Saves all Settings and Signals AppManager
+ */
 void Settings::saveSettings()
 {
     QString cert;
@@ -674,19 +784,18 @@ void Settings::saveSettings()
                 }
                 break;
 
-                //for saving mode
-            case 0: settings->setValue("general/mode",databaseRB->isChecked());
-                   settings->sync();
+            case 0://saving mode
+                settings->setValue("general/mode",databaseRB->isChecked());
+                settings->sync();
 
-                   if(!z)
-                   {
-                        siglist << 0;
-                        z = true;
-                   }
-                   break;
+                if(!z)
+                {
+                    siglist << 0;
+                    z = true;
+                }
+                break;
 
-            case 1://for saving certificate tab details
-
+            case 1://saving certificate tab details               
                 settings->beginGroup("certificate");
                 settings->setValue("bonafide/serialno",ser[0]);
                 settings->setValue("conduct/serialno",ser[1]);
@@ -695,7 +804,7 @@ void Settings::saveSettings()
                 siglist << 1;
                 break;
 
-            case 2://for date and academic year
+            case 2://date and academic year
                 settings->setValue("certificate/date",dateEdit->date());
                 settings->setValue("certificate/from",fromSB->value());
                 settings->setValue("certificate/to",toSB->value());
@@ -703,7 +812,7 @@ void Settings::saveSettings()
                 siglist << 2;
                 break;
 
-            case 3://for saving the printer
+            case 3://saving the printer
                 if(printersCombo->currentText().contains("(Default)"))
                     settings->setValue("general/printer",printersCombo->currentText().replace("(Default)",""));
                 else
@@ -711,27 +820,26 @@ void Settings::saveSettings()
                 siglist << 3;
                 break;
 
-            case 4://for saving print positions for bonafide
+            case 4://saving print positions for bonafide
                 cert="bonafide";
                 type=0;
                 savep(cert,type);
                 siglist <<4;
                 break;
 
-            case 5://for saving print positions for conduct
+            case 5://saving print positions for conduct
                 cert="conduct";
                 type=1;
                 savep(cert,type);
                 siglist << 5;
                 break;
 
-            case 6://for saving print positions for tc
+            case 6://saving print positions for tc
                 cert="tc";
                 type=2;
                 savep(cert,type);
                 siglist << 6;
                 break;
-
             }
         }
     }
@@ -740,6 +848,11 @@ void Settings::saveSettings()
         close();      
 }
 
+/* savep(QString&, int &)
+ * Called : By saveSettings()
+ * Performs : Saves the Certificate Print Positions into
+ * Windows Registry
+ */
 void Settings::savep(QString& cert,int &type)
 {
     if(!pos[type].isEmpty())
@@ -760,13 +873,18 @@ void Settings::savep(QString& cert,int &type)
     }
 }
 
+/*
+ * Close Event
+ */
 void Settings::closeEvent(QCloseEvent *e)
 {
     settings->setValue("general/laststackwidget",stackedWidget->currentIndex());
     emit sendSignal(siglist);
 }
 
+/*
+ * Destructor
+ */
 Settings::~Settings()
 {
 }
-

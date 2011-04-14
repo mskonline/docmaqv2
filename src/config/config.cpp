@@ -1,5 +1,5 @@
-/* DocmaQ Configure, Configuration Interface for DocmaQ v2.0
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ Configure, Configuration Interface for DocmaQ v2.1
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -29,6 +29,9 @@
 #include <QSqlError>
 #include <QDesktopWidget>
 
+/*
+ * Constructor
+ */
 Config::Config(QSettings *settings,GetConfig* getConfig,QWidget *parent)
     : QWidget(parent,Qt::WindowCloseButtonHint)
 {
@@ -97,6 +100,10 @@ Config::Config(QSettings *settings,GetConfig* getConfig,QWidget *parent)
     delete dw;
 }
 
+/* selectFunction()
+ * Called : On StackWidget Tab Changed
+ * Performs : Controls Setting up of Tabs
+ */
 void Config::selectFunction(int id)
 {
     //flags ensure each functions to be called once
@@ -111,6 +118,9 @@ void Config::selectFunction(int id)
     }
 }
 
+/*
+ * Set up Print Settings
+ */
 void Config::preparePrintSettings()
 {
     //this fuction is only called once
@@ -135,6 +145,9 @@ void Config::preparePrintSettings()
     insertFields();
 }
 
+/*
+ * Setup the Certificate Dimensions Text
+ */
 void Config::decideCert1( )
 {
     QString previous=cert1;
@@ -161,6 +174,9 @@ void Config::decideCert1( )
     }
 }
 
+/*
+ * Inserting Field Values
+ */
 void Config::insertFields()
 {
     //one flag is set we need not have the signals as the settings are saved only at ok
@@ -174,6 +190,9 @@ void Config::insertFields()
     setXY(0);//setting first fields X,Y for view
 }
 
+/*
+ * Setting up X,Y Print Position Spin Box
+ */
 void Config::setXY(int index)
 {
     if(pos[type1].contains(index))
@@ -193,6 +212,9 @@ void Config::setXY(int index)
     }
 }
 
+/*
+ * Set up Print Positions
+ */
 void Config::setPrintPositionsFlag()
 {
     int index=fieldCombo->currentIndex();
@@ -221,12 +243,19 @@ void Config::setPrintPositionsFlag()
         f[6]=true;
 }
 
+/*
+ * Set up DB Settings
+ */
 void Config::prepareDatabaseSettings()
 {
     flag[1]=true;
     adminPasswordLE->setFocus();
 }
 
+/* adminAuthentication()
+ * Called : When Users hits Enter key on Admin Password LineEdit
+ * Performs : Checks for Admin
+ */
 void Config::adminAuthentication()
 {
     QString passwd=adminPasswordLE->text();
@@ -261,6 +290,9 @@ void Config::adminAuthentication()
     }
 }
 
+/*
+ * Set up DB Settings
+ */
 void Config::fillDatabaseSettings()
 {
     databasenameLE->setText(databaseDetails.at(0));
@@ -272,6 +304,9 @@ void Config::fillDatabaseSettings()
     reconnectButton->setEnabled(false);
 }
 
+/*
+ * DB Settings Connections
+ */
 void Config::databaseSettingsChanged()
 {
     f[0]=true;
@@ -285,6 +320,9 @@ void Config::databaseSettingsChanged()
     disconnect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
 }
 
+/*
+ * Enable Reconnect Button
+ */
 void Config::enableReconnectButton()
 {
     if(databasenameLE->text().isEmpty()||hostnameLE->text().isEmpty()|| portLE->text().isEmpty()||usernameLE->text().isEmpty())
@@ -293,35 +331,51 @@ void Config::enableReconnectButton()
         reconnectButton->setEnabled(true);
 }
 
+/* checkConnectivity()
+ * Called : When User Clicks Reconnect Button
+ * Performs : Checks Connectivity
+ */
 void Config::checkConnectivity()
 {
     bool ok;
     {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","config");
-    db.setDatabaseName(databasenameLE->text());
-    db.setPort(portLE->text().toInt());
-    db.setHostName(hostnameLE->text());
-    db.setUserName(usernameLE->text());
-    db.setPassword(passwordLE->text());
-    ok=db.open();
+		QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","config");
+		db.setDatabaseName(databasenameLE->text());
+		db.setPort(portLE->text().toInt());
+		db.setHostName(hostnameLE->text());
+		db.setUserName(usernameLE->text());
+		db.setPassword(passwordLE->text());
+		ok=db.open();
 
-    if(ok)
-        QMessageBox::information(this,"DocmaQ Connection","Connection Successful. <b>" + usernameLE->text() + "</b> is now Connected to <b>" + databasenameLE->text() + "</b> Database.");
-    else
-        QMessageBox::critical(this,"DocmaQ Connection Error", "An Error Occured while Connecting to the Database." +
-                              tr("Please Check the Database details.\n\n") + "MySQL Reports : " + db.lastError().databaseText());
+		if(ok)
+			QMessageBox::information(this,"DocmaQ Connection","Connection Successful. <b>" + usernameLE->text() + "</b> is now Connected to <b>" + databasenameLE->text() + "</b> Database.");
+		else
+			QMessageBox::critical(this,"DocmaQ Connection Error", "An Error Occured while Connecting to the Database." +
+								  tr("Please Check the Database details.\n\n") + "MySQL Reports : " + db.lastError().databaseText());
 
-    db.close();
+		db.close();
+
+                settings->setValue("general/mode",ok);
+		databaseRB->setChecked(ok);
+		manualRB->setChecked(!ok);
     }
     QSqlDatabase::removeDatabase("test");
+
+	f[0] = true;
 }
 
+/*
+ * Set up Account setting
+ */
 void Config::prepareAccountSettings()
 {
     flag[2]=true;
     adminPasswordLE->setFocus();
 }
 
+/*
+ * Password Line Edit Event
+ */
 void Config::on_newPasswordLE_textEdited()
 {
     if (!newPasswordLE->text().isEmpty())
@@ -330,6 +384,10 @@ void Config::on_newPasswordLE_textEdited()
         changeButton->setEnabled(false);
 }
 
+/* on_changeButton_clicked()
+ * Called : When User Clicks Change Button
+ * Performs : Saves Changes to Admin/User Password
+ */
 void Config::on_changeButton_clicked()
 {
     if (newPasswordLE->text()==confirmPasswordLE->text() && !newPasswordLE->text().isEmpty())
@@ -361,17 +419,26 @@ void Config::on_changeButton_clicked()
     }
 }
 
+/*
+ * Preparing Log Settings
+ */
 void Config::prepareLogSettings()
 {
     flag[3]=true;
     adminPasswordLE->setFocus();
 }
 
+/*
+ * Fillup Log Settings Event
+ */
 void Config::fillLogSettings()
 {
     logPathLE->setFocus();
 }
 
+/*
+ * Browse Button Click Event
+ */
 void Config::on_browseButton_clicked()
 {
 
@@ -389,6 +456,10 @@ void Config::on_browseButton_clicked()
     logPathLE->setText(directory);
 }
 
+/* on_backupButton_clicked()
+ * Called : When User Clicks Backup Button
+ * Performs : Bakeup of Log
+ */
 void Config::on_backupButton_clicked()
 {
     if(logPathLE->text().isEmpty())
@@ -449,6 +520,9 @@ void Config::on_backupButton_clicked()
     }
 }
 
+/*
+ * Creating Server File
+ */
 bool Config::createServerFile( QString& filename, QString &path, QString &dir)
 {
     QString localfile=path+filename;
@@ -460,6 +534,10 @@ bool Config::createServerFile( QString& filename, QString &path, QString &dir)
     return true;
 }
 
+/* prepareCertificateSettings()
+ * Called : By selectFunction()
+ * Performs : Sets up the Certificate Settings Tab
+ */
 void Config::prepareCertificateSettings()
 {
     flag[4]=true;
@@ -481,6 +559,10 @@ void Config::prepareCertificateSettings()
     settings->endGroup();
 }
 
+/* decideCert2()
+ * Called : When User Clicks bonafide,Conduct,TC RadioBox
+ * Performs : Sets the Corresponding Certificate Spin Box
+ */
 void Config::decideCert2()
 {
 
@@ -505,13 +587,18 @@ void Config::decideCert2()
     serialSB->setValue(ser[type2]);
 }
 
-
+/*
+ * On Serial Spin Box Editing Completed Event
+ */
 void Config::on_serialSB_editingFinished()
 {
     f[1]=true;
     ser[type2]=serialSB->value();
 }
 
+/*
+ * Setting up Date,Academic Year Flag
+ */
 void Config::setAcademicYearFlag()
 {
     f[2]=true;
@@ -521,6 +608,10 @@ void Config::setAcademicYearFlag()
     disconnect(toSB,0,this,SLOT(setAcademicYearFlag()));
 }
 
+/* prepareGeneralSettings()
+ * Called : By selectFunction()
+ * Performs : Sets up the General Settings Tab
+ */
 void Config::prepareGeneralSettings()
 {
     flag[5]=true;
@@ -561,6 +652,9 @@ void Config::prepareGeneralSettings()
     connect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(setPrinterFlag( const QString&)),Qt::UniqueConnection);
 }
 
+/*
+ * Setting Mode Flag
+ */
 void Config::setModeFlag()
 {
     f[0]=true;
@@ -570,6 +664,9 @@ void Config::setModeFlag()
     disconnect(manualRB,SIGNAL(clicked()),this,SLOT(setModeFlag()));
 }
 
+/*
+ * Setting Printer Flag
+ */
 void Config::setPrinterFlag( const QString &printer)
 {
     f[3]=true;
@@ -578,6 +675,9 @@ void Config::setPrinterFlag( const QString &printer)
     disconnect(printersCombo,SIGNAL(currentIndexChanged( const QString &)),this,SLOT(setPrinterFlag( const QString&)));
 }
 
+/*
+ * Export Button Click Event
+ */
 void Config::on_exportButton_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,tr("Export Settings"), QDir::homePath ()+"/Desktop"+"/DocmaQ Settings.drf", tr("DocmaQ Registration Files (*.drf)"));
@@ -592,6 +692,9 @@ void Config::on_exportButton_clicked()
     QMessageBox::information(this,"DocmaQ Settings","Settings Successfully Exported");
 }
 
+/*
+ * Import Button Click Event
+ */
 void Config::on_importButton_clicked()
 {
     fileName.clear();
@@ -604,6 +707,10 @@ void Config::on_importButton_clicked()
     }
 }
 
+/* saveSettings()
+ * Called : When User Clicks okButton Button
+ * Performs : Saves all Settings
+ */
 void Config::saveSettings()
 {
     QString cert;
@@ -688,6 +795,11 @@ void Config::saveSettings()
         close();
 }
 
+/* savep(QString&, int &)
+ * Called : By saveSettings()
+ * Performs : Saves the Certificate Print Positions into
+ * Windows Registry
+ */
 void Config::savep(QString& cert,int &type)
 {
     if(!pos[type].isEmpty())
@@ -708,5 +820,8 @@ void Config::savep(QString& cert,int &type)
     }
 }
 
+/*
+ * Destructor
+ */
 Config::~Config()
 {}

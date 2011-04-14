@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@
   */
 AppManager::AppManager()
 {
+    // Splash Screen
     splash = new QSplashScreen;
     splash->setPixmap(QPixmap("./images/stpic.png"));
     splash->show();
@@ -102,6 +103,7 @@ void AppManager::load_init_modules()
         settings->setMode(d_mode);
     }
 
+    // Connections in Authen Manager
     connect(ad,SIGNAL(checkuser(QString)),cdb,SLOT(get_user_password(QString)));
     connect(ad,SIGNAL(userAuthenticated(int)),this,SLOT(load_final_modules(int)));
     connect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
@@ -145,10 +147,12 @@ void AppManager::load_final_modules(int admn)
     interface->setSBText(cdb->username,d_mode);
     interface->rbb->setChecked(true);
 
+    // Load Print Manager
     cprinter = new CPrinter(c_sno,dlist);
     cprinter->setPrinter();
     cprinter->st_list = st_plist;
 
+    // Settings
     settings->getPrinter(cprinter->p);
     settings->getPrintPositions(cprinter->blist,0);
     settings->getPrintPositions(cprinter->clist,1);
@@ -193,6 +197,7 @@ void AppManager::load_final_modules(int admn)
     connect(interface->prints->nprint,SIGNAL(released()),cprinter,SLOT(printc()));
     connect(interface,SIGNAL(quit()),this,SLOT(quit()));
 
+    // Shortcuts
     connect(interface->Bsc,SIGNAL(activated()),this,SLOT(b_print()));
     connect(interface->Csc,SIGNAL(activated()),this,SLOT(c_print()));
 
@@ -203,6 +208,7 @@ void AppManager::load_final_modules(int admn)
     connect(bg_ctype,SIGNAL(buttonClicked(int)),this,SLOT(updatetype(int)));
     connect(bg_ptype,SIGNAL(buttonClicked(int)),this,SLOT(update_print_type(int)));
 
+    // Remove Authen Manager Connections
     disconnect(ad,SIGNAL(checkuser(QString)),cdb,SLOT(get_user_password(QString)));
     disconnect(ad,SIGNAL(userAuthenticated(int)),this,SLOT(load_final_modules(int)));
     disconnect(cdb,SIGNAL(user_passwd(QString)),ad,SLOT(authenticate(QString)));
@@ -211,9 +217,9 @@ void AppManager::load_final_modules(int admn)
 }
 
 /* onRollEntry()
- * Called when the user presses "Enter" Key in the rollnole
+ * Called : when the user presses "Enter" Key in the rollnole
  * The Roll Number in the LineEdit is extracted
- * Depending on the Mode, Student Data is Collected
+ * Performs : Depending on the Mode, Student Data is Collected
  */
 void AppManager::onRollEntry()
 {
@@ -232,6 +238,7 @@ void AppManager::onRollEntry()
         cdb->format_tc(tc_student);
         interface->set_tc(tc_student);
 
+        interface->rollDisp->setText("<font color='white'>" + tc_student->roll + "</font>");
         interface->setWindowTitle("DocmaQ : " + tc_student->roll);
         return;
     }
@@ -239,6 +246,7 @@ void AppManager::onRollEntry()
     // Extract Roll Number
     roll =  interface->rollnoLe->text().toUpper();
 
+    // Check for Empty Roll
     if(roll.isEmpty())
     {
         if(interface->btable->rc == 0)
@@ -261,11 +269,13 @@ void AppManager::onRollEntry()
         return;
     }
 
+    // Student Object
     student = new Student;
     student->c_type[0] = c_type[0];
     student->c_type[1] = c_type[1];
     student->roll = roll;
 
+    // Check for Mode, Manual/DB
     if(d_mode)
     {
         // Database Mode
@@ -305,24 +315,27 @@ void AppManager::onRollEntry()
         }
     }
 
-    student->acyear = interface->acyear->toPlainText();
-
     // Append to the print List
     this->st_plist->append(student);
 
     // Set the interface
     interface->set_ct(student);  
 
+    // Set roll in Roll Display
+    interface->rollDisp->setText("<font color='white'>" + student->roll + "</font>");
+
     // Set the Window Title
     interface->setWindowTitle("DocmaQ : " + student->roll);
 }
 
 /* itemchanged(int,const QString)
- * Called by each QGraphicTextItem upon change
+ * Called : by each QGraphicTextItem upon change
  * in its Contents.
+ * Performs : btable enabling/disabling
  */
 void AppManager::itemchanged(int id, const QString &data)
 {
+    // Disable btable when a item is being edited
     if(id < 0 )
     {
         interface->setenabled(false);
@@ -352,9 +365,9 @@ void AppManager::itemchanged(int id, const QString &data)
 }
 
 /* revertDetails(int)
- * Called when User Selects 'Revert Details' option in
+ * Called : when User Selects 'Revert Details' option in
  * the context menu of a roll entry
- * Performs details retrival for changed Roll Number
+ * Performs : details retrival for changed Roll Number
  */
 void AppManager::revertDetails(int r)
 {
@@ -401,8 +414,8 @@ void AppManager::revertDetails(int r)
 
 
 /* btableclicked(int,int)
- * Called when a btable cell is clicked
- * Sets the preview corresponding to the
+ * Called : when a btable cell is clicked
+ * Performs : Sets the preview corresponding to the
  * Roll Number Clicked
  */
 void AppManager::btableclicked(int row,int col)
@@ -424,11 +437,15 @@ void AppManager::btableclicked(int row,int col)
 
     // Set Window Title
     interface->setWindowTitle("DocmaQ : " + student->roll);
+
+    interface->rollDisp->setText("<font color='white'>" + student->roll +"</font>");
 }
 
 /* updatetype(int)
- * Called when user changes the Certificate type
+ * Called : when user changes the Certificate type
  * through checkboxes
+ * Performs : Updates the Certificate type for
+ * the corresponding roll
  */
 void AppManager::updatetype(int i)
 {
@@ -516,8 +533,9 @@ void AppManager::updatetype(int i)
 }
 
 /* removeSt(int)
- * Called by btable when an roll number is deleted
+ * Called : by btable when an roll number is deleted
  * by pressing "delete" key
+ * Performs : Deletes the Roll entry in btable
  */
 void AppManager::removeSt(int i)
 {
@@ -545,6 +563,8 @@ void AppManager::removeSt(int i)
 
         // Window Title
         interface->setWindowTitle("DocmaQ");
+
+        interface->rollDisp->setText("");
         return;
     }
 
@@ -570,14 +590,19 @@ void AppManager::removeSt(int i)
             this->recalculate_csno(j);
     }
 
+    // Set Window Title and Roll Display
     if(interface->btable->rowCount() == 0)
+    {
          interface->setWindowTitle("DocmaQ");
+         interface->rollDisp->setText("");
+    }
 
     rollfocus();
 }
 
 /* rollfocus()
- * Called when the user doubleclicks the rollnolLe
+ * Called : when the user doubleclicks the rollnolLe
+ * Performs :
  */
 void AppManager::rollfocus()
 {
@@ -740,6 +765,7 @@ void AppManager::print()
     init_print(p_type);
 
     interface->setWindowTitle("DocmaQ");
+    interface->rollDisp->setText("");
 }
 
 /* init_print()
@@ -816,6 +842,7 @@ void AppManager::pdfprint()
     cprinter->pdfprint(c_count[0],c_count[1]);
 
     interface->setWindowTitle("DocmaQ");
+    interface->rollDisp->setText("");
 }
 
 /* TC_dissue
@@ -1115,6 +1142,9 @@ void AppManager::TC_mode()
         connect(interface->tprint,SIGNAL(released()),this,SLOT(print()));
         connect(interface->troll,SIGNAL(returnPressed()),this,SLOT(onRollEntry()));
     }
+
+    interface->setWindowTitle("DocmaQ");
+    interface->rollDisp->setText("");
 }
 
 void AppManager::createLogUI()

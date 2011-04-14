@@ -1,5 +1,5 @@
-/* DocmaQ v2.0, Credential Publishing System
-    Copyright (C) 2010 M.Sai Kumar <msk.mymails@gmail.com>
+/*  DocmaQ v2.1, Credential Publishing System
+    Copyright (C) 2011 M.Sai Kumar <msk.mymails@gmail.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -19,8 +19,12 @@
 #include "cdatabase.h"
 #include <QString>
 
+/*
+ * Constructor
+ */
 CDatabase::CDatabase()
 {
+    // Set the Queries
     qp1 = "select student_id from student_admission where student_rollno=";
     qp2 = "select student_name,father_name,gender from student_info where student_id=" ;
     qp3 = "select course,branch_id,current_sem,current_year from student_academic where student_id=" ;
@@ -32,6 +36,10 @@ CDatabase::CDatabase()
     is_connected = false;
 }
 
+/* connect(QStringList)
+ * Called : By AppManager::load_init_modules()
+ * Performs : Opens the DB Connection
+ */
 void CDatabase::connect(QStringList dbinfo)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","docmaq");
@@ -49,6 +57,10 @@ void CDatabase::connect(QStringList dbinfo)
         dbstatus = "    Connected to Database";
 }
 
+/* reconnect(QStringList)
+ * Called : By AppManager::updatevalues()
+ * Performs : Reconnects the DB
+ */
 bool CDatabase::reconnect(QStringList dbdetails)
 {
     if(QSqlDatabase::contains("docmaq"))
@@ -59,7 +71,8 @@ bool CDatabase::reconnect(QStringList dbdetails)
 }
 
 /* bool fetch(Student *)
- * fetches details for Bonafide & Conduct
+ * Called : By AppManager::onRollEntry()
+ * Performs : Fetches details for Bonafide & Conduct
  */
 bool CDatabase::fetch(Student *student)
 {
@@ -101,6 +114,26 @@ bool CDatabase::fetch(Student *student)
         sem = query.value(2).toString();
         year = query.value(3).toString();
 
+        // fetch acaedemic year
+        q = qp5 + student->id;
+        query.exec(q);
+        query.next();
+
+        QString temp;
+        int fyear,tyear = 4;
+
+        if(student->bid >= 10)
+        {
+            if(student->bid == 12 or student->bid == 22)
+                tyear = 3;
+            else
+                tyear = 2;
+        }
+
+        fyear = query.value(0).toDate().year();
+        tyear = fyear + tyear;
+        student->acyear = temp.sprintf("%d - %d",fyear,tyear);
+
         if ( student->course.isEmpty() &&  student->bid == 0 && year.isEmpty() && sem.isEmpty())
             emit report(WARNING , "Few Empty Details in Database for : " + student->roll + ". Please Fill them Manually.");
 
@@ -110,6 +143,10 @@ bool CDatabase::fetch(Student *student)
     return true;
 }
 
+/* bool fetch_ex(Student *)
+ * Called : By AppManager::onRollEntry()
+ * Performs : Fetches Student information from DB for TC
+ */
 bool CDatabase::fetch_ex(Student *student)
 {
     QSqlQuery query(QSqlDatabase::database("docmaq"));
@@ -166,6 +203,10 @@ bool CDatabase::fetch_ex(Student *student)
     return true;
 }
 
+/* int check_duplicate_issue(Student *)
+ * Called : CDatabase::fetch_ex()
+ * Performs : Check if this is a Duplicate Issue
+ */
 int CDatabase::check_duplicate_issue(Student *student)
 {
     QSqlQuery query(QSqlDatabase::database("docmaq"));
@@ -183,6 +224,8 @@ int CDatabase::check_duplicate_issue(Student *student)
 
     query.next();
 
+    // If this is a Duplicate, then fetch Original Issue related
+    // data
     if(!query.value(0).toString().isEmpty())
     {
         QString q = "Select duplicates, org_issued_on, org_issued_by,dup_issued_on, dup_issued_by, remarks from tc_log where student_id=" + student->id;
@@ -206,6 +249,10 @@ int CDatabase::check_duplicate_issue(Student *student)
     return 0;
 }
 
+/* int update_dissue()
+ * Called : By AppManager::TC_dissue()
+ * Performs : Updates DB on Duplicate Issue
+ */
 int CDatabase::update_dissue(Student *student)
 {
     QString q ;
@@ -233,8 +280,9 @@ int CDatabase::update_dissue(Student *student)
 }
 
 /* void log_tc(QStringList)
- * Called after Printing is completed & is logged in the TC Log
- * Record is created when TC is issued for the FIRST TIME
+ * Called : after Printing is completed & is logged in the TC Log
+ * Performs : Record is created when TC is issued for the
+ * FIRST time
  */
 int CDatabase::log_tc(Student *student)
 {
@@ -260,7 +308,8 @@ int CDatabase::log_tc(Student *student)
 }
 
 /* void get_user_password(QString)
- * Called by AuthenDialog to obtain User's Password
+ * Called : By AuthenDialog to obtain User's Password
+ * Performs : Queries the DB for this User's Password
  */
 void CDatabase::get_user_password(QString userid)
 {
@@ -287,6 +336,11 @@ void CDatabase::get_user_password(QString userid)
     emit user_passwd(passwd);
 }
 
+/* format_course()
+ * Called : by AppManager::onRollEntry() after Data is fetched
+ * from Database
+ * Performs : Formats the Course Details
+ */
 void CDatabase::format_course(Student *student)
 {
     int var_yr = year.toInt();
@@ -381,6 +435,10 @@ void CDatabase::format_course(Student *student)
     }
 }
 
+/* format_tc(Student *)
+ * Called : By AppManager::onRollEntry()
+ * Performs : Format TC Details
+ */
 void CDatabase::format_tc(Student *student)
 {
     switch ( student->bid )
@@ -425,6 +483,9 @@ void CDatabase::format_tc(Student *student)
     }
 }
 
+/*
+ * Destructor
+ */
 CDatabase::~CDatabase()
 {
     if(QSqlDatabase::contains("docmaq"))

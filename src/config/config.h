@@ -1,5 +1,5 @@
-/* DocmaQ Configure, Configuration Interface for DocmaQ v2.0
-    Copyright (C) 2010 K.Praneeth <praneethk@in.com>
+/*  DocmaQ Configure, Configuration Interface for DocmaQ v2.1
+    Copyright (C) 2011 K.Praneeth <praneethk@in.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
