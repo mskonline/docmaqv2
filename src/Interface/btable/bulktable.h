@@ -37,6 +37,7 @@ public:
 
 signals :
     void removeSt(int);
+    void b_clearRow();
 
 public slots:
     void editAct();

@@ -16,10 +16,10 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "../Data_Structures/student.h"
 #include "cprinter.h"
 #include <QDate>
 #include <QFileDialog>
-#include "../Data_Structures/student.h"
 
 /*
  * Constructor
@@ -112,8 +112,11 @@ void CPrinter::pdfprint(int bc,int cc)
     if(bc)
         printB();
 
+    stno = st_list->count();
+
     if(cc)
         printC();
+
 
     // Pdf printing End
     pdf = 0;
@@ -214,6 +217,7 @@ void CPrinter::printB()
             delete painter;
         }
     }
+
     st_ptr = 0;
     emit pcomplete(0);
 }
@@ -225,6 +229,7 @@ void CPrinter::printB()
 void CPrinter::printC()
 {
     st_ptr = 0;
+
     for(; st_ptr < stno ; ++st_ptr)
     {
         // Check if Conduct is checked

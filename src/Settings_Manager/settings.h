@@ -44,7 +44,6 @@ private slots:
     void databaseSettingsChanged();
     void checkConnectivity();
     void fillDatabaseSettings();
-    void enableReconnectButton();
 
     //Account page
     void on_newPasswordLE_textEdited();
@@ -77,18 +76,19 @@ private slots:
     void saveSettings();
 
 private:
-    QFile file;
+    GetSettings *getSettings;
+    QFile file,serverfile;
     QList<int>pos[3],x[3],y[3],ser;
     QTextStream out;
-    bool flag[6],f[8],au;
-    GetSettings *getSettings;
     QStringList databaseDetails,fields[3];
-    int type1,type2;//cert1 for print page,cert2 for certificate page
-    QString cert1,cert2,fileName;//similarly type1 these hold current type being dealt in respective pages
-    QFile serverfile;
     QString directory;
     QSettings *settings;
     QList <int> siglist;
+    QString cert1,cert2,fileName;//similarly type1 these hold current type being dealt in respective pages
+    QString ifileName;
+    bool flag[6],f[8],au,do_import;
+    int type1,type2;//cert1 for print page,cert2 for certificate page
+
     enum certificateType{BONAFIDE,CONDUCT,TC};
 
     void prepareDatabaseSettings();

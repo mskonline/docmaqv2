@@ -49,7 +49,7 @@ GetConfig::GetConfig()
 void GetConfig::setupRegistry()
 {
     settings->setValue("installdate",QDateTime::currentDateTime().toString());
-    settings->setValue("version","2.0");
+    settings->setValue("version","2.1");
     settings->setValue("installdir",QDir().absolutePath());
 
     QSettings *settings1=new QSettings(QSettings::SystemScope,"DocmaQ","App");

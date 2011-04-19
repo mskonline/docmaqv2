@@ -44,7 +44,6 @@ private slots:
     void databaseSettingsChanged();
     void checkConnectivity();
     void fillDatabaseSettings();
-    void enableReconnectButton();
 
     //Account page
     void on_newPasswordLE_textEdited();

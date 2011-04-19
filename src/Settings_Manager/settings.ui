@@ -29,7 +29,7 @@
    <string>DocmaQ Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/res.qrc">
+   <iconset resource="../Resources/res.qrc">
     <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
   </property>
   <widget class="QListWidget" name="listWidget">
@@ -159,7 +159,7 @@
      <string>Print</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
     </property>
    </item>
@@ -168,7 +168,7 @@
      <string>Database</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/database-process-icon.png</normaloff>:/Images/database-process-icon.png</iconset>
     </property>
    </item>
@@ -177,7 +177,7 @@
      <string>Account</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/users.png</normaloff>:/Images/users.png</iconset>
     </property>
    </item>
@@ -186,7 +186,7 @@
      <string>Log</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/Note-Book-Icon.png</normaloff>:/Images/Note-Book-Icon.png</iconset>
     </property>
    </item>
@@ -195,7 +195,7 @@
      <string>Certificate</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/field-256.png</normaloff>:/Images/field-256.png</iconset>
     </property>
    </item>
@@ -204,7 +204,7 @@
      <string>General</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/lin_agt_wrench-256.png</normaloff>:/Images/lin_agt_wrench-256.png</iconset>
     </property>
    </item>
@@ -222,7 +222,7 @@
     <string notr="true"/>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="printPage">
     <widget class="QGroupBox" name="printGB">
@@ -410,6 +410,12 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>7</pointsize>
+        <kerning>false</kerning>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">QSpinBox {
      padding-right: 15px; /* make room for the arrows */
@@ -495,6 +501,12 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>7</pointsize>
+        <kerning>false</kerning>
+       </font>
+      </property>
       <property name="styleSheet">
        <string notr="true">QSpinBox {
      padding-right: 15px; /* make room for the arrows */
@@ -576,7 +588,8 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="font">
        <font>
-        <stylestrategy>PreferAntialias</stylestrategy>
+        <pointsize>8</pointsize>
+        <stylestrategy>PreferDefault</stylestrategy>
        </font>
       </property>
       <property name="styleSheet">
@@ -792,7 +805,7 @@ stop: 0 #E0E0E0, stop: 1 #FFFFFF);
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap resource="../resources/res.qrc">:/Images/measuring_tape.png</pixmap>
+       <pixmap resource="../Resources/res.qrc">:/Images/measuring_tape.png</pixmap>
       </property>
      </widget>
     </widget>
@@ -3231,7 +3244,7 @@ p, li { white-space: pre-wrap; }
        <cstring>passwordLE</cstring>
       </property>
      </widget>
-     <widget class="QPushButton" name="reconnectButton">
+     <widget class="QPushButton" name="connectButton">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -3292,7 +3305,7 @@ border-color: navy; /* make the default button prominent */
 }</string>
       </property>
       <property name="text">
-       <string>&amp;Reconnect</string>
+       <string>&amp;Connect</string>
       </property>
       <property name="icon">
        <iconset>
@@ -4648,7 +4661,7 @@ p, li { white-space: pre-wrap; }
       </font>
      </property>
      <property name="title">
-      <string>Log Settings</string>
+      <string>Log Backup</string>
      </property>
      <widget class="QLabel" name="label_3">
       <property name="enabled">
@@ -6236,7 +6249,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>usernameLE</tabstop>
   <tabstop>passwordLE</tabstop>
   <tabstop>cancelButton</tabstop>
-  <tabstop>reconnectButton</tabstop>
+  <tabstop>connectButton</tabstop>
   <tabstop>newPasswordLE</tabstop>
   <tabstop>confirmPasswordLE</tabstop>
   <tabstop>changeButton</tabstop>
@@ -6254,7 +6267,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>databaseGB</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/res.qrc"/>
+  <include location="../Resources/res.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -87,9 +87,9 @@ d_log::d_log()
     sessionFile.setFileName("./logs/session/"+dt+".Log");
 }
 
-/* startSession(const QString&)
- * Called :
- * Performs :
+/* startSession(const QString&,const QString&)
+ * Called : AppManager::load_final_modules(),userchange()
+ * Performs : Starts the Session
  */
 void d_log::startSession(const QString& userid,const QString& username)
 {
@@ -118,9 +118,9 @@ void d_log::startSession(const QString& userid,const QString& username)
     out.setDevice(&file);
 }
 
-/*
- * Called :
- * Performs :
+/* writeCertificateLog(const QString&,const int&)
+ * Called : AppManager::pcomplete(),tc_pcomplete()
+ * Performs : Writes the Log for the printed Certificate
  */
 void d_log::writeCertificateLog(const QString& rollno,const int &c)
 {
@@ -152,14 +152,16 @@ void d_log::writeCertificateLog(const QString& rollno,const int &c)
     file.flush();
 }
 
+/*
+ * Close the Log File
+ */
 void d_log::closelog()
 {
     file.close();
 }
 
 /*
- * Called :
- * Performs :
+ * Open the Log File
  */
 void d_log::openlog()
 {
@@ -168,9 +170,9 @@ void d_log::openlog()
     out.setDevice(&file);
 }
 
-/*
- * Called :
- * Performs :
+/* endSession()
+ * Called : AppManager::quit(),relogin()
+ * Performs : Saves the Current Session
  */
 void d_log::endSession()
 {
@@ -200,9 +202,9 @@ void d_log::endSession()
     delete settings1;
 }
 
-/*
- * Called :
- * Performs :
+/* createlogmanager(QWidget *)
+ * Called : AppManager::createLogUI()
+ * Performs : Creates the Log Manager Interface
  */
 void d_log::createlogmanager(QWidget *parent)
 {

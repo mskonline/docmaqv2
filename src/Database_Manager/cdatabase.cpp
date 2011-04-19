@@ -114,17 +114,17 @@ bool CDatabase::fetch(Student *student)
         sem = query.value(2).toString();
         year = query.value(3).toString();
 
-        // fetch acaedemic year
+        // fetch data of admn
         q = qp5 + student->id;
         query.exec(q);
         query.next();
 
         QString temp;
-        int fyear,tyear = 4;
+        int fyear,tyear = 4,cyear = QDate::currentDate().year();
 
         if(student->bid >= 10)
         {
-            if(student->bid == 12 or student->bid == 22)
+            if(student->bid == 22)
                 tyear = 3;
             else
                 tyear = 2;
@@ -132,6 +132,10 @@ bool CDatabase::fetch(Student *student)
 
         fyear = query.value(0).toDate().year();
         tyear = fyear + tyear;
+
+        if(tyear >= cyear)
+            tyear = cyear;
+
         student->acyear = temp.sprintf("%d - %d",fyear,tyear);
 
         if ( student->course.isEmpty() &&  student->bid == 0 && year.isEmpty() && sem.isEmpty())
@@ -415,7 +419,7 @@ void CDatabase::format_course(Student *student)
     case 22 : student->branch ="";//MCA
         break;
     default : student->branch = "";
-}
+    }
 
     QString temp2 = student->branch;
     temp2 = !temp2.isEmpty() ? " - " + temp2 : "";

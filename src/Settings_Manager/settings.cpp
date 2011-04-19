@@ -62,13 +62,7 @@ Settings::Settings(int user,QSettings *settings,GetSettings* getSettings,QWidget
     connect(usernameLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     connect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
 
-    connect(databasenameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(portLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(hostnameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(usernameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(passwordLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-
-    connect(reconnectButton,SIGNAL(clicked()),this,SLOT(checkConnectivity()));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(checkConnectivity()));
 
     //Certificate page
 
@@ -90,7 +84,6 @@ Settings::Settings(int user,QSettings *settings,GetSettings* getSettings,QWidget
     listWidget->setCurrentRow(laststackwidget,QItemSelectionModel::ToggleCurrent);
 
     connect(stackedWidget,SIGNAL(currentChanged(int)),this,SLOT(selectFunction(int)));
-    selectFunction(laststackwidget);
 
     if(user == 0)
         tcRB2->hide();
@@ -103,6 +96,9 @@ Settings::Settings(int user,QSettings *settings,GetSettings* getSettings,QWidget
         flag[i] = false;
 
     au = false;
+    do_import = false;
+
+    selectFunction(laststackwidget);
 }
 
 /* selectFunction()
@@ -129,12 +125,12 @@ void Settings::selectFunction(int id)
     //flags ensure each functions to be called once
     switch(id)
     {
-    case 0:if(!flag[0])preparePrintSettings();break;
-    case 1:if(!flag[1])prepareDatabaseSettings();break;
-    case 2:if(!flag[2])prepareAccountSettings();break;
-    case 3:if(!flag[3])prepareLogSettings();break;
-    case 4:if(!flag[4])prepareCertificateSettings();break;
-    case 5:if(!flag[5])prepareGeneralSettings();break;
+        case 0:if(!flag[0])preparePrintSettings();break;
+        case 1:if(!flag[1])prepareDatabaseSettings();break;
+        case 2:if(!flag[2])prepareAccountSettings();break;
+        case 3:if(!flag[3])prepareLogSettings();break;
+        case 4:if(!flag[4])prepareCertificateSettings();break;
+        case 5:if(!flag[5])prepareGeneralSettings();break;
     }
 }
 
@@ -298,8 +294,9 @@ void Settings::adminAuthentication()
         changePasswordGB->setEnabled(true);
         logGB->setEnabled(true);
         userCombo->setEnabled(true);
-        //fill interface same as undo for first time
+        connectButton->setEnabled(true);
 
+        //fill interface same as undo for first time
         pLabel->hide();
         pLabel2->hide();
         pLabel3->hide();
@@ -309,14 +306,10 @@ void Settings::adminAuthentication()
 
         au = true;
 
-        if(flag[1])
-        {
-            getSettings->getDatabaseDetails(databaseDetails);
-            fillDatabaseSettings();
-        }
+        getSettings->getDatabaseDetails(databaseDetails);
+        fillDatabaseSettings();
 
-        if(flag[3])
-            fillLogSettings();
+        fillLogSettings();
     }
     else
     {
@@ -335,8 +328,6 @@ void Settings::fillDatabaseSettings()
     portLE->setText(databaseDetails.at(2));
     usernameLE->setText(databaseDetails.at(3));
     passwordLE->setText(databaseDetails.at(4));
-
-    reconnectButton->setEnabled(false);
 }
 
 /*
@@ -352,17 +343,6 @@ void Settings::databaseSettingsChanged()
     disconnect(portLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     disconnect(usernameLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     disconnect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
-}
-
-/*
- * Enable Reconnect Button
- */
-void Settings::enableReconnectButton()
-{
-    if(databasenameLE->text().isEmpty()||hostnameLE->text().isEmpty()|| portLE->text().isEmpty()||usernameLE->text().isEmpty())
-        reconnectButton->setEnabled(false);
-    else
-        reconnectButton->setEnabled(true);
 }
 
 /* checkConnectivity()
@@ -443,7 +423,6 @@ void Settings::on_changeButton_clicked()
             else
             {
                 QMessageBox::information(this,"DocmaQ Password Manager","Password Changed.");
-
             }
         }
     }
@@ -454,7 +433,6 @@ void Settings::on_changeButton_clicked()
         confirmPasswordLE->clear();
         newPasswordLE->setFocus();
     }
-
 }
 
 /*
@@ -736,14 +714,11 @@ void Settings::on_exportButton_clicked()
  */
 void Settings::on_importButton_clicked()
 {
-    fileName.clear();
-    fileName = QFileDialog::getOpenFileName(this,tr("Import Settings"), QDir::homePath ()+"/Desktop", tr("DocmaQ Settings (*.drf)"));
 
-    if (!fileName.isEmpty())
-    {
-        QProcess ::execute("regedit.exe",QStringList()<<"/s"<<fileName);
-        QMessageBox::information(this,"DocmaQ Settings","Settings Successfully Imported");
-    }
+    ifileName = QFileDialog::getOpenFileName(this,tr("Import Settings"), QDir::homePath ()+"/Desktop", tr("DocmaQ Settings (*.drf)"));
+
+    QMessageBox::information(this,"DocmaQ Settings","Settings Successfully Imported");
+    do_import = true;
 }
 
 /* saveSettings()
@@ -756,6 +731,22 @@ void Settings::saveSettings()
     bool z = false,willclose=true;
     int type;
     siglist.clear();
+
+    // Import New Settings
+    if(do_import)
+    {
+        if (!ifileName.isEmpty())
+        {
+            QProcess::execute("regedit.exe",QStringList()<<"/s"<<ifileName);
+
+            preparePrintSettings();
+            prepareGeneralSettings();
+            prepareCertificateSettings();
+
+            siglist << 0 << 1 << 2 << 3 << 4 << 5 << 6;            
+        }
+        do_import = false;
+    }
 
     for(int i=0;i<8;i++)
     {
@@ -879,6 +870,7 @@ void Settings::savep(QString& cert,int &type)
 void Settings::closeEvent(QCloseEvent *e)
 {
     settings->setValue("general/laststackwidget",stackedWidget->currentIndex());
+
     emit sendSignal(siglist);
 }
 

@@ -119,7 +119,8 @@ void BulkTable::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
     {
-    case Qt::Key_Delete : clearRow();
+    case Qt::Key_Delete :
+        emit b_clearRow();
     }
 }
 

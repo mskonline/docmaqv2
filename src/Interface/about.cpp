@@ -63,4 +63,3 @@ About_DocmaQ::About_DocmaQ(QWidget *parent) : QWidget(parent, Qt::Window)
                      tr("email : mola.kiran@gmail.com"));
 
 }
-

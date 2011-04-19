@@ -45,7 +45,7 @@ public:
     QStringList dlist,dblist;
     QString temp;
     int c_type[2],vpic,admn;
-    bool d_mode;
+    bool d_mode,c_text,t_text;
 
     AppManager();
     void load_init_modules();
@@ -101,6 +101,7 @@ public slots:
     void todown();
     void updatevalues(QList <int> &);
     void userchange(int);
+    void b_clearRow();
     void quit();
 };
 

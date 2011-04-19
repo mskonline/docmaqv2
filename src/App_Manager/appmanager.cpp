@@ -17,6 +17,7 @@
 */
 
 #include "appmanager.h"
+#include "thread.h"
 #include "../Database_Manager/cdatabase.h"
 #include "../interface/interface.h"
 #include "../Print_Manager/cprinter.h"
@@ -25,13 +26,9 @@
 #include "../Settings_Manager/getsettings.h"
 #include "../Log_Manager/log.h"
 
-#include "thread.h"
-#include <QDebug>
-
-/* AppManager()
-  *
-  * Constructor
-  */
+/*
+ * Constructor
+ */
 AppManager::AppManager()
 {
     // Splash Screen
@@ -51,6 +48,7 @@ AppManager::AppManager()
     c_type[1] = 0;
     vpic = 0;
     c_mode = p_type =  0;
+    c_text = t_text = false;
 
     admn = 0;
     c_count.append(0);
@@ -171,6 +169,7 @@ void AppManager::load_final_modules(int admn)
     connect(interface->btable,SIGNAL(cellPressed(int,int)),this,SLOT(btableclicked(int,int)));
     connect(interface->btable,SIGNAL(removeSt(int)),this,SLOT(removeSt(int)));
     connect(interface->btable,SIGNAL(cellChanged(int,int)),this,SLOT(revertDetails(int)));
+    connect(interface->btable,SIGNAL(b_clearRow()),this,SLOT(b_clearRow()));
 
     connect(interface->stname,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
     connect(interface->fname,SIGNAL(itemchanged(int ,const QString &)),this,SLOT(itemchanged(int ,const QString &)));
@@ -265,7 +264,7 @@ void AppManager::onRollEntry()
     // Check if roll already exits.
     if(!interface->btable->findItems(roll,Qt::MatchCaseSensitive).isEmpty())
     {
-        interface->report(ERROR,"Roll " + roll + " already exits in Roll Box.");
+        interface->report(ERROR,"Roll " + roll + " already exits.");
         return;
     }
 
@@ -362,6 +361,7 @@ void AppManager::itemchanged(int id, const QString &data)
 
     if(et == 0)
         interface->setenabled(true);
+
 }
 
 /* revertDetails(int)
@@ -373,6 +373,12 @@ void AppManager::revertDetails(int r)
 {
     if(interface->rollnoLe->hasFocus())
         return;
+
+    if(c_text or t_text)
+    {
+        c_text = t_text = false;
+        return;
+    }
 
     // Check if its in DB Mode
     if(d_mode)
@@ -485,6 +491,7 @@ void AppManager::updatetype(int i)
             }
         }
 
+        t_text = true;
         interface->btable->item(st_ptr,1)->setText(btype);
         interface->set_ct(student);
     }
@@ -570,10 +577,10 @@ void AppManager::removeSt(int i)
 
     // Update Counts
     c_count[0] = c_count[0] - st_plist->at(i)->c_type[0];
-   // interface->blcd->display(c_count[0]);
+    interface->blcd->display(c_count[0]);
 
     c_count[1] = c_count[1] - st_plist->at(i)->c_type[1];
-    //interface->clcd->display(c_count[1]);
+    interface->clcd->display(c_count[1]);
 
     int c_type[2];
     c_type[0] = st_plist->at(i)->c_type[0];
@@ -598,6 +605,16 @@ void AppManager::removeSt(int i)
     }
 
     rollfocus();
+}
+
+/*
+ * Check for whether an Roll Entry is
+ * Clicked or not
+ */
+void AppManager::b_clearRow()
+{
+    if(!fg_rollLe)
+        interface->btable->clearRow();
 }
 
 /* rollfocus()
@@ -839,6 +856,7 @@ void AppManager::pdfprint()
     interface->pdfb->setDown(false);
     if(interface->btable->rowCount() == 0)
         return;
+
     cprinter->pdfprint(c_count[0],c_count[1]);
 
     interface->setWindowTitle("DocmaQ");
@@ -913,6 +931,7 @@ void AppManager::pcomplete(int ctype)
                     temp = "B ";
                 else
                     temp = " C";
+                c_text = true;
                 interface->btable->item(j,1)->setText(temp);
             }
 

@@ -4,7 +4,7 @@
 QT += sql
 TARGET = DocmaQ
 TEMPLATE = app
-CONFIG += console
+CONFIG += release
 SOURCES += main.cpp \
     App_Manager/appmanager.cpp \
     Database_Manager/cdatabase.cpp \

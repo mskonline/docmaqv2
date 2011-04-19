@@ -17,7 +17,6 @@
 */
 
 #include "interface.h"
-#include <QDebug>
 
 /*
  * Constructor
@@ -767,7 +766,6 @@ void Interface::set_ct(Student *student)
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[0]));
        else
           sno->setPlainText(temp.sprintf("%04d",student->c_sno[1]));
-
     }
    else
    {
@@ -795,8 +793,8 @@ void Interface::set_ct(Student *student)
 }
 
 /* set_tc(Student *)
- * Called :
- * Performs :
+ * Called : AppManager::onRollEntry()
+ * Performs : Sets the Student Data in the View
  */
 void Interface::set_tc(Student *student)
 {
@@ -866,6 +864,7 @@ void Interface::resetView(int i)
     co->setPlainText("");
     sno->setPlainText("");
     cdetails->setPlainText("");
+    acyear->setPlainText("");
     purpose->setPlainText("");
     show_ct(i);
 }
@@ -890,6 +889,8 @@ void Interface::showTc(bool var)
     rarrow->setVisible(var);
     darrow->setVisible(var);
     uarrow->setVisible(var);
+    up_stp->setVisible(var);
+    rollproxy->setVisible(var);
 
     pic[0]->setVisible(var);
     pic[1]->setVisible(var);
@@ -914,13 +915,6 @@ void Interface::viewresized()
     // re position menu and session buttons
     menu->setPos(CView->mapToScene(CView->viewport()->pos()));
     session->setPos(CView->mapToScene(QPoint(w - 87,0)));
-
-    // re position the arrow buttons
-    /*larrow->setPos(CView->mapToScene(0,mh));
-    rarrow->setPos(CView->mapToScene(w - 21,mh));
-    uarrow->setPos(CView->mapToScene(mw - 145, h - 20));
-    darrow->setPos(CView->mapToScene(mw + 5, h - 20));
-    */
 
     larrow->setPos(CView->mapToScene(x,h-27));
     uarrow->setPos(CView->mapToScene(x + 55,h-27));

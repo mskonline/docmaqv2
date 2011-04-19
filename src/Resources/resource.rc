@@ -19,7 +19,7 @@ IDI_ICON1          ICON           "./images/print.ico"
 //
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 1 VERSIONINFO
-    FILEVERSION     1,0,0,0
+    FILEVERSION     2,0,0,0
     PRODUCTVERSION  2,0,0,0
     FILEOS          VOS__WINDOWS32
     FILETYPE        VFT_UNKNOWN
@@ -28,15 +28,15 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
     {
         BLOCK "04090025"
         {
-            VALUE "Comments", "Qt Based Publishing Application Developed by Praneeth,Sai Kumar,Kiran. Batch:2006-10"
+            VALUE "Comments", "Credential Publishing Application"
             VALUE "CompanyName", ""
             VALUE "FileDescription", "Credential Publishing"
-            VALUE "FileVersion", "2.0"
+            VALUE "FileVersion", "2.1"
             VALUE "InternalName", "Credential Publishing System"
-            VALUE "LegalCopyright", "Copyright (C) 2010 "
+            VALUE "LegalCopyright", "Copyright (C) 2011 "
             VALUE "OriginalFilename", "DocmaQ.exe"
             VALUE "ProductName", "Credential Publishing Application for SNIST"
-            VALUE "ProductVersion", "2.0"
+            VALUE "ProductVersion", "2.1"
         }
     }
     BLOCK "VarFileInfo"

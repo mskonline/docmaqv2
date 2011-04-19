@@ -39,7 +39,7 @@ Config::Config(QSettings *settings,GetConfig* getConfig,QWidget *parent)
     QSize s = dw->screen(dw->primaryScreen())->size();
     setupUi(this);
 
-    this->getConfig=getConfig;
+    this->getConfig = getConfig;
     this->settings = settings;
 
     move(s.width() / 2 - 235, s.height()/ 2 - 241) ;
@@ -63,13 +63,7 @@ Config::Config(QSettings *settings,GetConfig* getConfig,QWidget *parent)
     connect(usernameLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     connect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
 
-    connect(databasenameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(portLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(hostnameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(usernameLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-    connect(passwordLE,SIGNAL(textEdited(const QString &)),this,SLOT(enableReconnectButton()));
-
-    connect(reconnectButton,SIGNAL(clicked()),this,SLOT(checkConnectivity()));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(checkConnectivity()));
 
     //Certificate page
     connect(bonafideRB2,SIGNAL(clicked()),this,SLOT(decideCert2()));
@@ -96,8 +90,6 @@ Config::Config(QSettings *settings,GetConfig* getConfig,QWidget *parent)
 
     preparePrintSettings();
     adminPasswordLE->setFocus();
-
-    delete dw;
 }
 
 /* selectFunction()
@@ -274,14 +266,10 @@ void Config::adminAuthentication()
         puLabel->hide();
         adminPasswordLE->hide();
 
-        if(flag[1])
-        {
-            getConfig->getDatabaseDetails(databaseDetails);
-            fillDatabaseSettings();
-        }
 
-        if(flag[3])
-            fillLogSettings();
+        getConfig->getDatabaseDetails(databaseDetails);
+        fillDatabaseSettings();
+        fillLogSettings();
     }
     else
     {
@@ -300,8 +288,6 @@ void Config::fillDatabaseSettings()
     portLE->setText(databaseDetails.at(2));
     usernameLE->setText(databaseDetails.at(3));
     passwordLE->setText(databaseDetails.at(4));
-
-    reconnectButton->setEnabled(false);
 }
 
 /*
@@ -318,17 +304,6 @@ void Config::databaseSettingsChanged()
     disconnect(portLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     disconnect(usernameLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
     disconnect(passwordLE,SIGNAL(editingFinished()),this,SLOT(databaseSettingsChanged()));
-}
-
-/*
- * Enable Reconnect Button
- */
-void Config::enableReconnectButton()
-{
-    if(databasenameLE->text().isEmpty()||hostnameLE->text().isEmpty()|| portLE->text().isEmpty()||usernameLE->text().isEmpty())
-        reconnectButton->setEnabled(false);
-    else
-        reconnectButton->setEnabled(true);
 }
 
 /* checkConnectivity()
