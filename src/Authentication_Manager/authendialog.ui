@@ -38,7 +38,7 @@
    <string>DocmaQ Login</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/res.qrc">
+   <iconset resource="../Resources/res.qrc">
     <normaloff>:/Images/printer.png</normaloff>:/Images/printer.png</iconset>
   </property>
   <property name="autoFillBackground">
@@ -211,7 +211,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <string>Login</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/users.png</normaloff>:/Images/users.png</iconset>
     </property>
    </item>
@@ -220,7 +220,7 @@ stop: 0 #E7E7FF, stop: 1 #DCDCDC);
      <string>About</string>
     </property>
     <property name="icon">
-     <iconset resource="../resources/res.qrc">
+     <iconset resource="../Resources/res.qrc">
       <normaloff>:/Images/docmaq.png</normaloff>:/Images/docmaq.png</iconset>
     </property>
    </item>
@@ -953,7 +953,7 @@ min-width: 80px;
       <bool>false</bool>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -973,6 +973,9 @@ min-width: 80px;
      </property>
      <property name="text">
       <string>Details</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -1102,7 +1105,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>loginButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/res.qrc"/>
+  <include location="../Resources/res.qrc"/>
  </resources>
  <connections>
   <connection>

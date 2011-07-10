@@ -37,7 +37,10 @@ AuthenDialog::AuthenDialog(bool mode,bool con, QString dbstatus,QDialog* parent)
             details->hide();
         }
         else
-            connectionLabel->setText("    Connection with Database failed");
+        {
+            connectionLabel->setText("Connection with DB failed. In Manual Mode");
+            mode = false;
+        }
     }
     else
     {

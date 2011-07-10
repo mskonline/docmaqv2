@@ -54,7 +54,7 @@ void CDatabase::connect(QStringList dbinfo)
     if(db.lastError().isValid())
         dbstatus = db.lastError().databaseText();
     else
-        dbstatus = "    Connected to Database";
+        dbstatus = "                            Connected to Database";
 }
 
 /* reconnect(QStringList)

@@ -5053,9 +5053,6 @@ p, li { white-space: pre-wrap; }
       </property>
      </widget>
      <widget class="QSpinBox" name="serialSB">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
       <property name="geometry">
        <rect>
         <x>196</x>
