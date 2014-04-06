@@ -55,6 +55,26 @@ void CDatabase::connect(QStringList dbinfo)
         dbstatus = db.lastError().databaseText();
     else
         dbstatus = "                            Connected to Database";
+
+    if(is_connected)
+    {
+        QSettings settings("./Configurations.ini", QSettings::IniFormat);
+        settings.beginGroup("Bonafide");
+        int total = settings.value("total").toInt() + 1;
+
+        for (int i = 1; i < total; ++i)
+            bonafide_branchMap.insert(i,settings.value(QString::number(i)).toString());
+
+        settings.endGroup();
+
+        settings.beginGroup("TC");
+        total = settings.value("total").toInt() + 1;
+
+        for (int i = 1; i < total; ++i)
+            TC_branchMap.insert(i,settings.value(QString::number(i)).toString());
+
+        settings.endGroup();
+    }
 }
 
 /* reconnect(QStringList)
@@ -380,46 +400,7 @@ void CDatabase::format_course(Student *student)
     }
 
     // Branch
-    switch ( student->bid )
-    {
-    case 1 : student->branch ="EEE";
-        break;
-    case 2 : student->branch ="CSE";
-        break;
-    case 3 : student->branch ="ECE";
-        break;
-    case 4 : student->branch ="IT";
-        break;
-    case 5 : student->branch ="Mech";
-        break;
-    case 6 : student->branch ="Bio - Tech";
-        break;
-    case 9 : student->branch ="ECM";
-        break;
-    case 10 : student->branch ="S & H";
-        break;
-    case 12 : student->branch ="";//MBA
-        break;
-    case 13 : student->branch ="AM";
-        break;
-    case 14 : student->branch ="EET";
-        break;
-    case 15 : student->branch ="EPE";
-        break;
-    case 16 : student->branch ="DSCE";
-        break;
-    case 17 : student->branch ="VLSI";
-        break;
-    case 19 : student->branch ="SE";
-        break;
-    case 20 : student->branch ="CAD - CAM";
-        break;
-    case 21 : student->branch ="Bio-Tech";
-        break;
-    case 22 : student->branch ="";//MCA
-        break;
-    default : student->branch = "";
-    }
+    student->branch = bonafide_branchMap.value(student->bid);
 
     QString temp2 = student->branch;
     temp2 = !temp2.isEmpty() ? " - " + temp2 : "";
@@ -445,46 +426,7 @@ void CDatabase::format_course(Student *student)
  */
 void CDatabase::format_tc(Student *student)
 {
-    switch ( student->bid )
-    {
-    case 1 : student->branch ="Electricals and Electronics Engineering";
-        break;
-    case 2 : student->branch ="Computer Science and Engineering";
-        break;
-    case 3 : student->branch ="Electronics and Communication Engineering";
-        break;
-    case 4 : student->branch ="Information Technology";
-        break;
-    case 5 : student->branch ="Mechanical Engineering";
-        break;
-    case 6 : student->branch ="Bio Tech Engineering";
-        break;
-    case 9 : student->branch ="Electronics and Computer Engineering";
-        break;
-    case 10 : student->branch ="Science & Humanities";
-        break;
-    case 12 : student->branch ="Master of Business Adminstration";//MBA
-        break;
-    case 13 : student->branch ="Airline Management";
-        break;
-    case 14 : student->branch ="Electronic Engineering Technology";
-        break;
-    case 15 : student->branch ="Electrical and Power Engineering";
-        break;
-    case 16 : student->branch ="Digital Systems and Computer Electronics";
-        break;
-    case 17 : student->branch ="VLSI and Embedded Systems";
-        break;
-    case 19 : student->branch ="Software Engineering";
-        break;
-    case 20 : student->branch ="CAD - CAM";
-        break;
-    case 21 : student->branch ="Bio Tech Engineering";
-        break;
-    case 22 : student->branch ="Master of Computer Application";//MCA
-        break;
-    default : student->branch = "";
-    }
+    student->branch = TC_branchMap.value(student->bid);
 }
 
 /*

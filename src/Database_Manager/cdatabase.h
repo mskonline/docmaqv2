@@ -51,6 +51,8 @@ public:
 private:
     Student *student;
     int cmode;
+    QMap<int, QString> bonafide_branchMap;
+    QMap<int, QString> TC_branchMap;
 
 signals:
     void user_passwd(QString);
