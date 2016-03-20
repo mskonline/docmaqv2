@@ -15,6 +15,7 @@ DocmaQ provides the following features :-
 - Credential Log Managing and Accountabality 
 - Various Preferences and Settings 
 - Quicker and Easier Navigation 
+
 Current Version :- 2.1
 
 DocmaQ is exclusively developed to meet the Requirements of SNIST
