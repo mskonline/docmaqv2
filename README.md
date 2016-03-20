@@ -18,6 +18,7 @@ DocmaQ provides the following features :-
 Current Version :- 2.1
 
 DocmaQ is exclusively developed to meet the Requirements of SNIST
+
 Developers :-
 
 - Sai Kumar Manakan
